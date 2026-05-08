@@ -1,0 +1,79 @@
+:root {
+  --bg: #0a0a12;
+  --accent: #33ffff;
+  --text: #eef;
+  --card: #12121c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header,
+footer {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(51, 255, 255, 0.25);
+}
+
+footer {
+  border-top: 1px solid rgba(51, 255, 255, 0.25);
+  border-bottom: none;
+  margin-top: auto;
+}
+
+.subtitle {
+  opacity: 0.75;
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+}
+
+main {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  max-width: 720px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid rgba(51, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+}
+
+dt {
+  opacity: 0.65;
+}
+
+ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+li {
+  margin: 0.35rem 0;
+}
