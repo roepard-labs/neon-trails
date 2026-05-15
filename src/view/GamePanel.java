@@ -4,10 +4,12 @@ import events.InputController;
 import events.KeyboardBindings;
 import logic.DiscProjectile;
 import logic.GameConstants;
+import logic.GameSession;
 import logic.GameState;
 import logic.Player;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,17 +18,26 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.List;
+import java.util.function.IntConsumer;
 
 /**
  * Panel principal: entrada, simulación y renderizado.
+ * <p>
+ * NOTE: A diferencia de versiones anteriores, este panel NO arranca el hilo de juego al adjuntarse.
+ * La pantalla contenedora ({@code GameScreen}) decide cuándo iniciar y detener el bucle, para que el
+ * ciclo de vida del hilo encaje con el {@link java.awt.CardLayout} (que oculta paneles en vez de
+ * desmontarlos).
  */
 public class GamePanel extends JPanel {
 
     private final Object stateLock = new Object();
     private final InputController input = new InputController();
     private final GameState gameState;
+    private GameSession session;
     private GameLoop gameLoop;
     private Thread loopThread;
+    private IntConsumer onGameOver;
+    private boolean gameOverFired;
 
     public GamePanel() {
         setBackground(new Color(0x0a, 0x0a, 0x12));
@@ -36,23 +47,64 @@ public class GamePanel extends JPanel {
         KeyboardBindings.install(this, input);
     }
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        requestFocusInWindow();
-        if (loopThread == null || !loopThread.isAlive()) {
-            this.gameLoop = new GameLoop(this);
-            loopThread = new Thread(gameLoop, "neon-trails-game-loop");
-            loopThread.setDaemon(true);
-            loopThread.start();
+    /**
+     * Asocia la sesión activa para que el HUD muestre los nombres correctos.
+     */
+    public void setSession(GameSession session) {
+        this.session = session;
+    }
+
+    /**
+     * Registra el callback que se dispara una vez cuando un jugador llega a 0 vidas.
+     *
+     * @param onGameOver recibe el id (1 o 2) del jugador ganador
+     */
+    public void setOnGameOver(IntConsumer onGameOver) {
+        this.onGameOver = onGameOver;
+    }
+
+    /**
+     * Reinicia el estado del juego para una nueva partida.
+     */
+    public void resetGame() {
+        synchronized (stateLock) {
+            gameState.reset();
+        }
+        gameOverFired = false;
+        repaint();
+    }
+
+    /**
+     * Arranca el bucle de simulación en un hilo dedicado. Idempotente.
+     */
+    public void startLoop() {
+        if (loopThread != null && loopThread.isAlive()) {
+            return;
+        }
+        this.gameLoop = new GameLoop(this);
+        loopThread = new Thread(gameLoop, "neon-trails-game-loop");
+        loopThread.setDaemon(true);
+        loopThread.start();
+    }
+
+    /**
+     * Solicita la detención del bucle. No bloquea.
+     */
+    public void stopLoop() {
+        if (gameLoop != null) {
+            gameLoop.stop();
         }
     }
 
     @Override
+    public void addNotify() {
+        super.addNotify();
+        requestFocusInWindow();
+    }
+
+    @Override
     public void removeNotify() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
+        stopLoop();
         super.removeNotify();
     }
 
@@ -62,10 +114,22 @@ public class GamePanel extends JPanel {
     public void stepSimulation() {
         int w = Math.max(getWidth(), GameConstants.DEFAULT_WIDTH / 4);
         int h = Math.max(getHeight(), GameConstants.DEFAULT_HEIGHT / 4);
+        boolean justFinished;
+        int winnerId;
         synchronized (stateLock) {
             gameState.tick(input, w, h);
+            justFinished = gameState.isFinished() && !gameOverFired;
+            winnerId = gameState.getWinnerId();
+            if (justFinished) {
+                gameOverFired = true;
+            }
         }
         repaint();
+        if (justFinished && onGameOver != null) {
+            // NOTE: notificar en EDT; la pantalla cambiará de card y debe correr en Swing.
+            IntConsumer cb = onGameOver;
+            SwingUtilities.invokeLater(() -> cb.accept(winnerId));
+        }
     }
 
     @Override
@@ -80,11 +144,18 @@ public class GamePanel extends JPanel {
         drawBorder(g2, w, h);
         synchronized (stateLock) {
             drawDiscs(g2, gameState.getDiscs());
-            drawPlayer(g2, gameState.getPlayerOne(), "P1");
-            drawPlayer(g2, gameState.getPlayerTwo(), "P2");
+            drawPlayer(g2, gameState.getPlayerOne(), labelFor(1));
+            drawPlayer(g2, gameState.getPlayerTwo(), labelFor(2));
             drawHud(g2, w, h);
         }
         g2.dispose();
+    }
+
+    private String labelFor(int id) {
+        if (session == null) {
+            return id == 1 ? "P1" : "P2";
+        }
+        return id == 1 ? session.getPlayerOneName() : session.getPlayerTwoName();
     }
 
     private static void drawBorder(Graphics2D g2, int w, int h) {
@@ -105,7 +176,7 @@ public class GamePanel extends JPanel {
         g2.fillRoundRect(px, py, GameConstants.PLAYER_SIZE, GameConstants.PLAYER_SIZE, 8, 8);
         g2.setColor(Color.WHITE);
         g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
-        g2.drawString(label, px + 3, py + 15);
+        g2.drawString(label, px + 3, py - 4);
     }
 
     private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
@@ -123,10 +194,20 @@ public class GamePanel extends JPanel {
         g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
         Player p1 = gameState.getPlayerOne();
         Player p2 = gameState.getPlayerTwo();
-        g2.drawString("P1 puntos: " + p1.getScore() + (p1.isOnBike() ? "  [MOTO]" : ""), 12, 22);
-        g2.drawString("P2 puntos: " + p2.getScore() + (p2.isOnBike() ? "  [MOTO]" : ""), 12, 40);
+        g2.drawString(labelFor(1) + "  " + hearts(p1.getLives()) + (p1.isOnBike() ? "  [MOTO]" : ""), 12, 22);
+        g2.drawString(labelFor(2) + "  " + hearts(p2.getLives()) + (p2.isOnBike() ? "  [MOTO]" : ""), 12, 40);
         g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         String help = "P1: WASD | disco: Shift | moto 5s: Q   —   P2: flechas | disco: Enter | moto 5s: U";
         g2.drawString(help, 12, h - 12);
+    }
+
+    /** Representación visual de vidas como serie de corazones llenos / vacíos. */
+    private static String hearts(int lives) {
+        int total = Player.INITIAL_LIVES;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < total; i++) {
+            sb.append(i < lives ? '♥' : '♡');
+        }
+        return sb.toString();
     }
 }

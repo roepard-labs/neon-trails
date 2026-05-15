@@ -21,6 +21,10 @@ public class GameState {
     /** Último tamaño conocido del mundo (para respawns tras un golpe). */
     private int lastWorldWidth = GameConstants.DEFAULT_WIDTH;
     private int lastWorldHeight = GameConstants.DEFAULT_HEIGHT;
+    /** Bandera de fin de partida: cierra la simulación cuando un jugador llega a 0 vidas. */
+    private boolean finished;
+    /** Identificador del ganador (1 o 2); 0 mientras la partida sigue. */
+    private int winnerId;
 
     /**
      * Crea estado inicial con posiciones de spawn en esquinas opuestas.
@@ -43,6 +47,26 @@ public class GameState {
         return discs;
     }
 
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public int getWinnerId() {
+        return winnerId;
+    }
+
+    /**
+     * Restablece el estado para una nueva partida: vidas, posiciones y discos.
+     */
+    public void reset() {
+        playerOne.resetForNewGame();
+        playerTwo.resetForNewGame();
+        discs.clear();
+        finished = false;
+        winnerId = 0;
+        respawnPlayersAfterHit();
+    }
+
     /**
      * Avanza un tick de simulación.
      *
@@ -53,6 +77,10 @@ public class GameState {
     public void tick(InputController input, int width, int height) {
         this.lastWorldWidth = width;
         this.lastWorldHeight = height;
+        if (finished) {
+            // NOTE: La pantalla decide cuándo limpiar; aquí solo no avanzamos más simulación.
+            return;
+        }
         applyMovementInput(input);
         playerOne.moveWithinBounds(width, height);
         playerTwo.moveWithinBounds(width, height);
@@ -172,16 +200,28 @@ public class GameState {
             if (hitsPlayer(d, playerOne)) {
                 if (!(d.getOwnerId() == 1 && d.isFriendlyToOwner())) {
                     playerTwo.addScore(1);
-                    respawnPlayersAfterHit();
+                    playerOne.loseLife();
                     it.remove();
+                    if (playerOne.isDead()) {
+                        finished = true;
+                        winnerId = 2;
+                    } else {
+                        respawnPlayersAfterHit();
+                    }
                     return;
                 }
             }
             if (hitsPlayer(d, playerTwo)) {
                 if (!(d.getOwnerId() == 2 && d.isFriendlyToOwner())) {
                     playerOne.addScore(1);
-                    respawnPlayersAfterHit();
+                    playerTwo.loseLife();
                     it.remove();
+                    if (playerTwo.isDead()) {
+                        finished = true;
+                        winnerId = 1;
+                    } else {
+                        respawnPlayersAfterHit();
+                    }
                     return;
                 }
             }

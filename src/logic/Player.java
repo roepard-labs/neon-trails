@@ -7,6 +7,9 @@ import java.awt.Color;
  */
 public class Player {
 
+    /** Vidas iniciales por partida (requisito: condición de victoria por agotamiento de vidas). */
+    public static final int INITIAL_LIVES = 3;
+
     private final int id;
     private final Color color;
     private double x;
@@ -21,6 +24,7 @@ public class Player {
     /** Fin del modo moto en nanosegundos desde {@link System#nanoTime()}. */
     private long bikeUntilNanos;
     private int score;
+    private int lives = INITIAL_LIVES;
 
     /**
      * @param id identificador 1 o 2
@@ -116,6 +120,33 @@ public class Player {
 
     public void addScore(int delta) {
         this.score += delta;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    /** Resta una vida; nunca baja de cero. */
+    public void loseLife() {
+        if (lives > 0) {
+            lives--;
+        }
+    }
+
+    public boolean isDead() {
+        return lives <= 0;
+    }
+
+    /**
+     * Restablece vidas, score y enfriamiento para iniciar una nueva partida.
+     */
+    public void resetForNewGame() {
+        this.lives = INITIAL_LIVES;
+        this.score = 0;
+        this.fireCooldownTicks = 0;
+        this.bikeUntilNanos = 0L;
+        this.moveX = 0;
+        this.moveY = 0;
     }
 
     /**

@@ -23,7 +23,8 @@ La entrega debe alinearse con [**docs/rules/Proyecto Técnicas de Programación.
 | Lógica | [`src/logic/`](src/logic/) | Estado, entidades, reglas, constantes. Sin dependencias de Swing si es posible. |
 | Vista | [`src/view/`](src/view/) | Ventana, panel, bucle en **hilo** + repintado. |
 | Eventos | [`src/events/`](src/events/) | Entrada: *Key Bindings* (`InputMap`/`ActionMap`), no `KeyListener` salvo justificación. |
-| Recursos gráficos (actual) | [`src/assets/images/`](src/assets/images/) | Sprites / fondos; si se unifica con el PDF, valorar `src/resources/` y un cargador único. |
+| Recursos gráficos | [`src/resources/images/`](src/resources/images/) | Sprites / fondos; cargar con `getClass().getResourceAsStream("/images/...")` cuando se enchufen. |
+| Pantallas | [`src/view/screens/`](src/view/screens/) | Subclases de `BaseScreen` (Welcome, NameInput, Game, GameOver). Coordina `ScreenManager`. |
 | Documentación | [`docs/`](docs/) | Arquitectura, pruebas, reglas. |
 | Web stub | [`web/`](web/) | Mock de ranking / demo de UI estática. |
 
