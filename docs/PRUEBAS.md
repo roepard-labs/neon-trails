@@ -4,8 +4,8 @@ Marca cada ítem al validar manualmente en tu máquina.
 
 ## Arranque
 
-- [ ] `javac` compila todos los `.java` sin errores.
-- [ ] Al ejecutar `Main`, aparece la ventana con borde cian y dos jugadores.
+- [ ] `make verify` pasa (compila + tests JUnit + package) sin errores.
+- [ ] `make run` levanta la ventana con borde cian y los dos jugadores.
 
 ## Controles simultáneos
 
@@ -19,10 +19,15 @@ Marca cada ítem al validar manualmente en tu máquina.
 - [ ] **P2** con **U** entra en modo moto igual.
 - [ ] Tras ~5 s el modo moto termina solo (sin reiniciar la partida).
 
-## Discos y bordes
+## Discos: rebote, límite y recuperación
 
-- [ ] Los discos se mueven y desaparecen al tocar el borde del panel.
-- [ ] Un impacto válido suma punto al oponente y reposiciona jugadores; limpia discos.
+- [ ] Cada disparo rebota en bordes laterales (P1 apunta a una pared lateral con Shift; el disco vuelve sin desaparecer).
+- [ ] Cada disparo rebota en bordes superior/inferior (mismo test, apuntando hacia arriba/abajo).
+- [ ] Tras **3 rebotes** el disco queda quieto pegado a la pared y se tinta del color del dueño con anillo blanco.
+- [ ] **1 disco por jugador**: con un disco en juego (moviéndose o quieto), volver a presionar `Shift`/`Enter` no genera un segundo disco.
+- [ ] **Pickup del dueño**: P1 deja su disco quieto y camina sobre él → el disco desaparece y P1 puede disparar inmediatamente (sin esperar cooldown).
+- [ ] **Enemigo atraviesa**: P1 deja su disco quieto y P2 camina sobre él → no pasa nada (sin daño, sin colisión sólida).
+- [ ] **Hit con disco en movimiento**: sigue restando vida, suma punto al oponente, reposiciona jugadores y limpia todos los discos.
 
 ## Web stub
 
