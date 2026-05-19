@@ -34,7 +34,7 @@ Este Código de Conducta aplica tanto dentro de los espacios del proyecto como e
 
 ## Cumplimiento
 
-Los casos de comportamiento abusivo, acosador o inaceptable pueden ser reportados contactando a las personas mantenedoras del proyecto a través de [issues en GitHub](https://github.com/jemgdevp/neon-trails/issues). Todas las quejas serán revisadas e investigadas y resultarán en una respuesta que se considere necesaria y apropiada a las circunstancias.
+Los casos de comportamiento abusivo, acosador o inaceptable pueden ser reportados contactando a las personas mantenedoras del proyecto a través de [issues en GitHub](https://github.com/roepard-labs/neon-trails/issues). Todas las quejas serán revisadas e investigadas y resultarán en una respuesta que se considere necesaria y apropiada a las circunstancias.
 
 Las personas mantenedoras están obligadas a mantener la confidencialidad respecto a quien reporta un incidente.
 

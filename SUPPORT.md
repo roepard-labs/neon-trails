@@ -22,9 +22,9 @@
 
 ### Reportar bugs
 
-Usa la [plantilla de Bug Report](https://github.com/jemgdevp/neon-trails/issues/new?template=bug_report.md) en GitHub Issues.
+Usa la [plantilla de Bug Report](https://github.com/roepard-labs/neon-trails/issues/new?template=bug_report.md) en GitHub Issues.
 
 ### Contacto
 
 - **Email**: [murksopps@gmail.com](mailto:murksopps@gmail.com)
-- **Issues**: [github.com/jemgdevp/neon-trails/issues](https://github.com/jemgdevp/neon-trails/issues)
+- **Issues**: [github.com/roepard-labs/neon-trails/issues](https://github.com/roepard-labs/neon-trails/issues)

@@ -17,7 +17,7 @@ Antes de contribuir, lee [**docs/rules/Proyecto Técnicas de Programación.pdf**
 
 ### Reportar bugs
 
-1. Revisa que el bug no haya sido reportado ya en [Issues](https://github.com/jemgdevp/neon-trails/issues).
+1. Revisa que el bug no haya sido reportado ya en [Issues](https://github.com/roepard-labs/neon-trails/issues).
 2. Usa la plantilla de **Bug Report** para crear un issue.
 3. Incluye pasos para reproducir, comportamiento esperado vs. real, y capturas si aplica.
 
@@ -55,7 +55,7 @@ test: añadir o modificar tests
 
 ```bash
 # Requisitos: JDK 17 + Maven
-git clone https://github.com/jemgdevp/neon-trails.git
+git clone https://github.com/roepard-labs/neon-trails.git
 cd neon-trails
 make compile
 make run

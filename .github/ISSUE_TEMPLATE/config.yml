@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Preguntas o ayuda
-    url: https://github.com/jemgdevp/neon-trails/discussions
+    url: https://github.com/roepard-labs/neon-trails/discussions
     about: ¿Tienes una duda? Pregunta en Discussions
   - name: Documentación del proyecto
-    url: https://github.com/jemgdevp/neon-trails/tree/master/docs
+    url: https://github.com/roepard-labs/neon-trails/tree/main/docs
     about: Revisa la documentación antes de abrir un issue
