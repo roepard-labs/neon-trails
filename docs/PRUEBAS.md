@@ -4,8 +4,8 @@ Marca cada ítem al validar manualmente en tu máquina.
 
 ## Arranque
 
-- [ ] `javac` compila todos los `.java` sin errores.
-- [ ] Al ejecutar `Main`, aparece la ventana con borde cian y dos jugadores.
+- [ ] `make verify` pasa (compila + tests JUnit + package) sin errores.
+- [ ] `make run` levanta la ventana con borde cian y los dos jugadores.
 
 ## Controles simultáneos
 

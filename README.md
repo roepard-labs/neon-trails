@@ -4,11 +4,15 @@ Juego tipo arena (inspiración *Tron*) en **Java Swing**: dos jugadores locales,
 
 ## Ejecutar (consola)
 
+Requiere **JDK 17** y **Maven**. Desde la raíz:
+
 ```bash
-mkdir -p out
-javac -d out $(find src -name '*.java')
-java -cp out Main
+make run        # mvn exec:java  (arranca el juego)
+make test       # mvn test       (JUnit 5)
+make verify     # mvn -B verify  (compila + tests + jar)
 ```
+
+El `Makefile` es un wrapper sobre `mvn`; ver `make help` para todos los targets.
 
 ## Controles
 

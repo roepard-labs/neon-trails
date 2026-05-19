@@ -6,9 +6,9 @@ Este documento describe la organización mínima del proyecto según el PDF de *
 
 | Paquete | Carpeta | Responsabilidad |
 |---------|---------|-----------------|
-| `logic` | `src/logic/` | Estado del juego, entidades (`Player`, `DiscProjectile`), reglas de colisión y actualización por tick. |
-| `view` | `src/view/` | Ventana Swing (`JFrame`), panel de dibujo (`JPanel`), bucle que dispara repintado en el hilo de UI. |
-| `events` | `src/events/` | Entrada de teclado con *Key Bindings* (evita problemas de foco frente a `KeyListener`). |
+| `logic` | `src/main/java/logic/` | Estado del juego, entidades (`Player`, `DiscProjectile`), reglas de colisión y actualización por tick. |
+| `view` | `src/main/java/view/` | Ventana Swing (`JFrame`), panel de dibujo (`JPanel`), bucle que dispara repintado en el hilo de UI. |
+| `events` | `src/main/java/events/` | Entrada de teclado con *Key Bindings* (evita problemas de foco frente a `KeyListener`). |
 
 ## Flujo de ejecución
 

@@ -10,34 +10,37 @@ The `web/` directory is a static HTML/CSS/JS leaderboard mock. It does **not** t
 
 ## Build and run
 
-No Maven/Gradle/npm. Plain `javac` from the repo root, classpath `out/`, entry point `Main` (default package).
+Build system: **Maven** (`pom.xml` at repo root). Java 17 LTS. Entry point `Main` (default package). The `Makefile` is a thin wrapper over `mvn`.
 
 ```bash
-# Compile every .java in src into out/
-mkdir -p out
-javac -d out $(find src -name '*.java')
-
-# Run the game
-java -cp out Main
+make compile   # mvn compile
+make run       # mvn exec:java  (arranca el juego)
+make test      # mvn test
+make package   # mvn package    (jar en target/)
+make verify    # mvn -B verify  (paridad con CI)
+make clean     # mvn clean
 ```
 
 Web stub: open `web/index.html` directly in a browser. `app.js` falls back to embedded mock data if `fetch` is blocked under `file://`.
 
 ## Tests
 
-No automated test framework is configured. `tests/unit/` exists but is empty. Validation is manual — work through the checklist in `docs/PRUEBAS.md` before declaring a feature done. If you add JUnit, put sources under `tests/unit/` and document the runner here; do not drop ad-hoc test files into `src/`.
+JUnit 5 (Jupiter) corre vía Surefire. Tests viven en `src/test/java/` siguiendo el layout estándar Maven. La cobertura actual se limita a la capa pura `logic/` (`PlayerTest`, `DiscProjectileTest`, `GameConstantsTest`) — Swing/EDT/`view/` no se prueban con código aún; usar la checklist manual en `docs/PRUEBAS.md` para validar UI y controles.
+
+GitHub Actions (`.github/workflows/java.yml`) ejecuta `mvn -B verify` en push y PR contra `develop` y `master`.
 
 ## Architecture
 
 The three core packages are fixed by the assignment spec — do not collapse, rename, or merge them.
 
-| Layer  | Path                  | Role |
-|--------|-----------------------|------|
-| Entry  | `src/Main.java`       | `main()`, schedules `GameGUI.iniciar()` on the EDT |
-| Facade | `src/modules/`        | `GameGUI` — single boot hook; future menu / instructions screens plug in here |
-| Logic  | `src/logic/`          | `GameState`, `Player`, `DiscProjectile`, `GameConstants` — pure simulation, **no Swing imports** |
-| View   | `src/view/`           | `GameWindow` (`JFrame`), `GamePanel` (`JPanel` + render), `GameLoop` (game thread) |
-| Events | `src/events/`         | `InputController` (per-tick input snapshot), `KeyboardBindings` (Swing key bindings) |
+| Layer  | Path                          | Role |
+|--------|-------------------------------|------|
+| Entry  | `src/main/java/Main.java`     | `main()`, schedules `GameGUI.iniciar()` on the EDT |
+| Facade | `src/main/java/modules/`      | `GameGUI` — single boot hook; future menu / instructions screens plug in here |
+| Logic  | `src/main/java/logic/`        | `GameState`, `Player`, `DiscProjectile`, `GameConstants` — pure simulation, **no Swing imports** |
+| View   | `src/main/java/view/`         | `GameWindow` (`JFrame`), `GamePanel` (`JPanel` + render), `GameLoop` (game thread) |
+| Events | `src/main/java/events/`       | `InputController` (per-tick input snapshot), `KeyboardBindings` (Swing key bindings) |
+| Tests  | `src/test/java/logic/`        | JUnit 5 tests for the pure simulation layer |
 
 ### Threading model (load-bearing)
 
@@ -64,7 +67,7 @@ Two players share one keyboard: P1 = WASD + Shift (disc) + Q (bike); P2 = arrows
 - **Comments**: keep `// NOTE:`, `// TODO:`, `// FIXME:` markers when they capture non-obvious context (threading, focus quirks, spec requirements). They are the project's main way of recording "why".
 - **Scope**: changes stay minimal and task-focused. The assignment penalizes scope creep; do not refactor adjacent code "while you're there".
 - **Tunables**: balance/dimension constants belong in `GameConstants`. Add new ones there rather than scattering literals across files.
-- **Compiled output**: `out/` is currently committed (`.gitignore` only ignores `.cursor/`). If you do a clean build, recompile before committing so the checked-in classes match the source.
+- **Compiled output**: Maven escribe en `target/` y está ignorado en `.gitignore`. El antiguo `out/` (`javac` legacy) fue removido del repo y también está ignorado.
 
 ## Where to look first
 

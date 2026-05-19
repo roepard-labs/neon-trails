@@ -2,3 +2,12 @@
 .cursor/
 .claude/
 .claude-flow/
+
+# Maven build output
+target/
+
+# Legacy javac output (reemplazado por Maven)
+out/
+
+# Skills
+.agents/
