@@ -155,6 +155,10 @@ public class GameState {
         if (p.getFireCooldownTicks() > 0) {
             return;
         }
+        if (hasActiveDisc(p.getId())) {
+            // NOTE: Cada jugador solo puede tener un disco en juego; debe recogerlo para volver a disparar.
+            return;
+        }
         int fx = p.getFacingX();
         int fy = p.getFacingY();
         if (fx == 0 && fy == 0) {
@@ -175,20 +179,40 @@ public class GameState {
         return Math.max(min, Math.min(max, v));
     }
 
+    private boolean hasActiveDisc(int playerId) {
+        for (DiscProjectile d : discs) {
+            if (d.getOwnerId() == playerId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void updateDiscs(int width, int height) {
-        Iterator<DiscProjectile> it = discs.iterator();
-        while (it.hasNext()) {
-            DiscProjectile d = it.next();
+        for (DiscProjectile d : discs) {
             d.tick();
-            if (d.isExpired()) {
-                it.remove();
+            if (d.isStuck()) {
                 continue;
             }
-            if (d.getX() - GameConstants.DISC_RADIUS <= 0
-                    || d.getX() + GameConstants.DISC_RADIUS >= width
-                    || d.getY() - GameConstants.DISC_RADIUS <= 0
-                    || d.getY() + GameConstants.DISC_RADIUS >= height) {
-                it.remove();
+            // NOTE: Rebote eje a eje con clamp al borde para no incrustar el disco en la pared
+            // cuando se queda quieto tras el último rebote.
+            double minX = GameConstants.DISC_RADIUS;
+            double maxX = width - GameConstants.DISC_RADIUS;
+            double minY = GameConstants.DISC_RADIUS;
+            double maxY = height - GameConstants.DISC_RADIUS;
+            if (d.getX() <= minX) {
+                d.setPosition(minX, d.getY());
+                d.bounceX();
+            } else if (d.getX() >= maxX) {
+                d.setPosition(maxX, d.getY());
+                d.bounceX();
+            }
+            if (d.getY() <= minY) {
+                d.setPosition(d.getX(), minY);
+                d.bounceY();
+            } else if (d.getY() >= maxY) {
+                d.setPosition(d.getX(), maxY);
+                d.bounceY();
             }
         }
     }
@@ -197,6 +221,15 @@ public class GameState {
         Iterator<DiscProjectile> it = discs.iterator();
         while (it.hasNext()) {
             DiscProjectile d = it.next();
+            if (d.isStuck()) {
+                // NOTE: Un disco quieto no daña; solo el dueño puede recogerlo y eso resetea su cooldown.
+                Player owner = (d.getOwnerId() == 1) ? playerOne : playerTwo;
+                if (hitsPlayer(d, owner)) {
+                    owner.setFireCooldownTicks(0);
+                    it.remove();
+                }
+                continue;
+            }
             if (hitsPlayer(d, playerOne)) {
                 if (!(d.getOwnerId() == 1 && d.isFriendlyToOwner())) {
                     playerTwo.addScore(1);

@@ -143,7 +143,7 @@ public class GamePanel extends JPanel {
 
         drawBorder(g2, w, h);
         synchronized (stateLock) {
-            drawDiscs(g2, gameState.getDiscs());
+            drawDiscs(g2, gameState.getDiscs(), gameState.getPlayerOne(), gameState.getPlayerTwo());
             drawPlayer(g2, gameState.getPlayerOne(), labelFor(1));
             drawPlayer(g2, gameState.getPlayerTwo(), labelFor(2));
             drawHud(g2, w, h);
@@ -179,13 +179,24 @@ public class GamePanel extends JPanel {
         g2.drawString(label, px + 3, py - 4);
     }
 
-    private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
+    private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs, Player p1, Player p2) {
         for (DiscProjectile d : discs) {
             int r = GameConstants.DISC_RADIUS;
             int cx = (int) Math.round(d.getX()) - r;
             int cy = (int) Math.round(d.getY()) - r;
-            g2.setColor(new Color(0xaa, 0xff, 0xff));
-            g2.fillOval(cx, cy, r * 2, r * 2);
+            if (d.isStuck()) {
+                // NOTE: Disco quieto se tinta del color del dueño y lleva anillo blanco para indicar
+                // que es recogible. Solo el dueño puede recuperarlo.
+                Player owner = (d.getOwnerId() == 1) ? p1 : p2;
+                g2.setColor(owner.getColor());
+                g2.fillOval(cx, cy, r * 2, r * 2);
+                g2.setColor(Color.WHITE);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawOval(cx, cy, r * 2, r * 2);
+            } else {
+                g2.setColor(new Color(0xaa, 0xff, 0xff));
+                g2.fillOval(cx, cy, r * 2, r * 2);
+            }
         }
     }
 

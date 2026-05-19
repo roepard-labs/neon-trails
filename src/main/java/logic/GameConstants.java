@@ -31,6 +31,8 @@ public final class GameConstants {
     public static final double DISC_SPEED = 7.5;
     /** Tiempo de vida máximo del disco (ticks). */
     public static final int DISC_MAX_TICKS = 240;
+    /** Número máximo de rebotes en bordes antes de que el disco se detenga. */
+    public static final int DISC_MAX_BOUNCES = 3;
     /** Enfriamiento entre disparos (ticks). */
     public static final int FIRE_COOLDOWN_TICKS = 28;
 
