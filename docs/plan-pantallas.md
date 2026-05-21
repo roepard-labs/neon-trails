@@ -179,7 +179,7 @@ Añadir una pantalla nueva = crear clase que implemente `Screen` + registrarla e
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Contenido** | Reglas: 2 jugadores, movimiento con WASD/flechas, discos con Shift/Enter, moto 5s con Q/U. Objetivo: golpear al oponente con discos. |
+| **Contenido** | Reglas: 2 jugadores, movimiento con WASD/flechas, discos con E/Enter, moto 5s con Q/U. Objetivo: golpear al oponente con discos. |
 | **Fondo** | `instructions_page.png` (500×480) como referencia visual, o recreado con texto neón |
 | **Botón** | [Volver al menú] |
 | **Tecla** | Escape → volver |

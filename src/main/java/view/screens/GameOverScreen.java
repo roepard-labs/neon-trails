@@ -1,5 +1,8 @@
 package view.screens;
 
+import audio.Sfx;
+import audio.SoundManager;
+import audio.UiSound;
 import logic.GameSession;
 import view.BaseScreen;
 
@@ -15,6 +18,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Pantalla de fin de partida: anuncia ganador y permite volver al menú.
@@ -28,6 +32,8 @@ public class GameOverScreen extends BaseScreen {
 
     private final JLabel headline = new JLabel("", SwingConstants.CENTER);
     private final JLabel detail = new JLabel("", SwingConstants.CENTER);
+    /** Último jingle de game over reproducido; se conserva para detenerlo en {@link #onHide()}. */
+    private Sfx activeGameOverSfx;
 
     public GameOverScreen() {
         setBackground(BG);
@@ -53,10 +59,12 @@ public class GameOverScreen extends BaseScreen {
 
         JButton back = neonButton("Volver al menú");
         back.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UiSound.attachClick(back);
         back.addActionListener(e -> screens().mostrar("welcome"));
 
         JButton replay = neonButton("Jugar de nuevo");
         replay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UiSound.attachClick(replay);
         replay.addActionListener(e -> screens().mostrar("game"));
 
         center.add(title);
@@ -84,6 +92,18 @@ public class GameOverScreen extends BaseScreen {
         } else {
             headline.setText("Partida finalizada");
             detail.setText("");
+        }
+        // NOTE: Elegimos uniformemente entre las dos variantes para añadir variedad sin sobreingeniar
+        // un mapeo por jugador. La pista se detiene en onHide() al volver al menú.
+        activeGameOverSfx = ThreadLocalRandom.current().nextBoolean() ? Sfx.GAMEOVER_1 : Sfx.GAMEOVER_2;
+        SoundManager.play(activeGameOverSfx);
+    }
+
+    @Override
+    public void onHide() {
+        if (activeGameOverSfx != null) {
+            SoundManager.stop(activeGameOverSfx);
+            activeGameOverSfx = null;
         }
     }
 

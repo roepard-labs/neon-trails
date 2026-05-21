@@ -10,7 +10,7 @@ Marca cada ítem al validar manualmente en tu máquina.
 ## Controles simultáneos
 
 - [ ] **P1** se mueve con **W/A/S/D** mientras **P2** se mueve con **flechas** al mismo tiempo.
-- [ ] **P1** dispara con **Shift** (mantener o pulsar) respetando enfriamiento.
+- [ ] **P1** dispara con **E** (mantener o pulsar) respetando enfriamiento.
 - [ ] **P2** dispara con **Enter** respetando enfriamiento.
 
 ## Moto (5 s)
@@ -21,13 +21,41 @@ Marca cada ítem al validar manualmente en tu máquina.
 
 ## Discos: rebote, límite y recuperación
 
-- [ ] Cada disparo rebota en bordes laterales (P1 apunta a una pared lateral con Shift; el disco vuelve sin desaparecer).
+- [ ] Cada disparo rebota en bordes laterales (P1 apunta a una pared lateral con E; el disco vuelve sin desaparecer).
 - [ ] Cada disparo rebota en bordes superior/inferior (mismo test, apuntando hacia arriba/abajo).
 - [ ] Tras **3 rebotes** el disco queda quieto pegado a la pared y se tinta del color del dueño con anillo blanco.
-- [ ] **1 disco por jugador**: con un disco en juego (moviéndose o quieto), volver a presionar `Shift`/`Enter` no genera un segundo disco.
+- [ ] **1 disco por jugador**: con un disco en juego (moviéndose o quieto), volver a presionar `E`/`Enter` no genera un segundo disco.
 - [ ] **Pickup del dueño**: P1 deja su disco quieto y camina sobre él → el disco desaparece y P1 puede disparar inmediatamente (sin esperar cooldown).
 - [ ] **Enemigo atraviesa**: P1 deja su disco quieto y P2 camina sobre él → no pasa nada (sin daño, sin colisión sólida).
 - [ ] **Hit con disco en movimiento**: sigue restando vida, suma punto al oponente, reposiciona jugadores y limpia todos los discos.
+
+## Audio (SFX)
+
+Todos los archivos viven en `src/main/resources/audio/sfx/` y se cargan en arranque por `audio.SoundManager.preloadAll()`. Si no hay mixer (CI headless), el manager entra en modo silencioso y el juego sigue funcionando sin sonido.
+
+### Menús
+
+- [ ] Click en "Iniciar Juego" (WelcomeScreen) → suena `ui_click.wav`.
+- [ ] Click en "Jugar" (NameInputScreen) → suena `ui_click.wav`.
+- [ ] Enter dentro de un campo de nombre → también suena `ui_click.wav` antes de cambiar de pantalla.
+- [ ] Click en "Volver al menú" o "Jugar de nuevo" (GameOverScreen) → suena `ui_click.wav` + se corta el jingle de gameover inmediatamente.
+
+### Partida
+
+- [ ] **E / Enter** dispara → suena una variante aleatoria entre `shoot_1.wav`, `shoot_2.wav`, `shoot_3.wav` (jugar varias veces para verificar variabilidad).
+- [ ] Disco rebota contra borde → suena `bounce.wav` (hasta 2 veces; el último rebote suena distinto).
+- [ ] Disco queda quieto tras el 3er rebote → suena `stop.wav` (no `bounce`).
+- [ ] El dueño pasa sobre su disco quieto → suena `pickup.wav` y desaparece el disco.
+- [ ] **Q / U** activa moto → suena `bike_init.wav` y comienza un loop de `bike.wav` mientras dura.
+- [ ] Si ambos jugadores activan moto simultáneamente, el loop no se duplica (se escucha un único `bike.wav` de fondo).
+- [ ] Al expirar la moto (~5 s sin reactivar) → suena `bike_end.wav` y el loop se detiene.
+- [ ] Disco enemigo golpea a un jugador → suenan `hit.wav` y luego `respawn.wav`.
+
+### Game Over
+
+- [ ] Tras perder la última vida, en GameOverScreen suena `gameover_1.wav` o `gameover_2.wav` (alterna al azar entre partidas).
+- [ ] Volver al menú detiene el jingle de inmediato (no continúa de fondo en WelcomeScreen).
+- [ ] Jugar varias partidas seguidas no produce latencia creciente ni clip cortado: el preload evita jitter en el primer disparo de cada partida.
 
 ## Web stub
 
@@ -37,4 +65,4 @@ Marca cada ítem al validar manualmente en tu máquina.
 ## Regresiones conocidas / TODO
 
 - [ ] Si el foco no está en la ventana, las teclas pueden no registrarse — hacer clic en el panel.
-- [ ] FIXME futuro: pantallas del PDF (menú, game over, ranking persistente, sonidos).
+- [ ] FIXME futuro: pantallas del PDF (ranking persistente, música de fondo del menú).

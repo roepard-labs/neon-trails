@@ -1,3 +1,4 @@
+import audio.SoundManager;
 import modules.GameGUI;
 
 import javax.swing.SwingUtilities;
@@ -8,6 +9,11 @@ import javax.swing.SwingUtilities;
 public class Main {
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new GameGUI().iniciar());
+        SwingUtilities.invokeLater(() -> {
+            // NOTE: precarga de SFX antes de mostrar la ventana para evitar jitter en el primer
+            // disparo. Si no hay mixer (headless / CI), el manager entra en modo no-op silencioso.
+            SoundManager.preloadAll();
+            new GameGUI().iniciar();
+        });
     }
 }

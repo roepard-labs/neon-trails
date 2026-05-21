@@ -6,7 +6,6 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * Registra atajos de teclado con {@link InputMap}/{@link ActionMap} en el componente raíz.
@@ -39,10 +38,8 @@ public final class KeyboardBindings {
         bindHold(im, am, "P1_DOWN_PRESS", "P1_DOWN_RELEASE", KeyStroke.getKeyStroke("pressed S"),
                 KeyStroke.getKeyStroke("released S"), () -> input.setP1Down(true), () -> input.setP1Down(false));
 
-        // NOTE: VK_SHIFT captura cualquier Shift; más estable que la cadena "SHIFT" en algunos entornos.
-        bindHold(im, am, "P1_FIRE_PRESS", "P1_FIRE_RELEASE",
-                KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, false),
-                KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true),
+        bindHold(im, am, "P1_FIRE_PRESS", "P1_FIRE_RELEASE", KeyStroke.getKeyStroke("pressed E"),
+                KeyStroke.getKeyStroke("released E"),
                 () -> input.setP1Shoot(true), () -> input.setP1Shoot(false));
 
         bindEdge(im, am, "P1_BIKE", KeyStroke.getKeyStroke("pressed Q"), input::requestP1Bike);

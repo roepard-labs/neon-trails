@@ -15,9 +15,14 @@ import java.util.List;
  */
 public class GameState {
 
+    /** Listener no-op compartido cuando el constructor sin listener se usa (compat / tests). */
+    private static final GameEventListener NOOP_LISTENER = new GameEventListener() {
+    };
+
     private final Player playerOne;
     private final Player playerTwo;
     private final List<DiscProjectile> discs = new ArrayList<>();
+    private final GameEventListener listener;
     /** Último tamaño conocido del mundo (para respawns tras un golpe). */
     private int lastWorldWidth = GameConstants.DEFAULT_WIDTH;
     private int lastWorldHeight = GameConstants.DEFAULT_HEIGHT;
@@ -25,14 +30,29 @@ public class GameState {
     private boolean finished;
     /** Identificador del ganador (1 o 2); 0 mientras la partida sigue. */
     private int winnerId;
+    /**
+     * Cache persistente entre ticks del estado de moto por jugador, para detectar la transición
+     * true→false (expiración del temporizador) sin importar en qué tick ocurra.
+     */
+    private boolean prevOnBikeP1;
+    private boolean prevOnBikeP2;
 
     /**
-     * Crea estado inicial con posiciones de spawn en esquinas opuestas.
+     * Crea estado inicial con posiciones de spawn en esquinas opuestas y sin listener (no-op).
      */
     public GameState(int width, int height) {
+        this(width, height, NOOP_LISTENER);
+    }
+
+    /**
+     * Crea estado inicial con un {@link GameEventListener} que recibe eventos discretos
+     * (disparo, rebote, golpe, etc.) durante la simulación.
+     */
+    public GameState(int width, int height, GameEventListener listener) {
         int margin = GameConstants.PLAYER_SIZE * 2;
         this.playerOne = new Player(1, new Color(0x00, 0xff, 0xff), margin, margin);
         this.playerTwo = new Player(2, new Color(0xff, 0x33, 0x99), width - margin, height - margin);
+        this.listener = listener != null ? listener : NOOP_LISTENER;
     }
 
     public Player getPlayerOne() {
@@ -93,13 +113,28 @@ public class GameState {
 
         if (input.consumeP1BikeRequest()) {
             playerOne.activateBike();
+            listener.onBikeActivated(1);
         }
         if (input.consumeP2BikeRequest()) {
             playerTwo.activateBike();
+            listener.onBikeActivated(2);
         }
 
         updateDiscs(width, height);
         resolveDiscHits();
+
+        // NOTE: Compara el estado de moto cacheado del tick anterior con el actual al cierre del
+        // tick. Detecta la expiración del temporizador (true→false) aunque ocurra entre ticks.
+        boolean nowOnBikeP1 = playerOne.isOnBike();
+        boolean nowOnBikeP2 = playerTwo.isOnBike();
+        if (prevOnBikeP1 && !nowOnBikeP1) {
+            listener.onBikeEnded(1);
+        }
+        if (prevOnBikeP2 && !nowOnBikeP2) {
+            listener.onBikeEnded(2);
+        }
+        prevOnBikeP1 = nowOnBikeP1;
+        prevOnBikeP2 = nowOnBikeP2;
     }
 
     private void applyMovementInput(events.InputController input) {
@@ -173,6 +208,7 @@ public class GameState {
                 height - GameConstants.DISC_RADIUS);
         discs.add(new DiscProjectile(p.getId(), cx, cy, vx, vy));
         p.setFireCooldownTicks(GameConstants.FIRE_COOLDOWN_TICKS);
+        listener.onShoot(p.getId());
     }
 
     private static double clamp(double v, double min, double max) {
@@ -200,19 +236,33 @@ public class GameState {
             double maxX = width - GameConstants.DISC_RADIUS;
             double minY = GameConstants.DISC_RADIUS;
             double maxY = height - GameConstants.DISC_RADIUS;
+            boolean bouncedAny = false;
             if (d.getX() <= minX) {
                 d.setPosition(minX, d.getY());
                 d.bounceX();
+                bouncedAny = true;
             } else if (d.getX() >= maxX) {
                 d.setPosition(maxX, d.getY());
                 d.bounceX();
+                bouncedAny = true;
             }
             if (d.getY() <= minY) {
                 d.setPosition(d.getX(), minY);
                 d.bounceY();
+                bouncedAny = true;
             } else if (d.getY() >= maxY) {
                 d.setPosition(d.getX(), maxY);
                 d.bounceY();
+                bouncedAny = true;
+            }
+            if (bouncedAny) {
+                // NOTE: si el rebote consumió el último, emitimos sólo onDiscStopped; evita
+                // bounce + stop sonando juntos en la misma transición.
+                if (d.isStuck()) {
+                    listener.onDiscStopped();
+                } else {
+                    listener.onBounce();
+                }
             }
         }
     }
@@ -227,6 +277,7 @@ public class GameState {
                 if (hitsPlayer(d, owner)) {
                     owner.setFireCooldownTicks(0);
                     it.remove();
+                    listener.onPickup(owner.getId());
                 }
                 continue;
             }
@@ -235,11 +286,14 @@ public class GameState {
                     playerTwo.addScore(1);
                     playerOne.loseLife();
                     it.remove();
+                    listener.onHit(1);
                     if (playerOne.isDead()) {
                         finished = true;
                         winnerId = 2;
+                        listener.onGameOver(2);
                     } else {
                         respawnPlayersAfterHit();
+                        listener.onRespawn();
                     }
                     return;
                 }
@@ -249,11 +303,14 @@ public class GameState {
                     playerOne.addScore(1);
                     playerTwo.loseLife();
                     it.remove();
+                    listener.onHit(2);
                     if (playerTwo.isDead()) {
                         finished = true;
                         winnerId = 1;
+                        listener.onGameOver(1);
                     } else {
                         respawnPlayersAfterHit();
+                        listener.onRespawn();
                     }
                     return;
                 }

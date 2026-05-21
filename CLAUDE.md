@@ -55,7 +55,7 @@ Use Swing **Key Bindings** (`InputMap` + `ActionMap`) with `WHEN_IN_FOCUSED_WIND
 - a held boolean (movement, fire) toggled by paired press/release bindings, or
 - an edge-trigger request (`requestPxBike` / `consumePxBikeRequest`) consumed once per tick.
 
-Two players share one keyboard: P1 = WASD + Shift (disc) + Q (bike); P2 = arrows + Enter (disc) + U (bike). Keep both reachable on a single layout when adding keys.
+Two players share one keyboard: P1 = WASD + E (disc) + Q (bike); P2 = arrows + Enter (disc) + U (bike). Keep both reachable on a single layout when adding keys.
 
 ### Game rules (current baseline)
 

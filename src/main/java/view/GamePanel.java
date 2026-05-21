@@ -1,9 +1,11 @@
 package view;
 
+import audio.AudioGameEventListener;
 import events.InputController;
 import events.KeyboardBindings;
 import logic.DiscProjectile;
 import logic.GameConstants;
+import logic.GameEventListener;
 import logic.GameSession;
 import logic.GameState;
 import logic.Player;
@@ -32,6 +34,7 @@ public class GamePanel extends JPanel {
 
     private final Object stateLock = new Object();
     private final InputController input = new InputController();
+    private final GameEventListener gameEventListener = new AudioGameEventListener();
     private final GameState gameState;
     private GameSession session;
     private GameLoop gameLoop;
@@ -43,7 +46,8 @@ public class GamePanel extends JPanel {
         setBackground(new Color(0x0a, 0x0a, 0x12));
         setPreferredSize(new Dimension(GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT));
         setFocusable(true);
-        this.gameState = new GameState(GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT);
+        this.gameState = new GameState(GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT,
+                gameEventListener);
         KeyboardBindings.install(this, input);
     }
 
@@ -208,7 +212,7 @@ public class GamePanel extends JPanel {
         g2.drawString(labelFor(1) + "  " + hearts(p1.getLives()) + (p1.isOnBike() ? "  [MOTO]" : ""), 12, 22);
         g2.drawString(labelFor(2) + "  " + hearts(p2.getLives()) + (p2.isOnBike() ? "  [MOTO]" : ""), 12, 40);
         g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
-        String help = "P1: WASD | disco: Shift | moto 5s: Q   —   P2: flechas | disco: Enter | moto 5s: U";
+        String help = "P1: WASD | disco: E | moto 5s: Q   —   P2: flechas | disco: Enter | moto 5s: U";
         g2.drawString(help, 12, h - 12);
     }
 

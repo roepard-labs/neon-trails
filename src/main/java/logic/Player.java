@@ -108,6 +108,19 @@ public class Player {
     }
 
     /**
+     * Ajusta directamente el instante en que termina el modo moto.
+     * <p>
+     * NOTE: Visibilidad de paquete a propósito: sólo para pruebas dentro de {@code logic/}
+     * (forzar expiración inmediata sin esperar 5 s reales). No usar desde {@code view/}, {@code audio/}
+     * ni {@code events/}.
+     *
+     * @param nanos valor absoluto en escala de {@link System#nanoTime()}
+     */
+    void setBikeUntilNanos(long nanos) {
+        this.bikeUntilNanos = nanos;
+    }
+
+    /**
      * @return true si el jugador está en modo moto (velocidad aumentada).
      */
     public boolean isOnBike() {

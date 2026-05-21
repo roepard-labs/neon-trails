@@ -1,5 +1,6 @@
 package view.screens;
 
+import audio.UiSound;
 import view.BaseScreen;
 
 import javax.swing.BorderFactory;
@@ -64,8 +65,10 @@ public class WelcomeScreen extends BaseScreen {
         p.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
 
         JButton play = neonButton("Iniciar Juego");
+        UiSound.attachClick(play);
         play.addActionListener(e -> screens().mostrar("nameinput"));
         play.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // UiSound.attachHover(play); // opcional: hover suave si se quiere más vivo
 
         p.add(Box.createVerticalGlue());
         p.add(play);

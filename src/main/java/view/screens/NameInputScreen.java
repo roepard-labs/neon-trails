@@ -1,5 +1,8 @@
 package view.screens;
 
+import audio.SoundManager;
+import audio.Sfx;
+import audio.UiSound;
 import logic.GameSession;
 import view.BaseScreen;
 
@@ -63,7 +66,9 @@ public class NameInputScreen extends BaseScreen {
 
         JButton play = neonButton("Jugar");
         play.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UiSound.attachClick(play);
         play.addActionListener(e -> empezar());
+        // UiSound.attachHover(play); // opcional
         form.add(play);
 
         return form;
@@ -87,7 +92,12 @@ public class NameInputScreen extends BaseScreen {
         field.setForeground(TEXT);
         field.setCaretColor(accent);
         field.setBorder(BorderFactory.createLineBorder(accent, 2));
-        field.addActionListener(e -> empezar());
+        // NOTE: Enter en un campo dispara empezar() — reproducimos el click manualmente porque
+        // attachClick sólo aplica a JButton.
+        field.addActionListener(e -> {
+            SoundManager.play(Sfx.UI_CLICK);
+            empezar();
+        });
 
         row.add(l);
         row.add(Box.createVerticalStrut(6));

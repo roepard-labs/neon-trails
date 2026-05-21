@@ -18,7 +18,7 @@ El `Makefile` es un wrapper sobre `mvn`; ver `make help` para todos los targets.
 
 | Jugador | Movimiento | Disco | Moto (5 s) |
 |---------|------------|-------|------------|
-| P1 | W A S D | Shift | Q |
+| P1 | W A S D | E | Q |
 | P2 | Flechas | Enter | U |
 
 ## Documentación

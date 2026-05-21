@@ -10,10 +10,10 @@ Formatos adecuados .svg para animaciones.
 
 PDF exige **4 sonidos mínimos**. Formato obligatorio: **`.wav` PCM 16-bit**, mono (estéreo opcional para los últimos dos), 44.1 o 22.05 kHz, <200 KB cada uno. Ubicación: `src/resources/sounds/`. Generar los 3 primeros en 30 s cada uno con [jsfxr](https://sfxr.me) (CC0, browser, sin cuenta).
 
-- [ ] `shoot.wav` — disparo de disco (Shift / Enter). 80–150 ms. "Pew" / blip electrónico corto. jsfxr preset: **Laser/Shoot**.
-- [ ] `hit.wav` — golpe confirmado, pérdida de vida. 200–400 ms. Impacto seco / glitch. jsfxr preset: **Hit/Hurt**.
-- [ ] `bike.wav` — activación de modo moto (Q / U). 300–600 ms. Whoosh / power-up. jsfxr preset: **Powerup**.
-- [ ] `gameover.wav` — al entrar a GameOverScreen. 1000–2000 ms. Jingle / stinger descendente. Buscar en [kenney.nl](https://kenney.nl) (CC0) u [opengameart.org](https://opengameart.org) filtrando por CC0.
+- [x] `shoot.wav` — disparo de disco (E / Enter). Integrado como 3 variantes (`shoot_1/2/3.wav`) seleccionadas aleatoriamente vía `audio.SoundManager.playRandom`.
+- [x] `hit.wav` — golpe confirmado, pérdida de vida. Integrado: emitido por `GameState.resolveDiscHits` al disparar el listener.
+- [x] `bike.wav` — activación de modo moto. Integrado: `bike_init.wav` al activar + loop `bike.wav` mientras al menos un jugador esté en moto + `bike_end.wav` al expirar.
+- [x] `gameover.wav` — al entrar a GameOverScreen. Integrado: random entre `gameover_1.wav` y `gameover_2.wav` en `GameOverScreen.onShow()`; detenido en `onHide()`.
 
 **Restricciones técnicas**:
 - Nada de `.mp3` (Java SE no lo soporta sin librería externa, rompería la regla "cero dependencias").
@@ -76,7 +76,7 @@ Todos `.wav` PCM 16-bit mono, 44.1 kHz, <200 KB. Ubicación: `src/main/resources
 | Imagen | Dimensiones | Pantalla | Contenido |
 |--------|-------------|----------|-----------|
 | `neon_trails_logo.png` | ~600×200 px | `WelcomeScreen` (título) | Texto "NEON TRAILS" en fuente Tron, blanco con glow cian. |
-| `instructions_neontrails.png` | ~600×400 px | Pantalla de instrucciones (futura) | Controles reales: **P1** = WASD + Shift (disco) + Q (moto). **P2** = flechas + Enter (disco) + U (moto). Mecánica nueva: disco rebota 3 veces y queda quieto; solo el dueño puede recogerlo. |
+| `instructions_neontrails.png` | ~600×400 px | Pantalla de instrucciones (futura) | Controles reales: **P1** = WASD + E (disco) + Q (moto). **P2** = flechas + Enter (disco) + U (moto). Mecánica nueva: disco rebota 3 veces y queda quieto; solo el dueño puede recogerlo. |
 | `hud_background.png` *(opcional)* | ancho HUD × 60 px | Tira inferior del HUD en `GamePanel.drawHud()` | Sin texto, solo gradiente neón sutil. |
 | `over_neontrails.png` | similar a `over.png` (~460×60 px) | `GameOverScreen` | Texto "GAME OVER" estilo Tron, mismo *look* que `branding/over.png` pero con paleta del proyecto. |
 

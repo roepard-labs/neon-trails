@@ -11,7 +11,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Arena de juego 2D con bordes colisionables (`view/GamePanel`)
 - Sistema de dos jugadores locales con movimiento independiente
 - Controles: P1 (WASD) y P2 (Flechas)
-- Disparo de discos (P1: Shift, P2: Enter)
+- Disparo de discos (P1: E, P2: Enter)
 - Modo moto ~5 s como power-up temporal (P1: Q, P2: U)
 - Pantallas: Welcome, NameInput, Game, GameOver mediante `ScreenManager`
 - CI/CD con GitHub Actions: compila, testea y empaqueta en push y PR
