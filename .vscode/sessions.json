@@ -1,0 +1,64 @@
+{
+    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+    "theme": "tribe",
+    "active": "neon-trails",
+    "activateOnStartup": true,
+    "keepExistingTerminals": false,
+    "sessions": {
+        "neon-trails": [
+            {
+                "name": "run",
+                "autoExecuteCommands": true,
+                "icon": "rocket",
+                "color": "terminal.ansiGreen",
+                "commands": [
+                    "make run"
+                ]
+            },
+            [
+                {
+                    "name": "claude",
+                    "autoExecuteCommands": true,
+                    "icon": "comment-discussion",
+                    "color": "terminal.ansiCyan",
+                    "commands": [
+                        "claude"
+                    ]
+                }
+            ],
+            [
+                {
+                    "name": "copilot",
+                    "autoExecuteCommands": true,
+                    "icon": "github",
+                    "color": "terminal.ansiBlue",
+                    "commands": [
+                        "copilot"
+                    ]
+                }
+            ],
+            [
+                {
+                    "name": "opencode",
+                    "autoExecuteCommands": true,
+                    "icon": "terminal",
+                    "color": "terminal.ansiMagenta",
+                    "commands": [
+                        "opencode"
+                    ]
+                }
+            ],
+            [
+                {
+                    "name": "git:status",
+                    "autoExecuteCommands": true,
+                    "icon": "git-branch",
+                    "color": "terminal.ansiYellow",
+                    "commands": [
+                        "git status"
+                    ]
+                }
+            ]
+        ]
+    }
+}
