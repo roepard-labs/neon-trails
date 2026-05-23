@@ -3,6 +3,7 @@ package logic;
 import events.InputController;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -105,6 +106,15 @@ public class GameState {
         playerOne.moveWithinBounds(width, height);
         playerTwo.moveWithinBounds(width, height);
 
+        // NOTE: Graba rastro tras el movimiento del tick para que cada punto refleje la posición
+        // ya validada contra los bordes. addTrailPoint salta duplicados (jugador quieto).
+        if (playerOne.isOnBike()) {
+            playerOne.addTrailPoint(playerOne.getX(), playerOne.getY());
+        }
+        if (playerTwo.isOnBike()) {
+            playerTwo.addTrailPoint(playerTwo.getX(), playerTwo.getY());
+        }
+
         playerOne.tickCooldown();
         playerTwo.tickCooldown();
 
@@ -122,6 +132,7 @@ public class GameState {
 
         updateDiscs(width, height);
         resolveDiscHits();
+        resolveTrailHits();
 
         // NOTE: Compara el estado de moto cacheado del tick anterior con el actual al cierre del
         // tick. Detecta la expiración del temporizador (true→false) aunque ocurra entre ticks.
@@ -129,12 +140,21 @@ public class GameState {
         boolean nowOnBikeP2 = playerTwo.isOnBike();
         if (prevOnBikeP1 && !nowOnBikeP1) {
             listener.onBikeEnded(1);
+            playerOne.startTrailErosion();
         }
         if (prevOnBikeP2 && !nowOnBikeP2) {
             listener.onBikeEnded(2);
+            playerTwo.startTrailErosion();
         }
         prevOnBikeP1 = nowOnBikeP1;
         prevOnBikeP2 = nowOnBikeP2;
+
+        if (playerOne.isTrailEroding()) {
+            playerOne.erodeTrail();
+        }
+        if (playerTwo.isTrailEroding()) {
+            playerTwo.erodeTrail();
+        }
     }
 
     private void applyMovementInput(events.InputController input) {
@@ -336,5 +356,79 @@ public class GameState {
         int margin = GameConstants.PLAYER_SIZE * 2;
         playerOne.setPosition(margin, margin);
         playerTwo.setPosition(w - margin, h - margin);
+        playerOne.clearTrail();
+        playerTwo.clearTrail();
+    }
+
+    /**
+     * Resuelve colisiones de los jugadores contra rastros de moto (propios o enemigos).
+     * <p>
+     * NOTE: Se ejecuta tras {@link #resolveDiscHits()} para que un golpe de disco letal corte la
+     * cadena. La invulnerabilidad temporal evita doble daño en ticks consecutivos sobre el mismo
+     * trail; los últimos {@link GameConstants#TRAIL_GRACE_POINTS} puntos del trail propio no dañan
+     * al dueño (gracia para que activar la moto no se autodañe).
+     */
+    private void resolveTrailHits() {
+        if (finished) {
+            return;
+        }
+        // Cada víctima se chequea contra ambos trails. Orden: trail propio primero (más probable
+        // en juegos cerrados) y luego trail enemigo. checkTrailHit aplica daño y respawn si toca.
+        checkTrailHit(playerOne, playerOne, 1);
+        if (finished) {
+            return;
+        }
+        checkTrailHit(playerOne, playerTwo, 1);
+        if (finished) {
+            return;
+        }
+        checkTrailHit(playerTwo, playerTwo, 2);
+        if (finished) {
+            return;
+        }
+        checkTrailHit(playerTwo, playerOne, 2);
+    }
+
+    private void checkTrailHit(Player victim, Player trailOwner, int victimId) {
+        if (victim.isTrailInvuln()) {
+            return;
+        }
+        List<Point2D.Double> trail = trailOwner.getMotoTrail();
+        if (trail.isEmpty()) {
+            return;
+        }
+        int endIdx = trail.size();
+        if (victim == trailOwner) {
+            // Gracia: ignorar los puntos más recientes del propio rastro (cabeza de la lista).
+            endIdx = Math.max(0, trail.size() - GameConstants.TRAIL_GRACE_POINTS);
+        }
+        for (int i = 0; i < endIdx; i++) {
+            Point2D.Double pt = trail.get(i);
+            if (pointHitsPlayer(pt.x, pt.y, victim)) {
+                applyTrailHit(victim, victimId);
+                return;
+            }
+        }
+    }
+
+    private void applyTrailHit(Player victim, int victimId) {
+        victim.loseLife();
+        victim.setTrailInvuln();
+        listener.onTrailHit(victimId);
+        if (victim.isDead()) {
+            finished = true;
+            winnerId = (victimId == 1) ? 2 : 1;
+            listener.onGameOver(winnerId);
+        } else {
+            respawnPlayersAfterHit();
+            listener.onRespawn();
+        }
+    }
+
+    private static boolean pointHitsPlayer(double px, double py, Player p) {
+        double cx = p.getX();
+        double cy = p.getY();
+        double half = GameConstants.PLAYER_SIZE / 2.0;
+        return px >= cx - half && px <= cx + half && py >= cy - half && py <= cy + half;
     }
 }

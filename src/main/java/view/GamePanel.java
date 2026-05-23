@@ -19,6 +19,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.function.IntConsumer;
 
@@ -147,12 +149,36 @@ public class GamePanel extends JPanel {
 
         drawBorder(g2, w, h);
         synchronized (stateLock) {
+            drawTrails(g2, gameState.getPlayerOne(), gameState.getPlayerTwo());
             drawDiscs(g2, gameState.getDiscs(), gameState.getPlayerOne(), gameState.getPlayerTwo());
             drawPlayer(g2, gameState.getPlayerOne(), labelFor(1));
             drawPlayer(g2, gameState.getPlayerTwo(), labelFor(2));
             drawHud(g2, w, h);
         }
         g2.dispose();
+    }
+
+    private static void drawTrails(Graphics2D g2, Player p1, Player p2) {
+        drawPlayerTrail(g2, p1);
+        drawPlayerTrail(g2, p2);
+    }
+
+    private static void drawPlayerTrail(Graphics2D g2, Player p) {
+        List<Point2D.Double> trail = p.getMotoTrail();
+        if (trail.size() < 2) {
+            return;
+        }
+        g2.setColor(p.getColor());
+        g2.setStroke(new BasicStroke(GameConstants.TRAIL_LINE_WIDTH,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        Path2D.Double path = new Path2D.Double();
+        Point2D.Double first = trail.get(0);
+        path.moveTo(first.x, first.y);
+        for (int i = 1; i < trail.size(); i++) {
+            Point2D.Double pt = trail.get(i);
+            path.lineTo(pt.x, pt.y);
+        }
+        g2.draw(path);
     }
 
     private String labelFor(int id) {
