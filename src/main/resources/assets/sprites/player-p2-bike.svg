@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Neon Trails · P2 humanoide · ON-BIKE · top-down 28x28
+     Postura agachada sobre la moto. Brazos al frente, piernas pegadas. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
+  <defs>
+    <filter id="glow-p2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="glow-p2-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF99CC" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#FF3399" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g id="player-p2-bike" filter="url(#glow-p2)">
+    <!-- CABEZA · adelantada hacia el norte (postura agachada) -->
+    <circle cx="14" cy="5.5" r="2.4" fill="#0a0a12" stroke="#FF3399" stroke-width="0.75"/>
+    <circle cx="14" cy="5.5" r="1.2" fill="#FF99CC" opacity="0.9">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="0.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- HOMBROS · adelantados -->
+    <line x1="10" y1="9" x2="18" y2="9" stroke="#FF3399" stroke-width="0.7"/>
+
+    <!-- TORSO · comprimido (agachado) -->
+    <ellipse cx="14" cy="13" rx="3.8" ry="3.5" fill="#0a0a12" stroke="#FF3399" stroke-width="0.9"/>
+    <line x1="14" y1="9" x2="14" y2="16.5" stroke="#FF3399" stroke-width="0.55" opacity="0.85"/>
+    <line x1="10.8" y1="12" x2="17.2" y2="12" stroke="#FF3399" stroke-width="0.3" opacity="0.5"/>
+
+    <!-- BRAZOS · extendidos al frente sujetando manillares -->
+    <line x1="10" y1="9" x2="9" y2="3" stroke="#FF3399" stroke-width="0.9" stroke-linecap="round"/>
+    <line x1="18" y1="9" x2="19" y2="3" stroke="#FF3399" stroke-width="0.9" stroke-linecap="round"/>
+    <!-- Puños sobre manillares -->
+    <circle cx="9" cy="2.5" r="0.9" fill="#0a0a12" stroke="#FF99CC" stroke-width="0.5"/>
+    <circle cx="19" cy="2.5" r="0.9" fill="#0a0a12" stroke="#FF99CC" stroke-width="0.5"/>
+    <!-- Reflejos cinéticos en brazos -->
+    <line x1="9.5" y1="5" x2="9.2" y2="6.5" stroke="#FF99CC" stroke-width="0.3" opacity="0.6"/>
+    <line x1="18.5" y1="5" x2="18.8" y2="6.5" stroke="#FF99CC" stroke-width="0.3" opacity="0.6"/>
+
+    <!-- PIERNAS · pegadas al chasis (líneas cortas) -->
+    <line x1="12.5" y1="16.5" x2="12" y2="22" stroke="#FF3399" stroke-width="0.9" stroke-linecap="round"/>
+    <line x1="15.5" y1="16.5" x2="16" y2="22" stroke="#FF3399" stroke-width="0.9" stroke-linecap="round"/>
+    <!-- Botas -->
+    <line x1="11.5" y1="22" x2="12.5" y2="22" stroke="#FF3399" stroke-width="1.1" stroke-linecap="round"/>
+    <line x1="15.5" y1="22" x2="16.5" y2="22" stroke="#FF3399" stroke-width="1.1" stroke-linecap="round"/>
+
+    <!-- NÚCLEO · pulso rápido (modo activo) -->
+    <circle cx="14" cy="13" r="1.6" fill="url(#glow-p2-core)">
+      <animate attributeName="opacity" values="0.65;1;0.65" dur="0.4s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- VELOCIDAD · líneas detrás del piloto -->
+    <line x1="13" y1="23" x2="12.5" y2="27" stroke="#FF99CC" stroke-width="0.4" stroke-linecap="round" opacity="0.55">
+      <animate attributeName="opacity" values="0.1;0.7;0.1" dur="0.3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="15" y1="23" x2="15.5" y2="27" stroke="#FF99CC" stroke-width="0.4" stroke-linecap="round" opacity="0.55">
+      <animate attributeName="opacity" values="0.1;0.7;0.1" dur="0.3s" begin="0.1s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</svg>

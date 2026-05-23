@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Neon Trails · DISCO P1 · STUCK -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14">
+  <defs>
+    <filter id="glow-disc-p1" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.7" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g id="disc-p1-stuck" filter="url(#glow-disc-p1)">
+    
+    <!-- Anillo exterior -->
+    <circle cx="7" cy="7" r="5.5" fill="none" stroke="#00FFFF" stroke-width="0.9"/>
+    <!-- Anillo interno -->
+    <circle cx="7" cy="7" r="3.5" fill="none" stroke="#AAFFFF" stroke-width="0.5" opacity="0.7"/>
+    <!-- Aspas / divisiones -->
+    <line x1="7" y1="1.5" x2="7" y2="12.5" stroke="#AAFFFF" stroke-width="0.55" opacity="0.8"/>
+    <line x1="1.5" y1="7" x2="12.5" y2="7" stroke="#AAFFFF" stroke-width="0.55" opacity="0.8"/>
+    <line x1="3" y1="3" x2="11" y2="11" stroke="#AAFFFF" stroke-width="0.35" opacity="0.5"/>
+    <line x1="11" y1="3" x2="3" y2="11" stroke="#AAFFFF" stroke-width="0.35" opacity="0.5"/>
+    <!-- Núcleo brillante -->
+    <circle cx="7" cy="7" r="1.6" fill="#AAFFFF" opacity="0.5">
+      
+    </circle>
+    <circle cx="7" cy="7" r="0.6" fill="#ffffff" opacity="0.7"/>
+  </g>
+</svg>

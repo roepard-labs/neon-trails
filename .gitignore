@@ -11,3 +11,7 @@ out/
 
 # Skills
 .agents/
+.sisyphus/
+
+# Bundles de handoff (extraer y commitear sólo los assets útiles, no el tarball)
+*.tar.gz

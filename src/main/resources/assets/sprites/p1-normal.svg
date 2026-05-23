@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Neon Trails - P1 (cian) - conduccion normal - vista aerea
+     viewBox 22x22, ~25% energia. Apuntando al norte. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="22" height="22">
+  <defs>
+    <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.55" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="pulse-blue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#aaffff" stop-opacity="1"/>
+      <stop offset="60%"  stop-color="#00ffff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g id="velocity-trail" stroke="#00ffff" stroke-linecap="round" stroke-width="0.45" opacity="0.6">
+    <line x1="8.5"  y1="19" x2="8.5"  y2="22" opacity="0.45">
+      <animate attributeName="opacity" values="0;0.45;0" dur="0.4s" repeatCount="indefinite"/>
+    </line>
+    <line x1="11"   y1="19" x2="11"   y2="22" opacity="0.6">
+      <animate attributeName="opacity" values="0;0.6;0" dur="0.4s" begin="0.13s" repeatCount="indefinite"/>
+    </line>
+    <line x1="13.5" y1="19" x2="13.5" y2="22" opacity="0.45">
+      <animate attributeName="opacity" values="0;0.45;0" dur="0.4s" begin="0.26s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <g id="player-body" filter="url(#glow-blue)">
+    <rect class="main-body"
+          x="3.5" y="8" width="15" height="11" rx="1.6" ry="1.6"
+          fill="#0a0a12" stroke="#00ffff" stroke-width="0.6"/>
+    <polygon class="direction-arrow"
+             points="11,2 5.5,8 16.5,8"
+             fill="#0a0a12" stroke="#00ffff" stroke-width="0.6"
+             stroke-linejoin="miter"/>
+    <line x1="11" y1="9" x2="11" y2="18" stroke="#00ffff" stroke-width="0.35" opacity="0.6"/>
+    <line x1="5.5" y1="12" x2="16.5" y2="12" stroke="#00ffff" stroke-width="0.3" opacity="0.55"/>
+    <line x1="5.5" y1="15.5" x2="16.5" y2="15.5" stroke="#00ffff" stroke-width="0.3" opacity="0.55"/>
+    <circle class="core-glow" cx="11" cy="13.5" r="1.8" fill="url(#pulse-blue)">
+      <animate attributeName="opacity" values="0.45;1;0.45" dur="0.6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

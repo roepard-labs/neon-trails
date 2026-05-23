@@ -1,0 +1,252 @@
+/* ==========================================================================
+   Neon Trails — Design Tokens
+   --------------------------------------------------------------------------
+   Source of truth for color and type. Mirrors the Java Color() values used
+   in src/main/java/view/screens/* and src/main/java/logic/GameState.java.
+   Web vars match web/styles.css.
+   ========================================================================== */
+
+/* Rajdhani — supplied by the user. Squared, condensed sci-fi sans; a much
+   closer match to the geometric stencil look of assets/branding-reference/
+   than the Orbitron substitute used earlier. Latin and Devanagari subsets
+   are split across files; same family, different unicode-range so each
+   file is only fetched when those glyphs are actually rendered.
+
+   IMPORTANT: only 300 + 400 weight files were supplied. The 400 file is
+   re-mapped across font-weight 400..700 so headlines (which the system
+   specifies at 700) don't silently fall back to system sans. Real Rajdhani
+   600/700 strokes are heavier than the synthetic; ship the proper TTFs
+   when available and tighten these ranges. */
+
+/* Latin — only the 300 weight TTF was supplied. We declare it once per
+   integer weight the design system actually uses (400/500/600/700) so the
+   font-weight cascade ALWAYS resolves to this file for Latin glyphs.
+   Without the explicit per-weight blocks, browsers refuse the weight-range
+   syntax on a non-variable TTF and silently fall back to system sans for
+   any text bolder than 300 — which is most of the brand. Replace the
+   `src:` lines with real `rajdhani-latin-500/600/700-normal.ttf` files when
+   available; one-line swap each. */
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-latin-300-normal.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-latin-300-normal.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-latin-300-normal.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-latin-300-normal.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-latin-300-normal.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* Devanagari (fallback / Hindi typesetting) */
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-devanagari-300-normal.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+@font-face {
+  font-family: "Rajdhani";
+  src: url("fonts/rajdhani-devanagari-400-normal.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+
+/* JetBrains Mono — pinned to a working jsDelivr font URL (fontsource).
+   The previous gstatic v18 path was a stale invented hash. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono"),
+       url("https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: local("JetBrains Mono"),
+       url("https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* TODO: drop these real-weight files into fonts/ to retire the synthesis:
+   - fonts/rajdhani-latin-500-normal.ttf
+   - fonts/rajdhani-latin-600-normal.ttf
+   - fonts/rajdhani-latin-700-normal.ttf
+   Then tighten the 400 @font-face above back to `font-weight: 400`. */
+
+:root {
+  /* ---------- Colors: surfaces / chrome --------------------------------- */
+  --nt-bg:           #0a0a12;   /* world background (Java: 0x0a, 0x0a, 0x12) */
+  --nt-bg-elev-1:    #12121c;   /* card / panel surface (web/styles.css)    */
+  --nt-bg-elev-2:    #14141c;   /* input field background (NameInputScreen) */
+  --nt-grid:         rgba(51, 255, 255, 0.06); /* faint arena grid lines    */
+  --nt-arena-border: rgba(51, 255, 255, 0.31); /* arena edge: 0x33ffff @ 80 */
+  --nt-divider:      rgba(51, 255, 255, 0.25); /* card outlines, dividers   */
+
+  /* ---------- Colors: players (the only two brand colors) --------------- */
+  --nt-p1:           #00ffff;   /* Player 1 — cyan; primary accent          */
+  --nt-p1-soft:      #33ffff;   /* secondary cyan used in arena border      */
+  --nt-p1-trail:     #aaffff;   /* in-flight disc tint                      */
+  --nt-p2:           #ff3399;   /* Player 2 — pink/magenta                  */
+  --nt-p2-soft:      #ff66b3;   /* lighter pink for hover / glow            */
+
+  /* ---------- Colors: ink ----------------------------------------------- */
+  --nt-fg:           #eeeeff;   /* primary text                             */
+  --nt-fg-muted:     rgba(238, 238, 255, 0.65);
+  --nt-fg-dim:       rgba(238, 238, 255, 0.40);
+  --nt-fg-on-cyan:   #0a0a12;   /* dark text on solid cyan button           */
+
+  /* ---------- Glow / shadow systems ------------------------------------- */
+  --nt-glow-cyan:   0 0 12px rgba(0, 255, 255, 0.55), 0 0 28px rgba(0, 255, 255, 0.25);
+  --nt-glow-cyan-soft: 0 0 6px rgba(0, 255, 255, 0.35);
+  --nt-glow-pink:   0 0 12px rgba(255, 51, 153, 0.55), 0 0 28px rgba(255, 51, 153, 0.20);
+  --nt-glow-pink-soft: 0 0 6px rgba(255, 51, 153, 0.35);
+  --nt-glow-white:  0 0 8px rgba(255, 255, 255, 0.45);
+  --nt-shadow-card: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --nt-bike-halo:   rgba(255, 255, 255, 0.24); /* 60/255 alpha from GamePanel */
+
+  /* ---------- Spacing — scaled from the Swing padding constants --------- */
+  --nt-space-1:  4px;
+  --nt-space-2:  6px;
+  --nt-space-3:  8px;
+  --nt-space-4:  12px;
+  --nt-space-5:  20px;
+  --nt-space-6:  24px;
+  --nt-space-7:  28px;   /* JButton horizontal padding (WelcomeScreen)       */
+  --nt-space-8:  40px;
+  --nt-space-9:  60px;
+
+  /* ---------- Radii — Swing uses fillRoundRect(8,8) for player tiles --- */
+  --nt-radius-sm: 2px;
+  --nt-radius-md: 8px;   /* player tile / pill */
+  --nt-radius-lg: 10px;  /* web card (web/styles.css) */
+  --nt-radius-pill: 999px;
+
+  /* ---------- Borders / strokes ---------------------------------------- */
+  --nt-stroke-hairline: 1px;
+  --nt-stroke-default:  2px;  /* JTextField border in NameInputScreen */
+  --nt-stroke-arena:    3px;  /* arena edge BasicStroke(3f)            */
+
+  /* ---------- Type families -------------------------------------------- */
+  --nt-font-display: "Rajdhani", "Orbitron", "TR2N", "Audiowide", system-ui, sans-serif;
+  --nt-font-mono:    "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, Menlo, monospace;
+  --nt-font-numeric: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  /* ---------- Type scale: rooted on the Swing pixel sizes -------------- */
+  /* WelcomeScreen title=56, ¿Quiénes juegan?=36, GAME OVER=48, headline=28
+     buttons=18-20, body=14, hint/help=11-13                              */
+  --nt-fs-hero:     56px;  /* "NEON TRAILS" title              */
+  --nt-fs-display:  48px;  /* "GAME OVER"                       */
+  --nt-fs-h1:       36px;
+  --nt-fs-h2:       28px;
+  --nt-fs-h3:       20px;
+  --nt-fs-button:   18px;
+  --nt-fs-body:     14px;
+  --nt-fs-hud:      13px;
+  --nt-fs-caption:  11px;
+
+  --nt-tracking-display: 0.10em;
+  --nt-tracking-button:  0.14em;
+  --nt-tracking-body:    0.02em;
+  --nt-leading-tight: 1.05;
+  --nt-leading-body:  1.5;
+
+  /* ---------- Motion --------------------------------------------------- */
+  --nt-tick: 16ms;             /* game loop tick (GameConstants.GAME_TICK_MS)   */
+  --nt-bike-duration: 5s;      /* BIKE_DURATION_SEC                              */
+  --nt-ease-out:  cubic-bezier(0.22, 1, 0.36, 1);
+  --nt-ease-glow: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* ============================== Semantic =================================
+   Use these in HTML directly — no class soup needed for the common case.
+   ========================================================================= */
+html, body {
+  background: var(--nt-bg);
+  color: var(--nt-fg);
+  font-family: var(--nt-font-mono);
+  font-size: var(--nt-fs-body);
+  line-height: var(--nt-leading-body);
+  letter-spacing: var(--nt-tracking-body);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .nt-h1, h2, .nt-h2, h3, .nt-h3, .nt-hero, .nt-display {
+  font-family: var(--nt-font-display);
+  font-weight: 700;
+  line-height: var(--nt-leading-tight);
+  letter-spacing: var(--nt-tracking-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+.nt-hero    { font-size: var(--nt-fs-hero);    color: var(--nt-p1); text-shadow: var(--nt-glow-cyan); }
+.nt-display { font-size: var(--nt-fs-display); color: var(--nt-fg); text-shadow: var(--nt-glow-white); }
+h1, .nt-h1  { font-size: var(--nt-fs-h1); color: var(--nt-p1); }
+h2, .nt-h2  { font-size: var(--nt-fs-h2); color: var(--nt-p1); }
+h3, .nt-h3  { font-size: var(--nt-fs-h3); color: var(--nt-fg); letter-spacing: var(--nt-tracking-button); }
+
+p           { margin: 0 0 var(--nt-space-4); color: var(--nt-fg); }
+.nt-muted   { color: var(--nt-fg-muted); }
+.nt-dim     { color: var(--nt-fg-dim); }
+
+code, kbd, samp, .nt-mono {
+  font-family: var(--nt-font-mono);
+  font-size: 0.95em;
+}
+
+/* Keycap-style key indicator (used heavily — the game is keyboard-only) */
+.nt-kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 2px 6px;
+  background: var(--nt-bg-elev-2);
+  border: 1px solid var(--nt-divider);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: var(--nt-font-mono);
+  font-size: 0.85em;
+  color: var(--nt-fg);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.nt-kbd--p1 { color: var(--nt-p1); border-color: rgba(0,255,255,0.45); }
+.nt-kbd--p2 { color: var(--nt-p2); border-color: rgba(255,51,153,0.45); }
