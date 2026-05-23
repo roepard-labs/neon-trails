@@ -19,8 +19,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.IntConsumer;
 
@@ -147,15 +149,24 @@ public class GamePanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
 
+        drawArenaFloor(g2, w, h);
         drawBorder(g2, w, h);
         synchronized (stateLock) {
             drawTrails(g2, gameState.getPlayerOne(), gameState.getPlayerTwo());
-            drawDiscs(g2, gameState.getDiscs(), gameState.getPlayerOne(), gameState.getPlayerTwo());
+            drawDiscs(g2, gameState.getDiscs());
             drawPlayer(g2, gameState.getPlayerOne(), labelFor(1));
             drawPlayer(g2, gameState.getPlayerTwo(), labelFor(2));
             drawHud(g2, w, h);
         }
         g2.dispose();
+    }
+
+    private static void drawArenaFloor(Graphics2D g2, int w, int h) {
+        if (w <= 0 || h <= 0) {
+            return;
+        }
+        BufferedImage floor = SpriteLoader.load("arena-floor-vaporwave.svg", w, h);
+        g2.drawImage(floor, 0, 0, null);
     }
 
     private static void drawTrails(Graphics2D g2, Player p1, Player p2) {
@@ -195,38 +206,44 @@ public class GamePanel extends JPanel {
     }
 
     private void drawPlayer(Graphics2D g2, Player p, String label) {
-        int half = GameConstants.PLAYER_SIZE / 2;
-        int px = (int) Math.round(p.getX()) - half;
-        int py = (int) Math.round(p.getY()) - half;
+        // NOTE: Sprite del handoff a 2x el lado lógico (PLAYER_SIZE=22 → 44 px) para que el glow
+        // SMIL no quede recortado. El hitbox lógico sigue siendo 22, solo el render se infla.
+        int spriteSize = GameConstants.PLAYER_SIZE * 2;
+        int half = spriteSize / 2;
+        int cx = (int) Math.round(p.getX());
+        int cy = (int) Math.round(p.getY());
+
         if (p.isOnBike()) {
+            // Aura translúcida bajo el sprite para reforzar visualmente el modo moto.
             g2.setColor(new Color(255, 255, 255, 60));
-            g2.fillOval(px - 6, py - 6, GameConstants.PLAYER_SIZE + 12, GameConstants.PLAYER_SIZE + 12);
+            g2.fillOval(cx - half - 4, cy - half - 4, spriteSize + 8, spriteSize + 8);
         }
-        g2.setColor(p.getColor());
-        g2.fillRoundRect(px, py, GameConstants.PLAYER_SIZE, GameConstants.PLAYER_SIZE, 8, 8);
+
+        String spriteName = (p.getId() == 1 ? "p1" : "p2") + (p.isOnBike() ? "-moto" : "-normal") + ".svg";
+        BufferedImage sprite = SpriteLoader.load(spriteName, spriteSize);
+        // Rotación: el SVG apunta al norte (facing 0,-1 = ángulo 0).
+        double angle = Math.atan2(p.getFacingX(), -p.getFacingY());
+        AffineTransform old = g2.getTransform();
+        g2.rotate(angle, cx, cy);
+        g2.drawImage(sprite, cx - half, cy - half, null);
+        g2.setTransform(old);
+
         g2.setColor(Color.WHITE);
         g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
-        g2.drawString(label, px + 3, py - 4);
+        g2.drawString(label, cx - half + 3, cy - half - 4);
     }
 
-    private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs, Player p1, Player p2) {
+    private static void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
+        // Tamaño visible del disco: 4x el radio lógico para que el glow del sprite no se recorte.
+        int spriteSize = GameConstants.DISC_RADIUS * 4;
+        int half = spriteSize / 2;
         for (DiscProjectile d : discs) {
-            int r = GameConstants.DISC_RADIUS;
-            int cx = (int) Math.round(d.getX()) - r;
-            int cy = (int) Math.round(d.getY()) - r;
-            if (d.isStuck()) {
-                // NOTE: Disco quieto se tinta del color del dueño y lleva anillo blanco para indicar
-                // que es recogible. Solo el dueño puede recuperarlo.
-                Player owner = (d.getOwnerId() == 1) ? p1 : p2;
-                g2.setColor(owner.getColor());
-                g2.fillOval(cx, cy, r * 2, r * 2);
-                g2.setColor(Color.WHITE);
-                g2.setStroke(new BasicStroke(1.5f));
-                g2.drawOval(cx, cy, r * 2, r * 2);
-            } else {
-                g2.setColor(new Color(0xaa, 0xff, 0xff));
-                g2.fillOval(cx, cy, r * 2, r * 2);
-            }
+            int cx = (int) Math.round(d.getX());
+            int cy = (int) Math.round(d.getY());
+            String state = d.isStuck() ? "stuck" : "active";
+            String spriteName = "disc-p" + d.getOwnerId() + "-" + state + ".svg";
+            BufferedImage sprite = SpriteLoader.load(spriteName, spriteSize);
+            g2.drawImage(sprite, cx - half, cy - half, null);
         }
     }
 
