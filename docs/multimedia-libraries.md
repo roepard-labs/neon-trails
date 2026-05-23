@@ -18,37 +18,54 @@ Cada sección cubre **una** librería, la más adecuada para el formato.
 
 ## 🖼️ SVG — Apache Batik
 
-**Maven:**
+**Maven (usado por el proyecto, ver `pom.xml`):**
 ```xml
 <dependency>
     <groupId>org.apache.xmlgraphics</groupId>
-    <artifactId>batik-all</artifactId>
+    <artifactId>batik-transcoder</artifactId>
+    <version>1.17</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-codec</artifactId>
     <version>1.17</version>
 </dependency>
 ```
 
-**Por qué esta:** Es el estándar de facto en Java para SVG. Usado por Apache POI, JasperReports, Gephi. Renderiza a `BufferedImage` y lo dibujas con `Graphics2D` en cualquier `JPanel`.
+**Por qué esta:** Es el estándar de facto en Java para SVG. Usado por Apache POI, JasperReports, Gephi. Renderiza a `BufferedImage` y lo dibujas con `Graphics2D` en cualquier `JPanel`. Preferimos `batik-transcoder` + `batik-codec` (~3 MB combinados) sobre `batik-all` (~8 MB) para no inflar el jar entregable.
 
-**Ejemplo mínimo (cargar SVG y pintarlo):**
+**Uso real en el proyecto:** [`view/SpriteLoader.java`](../src/main/java/view/SpriteLoader.java) carga los SVG del handoff (`src/main/resources/assets/sprites/`) y los cachea como `BufferedImage`. Las animaciones SMIL se rasterizan al instante `t=0` (frame estático); con sprites pequeños es suficiente para el render top-down de la arena. Para animación viva en el panel, evaluar `org.apache.batik.swing.JSVGCanvas` (más pesado).
+
+**Ejemplo mínimo (igual al patrón del SpriteLoader real):**
 ```java
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import org.apache.batik.transcoder.SVGAbstractTranscoder;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 
-// Cargar SVG como BufferedImage
-PNGTranscoder transcoder = new PNGTranscoder();
-try (InputStream svgStream = getClass().getResourceAsStream("/assets/icon.svg")) {
-    TranscoderInput input = new TranscoderInput(svgStream);
-    BufferedImageTranscoder output = new BufferedImageTranscoder();
-    transcoder.transcode(input, null);
-    BufferedImage image = output.getBufferedImage();
-    // luego: g2d.drawImage(image, x, y, null);
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
+
+class CapturingTranscoder extends ImageTranscoder {
+    BufferedImage image;
+    @Override public BufferedImage createImage(int w, int h) {
+        return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    }
+    @Override public void writeImage(BufferedImage img, TranscoderOutput out) {
+        this.image = img;
+    }
+}
+
+try (InputStream svg = getClass().getResourceAsStream("/assets/sprites/p1-normal.svg")) {
+    CapturingTranscoder t = new CapturingTranscoder();
+    t.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, 22f);
+    t.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, 22f);
+    t.transcode(new TranscoderInput(svg), null);
+    // t.image listo para g2d.drawImage(t.image, x, y, null)
 }
 ```
 
-**Alternativa ligera:** `com.formdev:svgSalamander:1.1.4` (~400 KB vs ~8 MB). API más simple pero menos features.
+**Alternativa ligera:** `com.formdev:svgSalamander:1.1.4` (~400 KB vs ~3 MB). API más simple pero menos features y menos mantenimiento activo.
 
 ---
 

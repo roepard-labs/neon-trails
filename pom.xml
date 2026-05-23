@@ -22,6 +22,21 @@
     </properties>
 
     <dependencies>
+        <!--
+            Apache Batik: render de los SVG animados del handoff de Claude Design a BufferedImage.
+            Ver docs/multimedia-libraries.md (sección SVG) y view/SpriteLoader.java para uso real.
+        -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>1.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-codec</artifactId>
+            <version>1.17</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
