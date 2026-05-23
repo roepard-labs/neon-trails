@@ -4,9 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -72,5 +74,45 @@ class SpriteLoaderTest {
         assertThrows(IllegalArgumentException.class,
                 () -> SpriteLoader.load("no-existe.svg", 22),
                 "Ruta inválida debe lanzar IllegalArgumentException con mensaje explicativo");
+    }
+
+    @Test
+    void tryGetCachedReturnsNullBeforeLoad() {
+        assertNull(SpriteLoader.tryGetCached("p1-normal.svg", 22),
+                "Sin carga previa, tryGetCached debe ser non-blocking y devolver null");
+    }
+
+    @Test
+    void tryGetCachedReturnsCachedImageAfterLoad() {
+        BufferedImage loaded = SpriteLoader.load("p2-moto.svg", 44);
+        BufferedImage cached = SpriteLoader.tryGetCached("p2-moto.svg", 44);
+
+        assertSame(loaded, cached,
+                "tryGetCached debe devolver exactamente la imagen que ya está en cache");
+    }
+
+    @Test
+    void preloadAsyncPopulatesCacheInBackground() throws InterruptedException {
+        Thread worker = SpriteLoader.preloadAsync(List.of(
+                new SpriteLoader.SpriteSpec("p1-normal.svg", 30),
+                new SpriteLoader.SpriteSpec("disc-p1-active.svg", 28)));
+        // El preload se ejecuta en thread daemon; esperamos a que termine para verificar.
+        worker.join(10_000L);
+
+        assertNotNull(SpriteLoader.tryGetCached("p1-normal.svg", 30),
+                "Tras el preload, el sprite debe estar disponible en cache");
+        assertNotNull(SpriteLoader.tryGetCached("disc-p1-active.svg", 28));
+    }
+
+    @Test
+    void preloadAsyncSkipsMissingSpritesWithoutCrashing() throws InterruptedException {
+        Thread worker = SpriteLoader.preloadAsync(List.of(
+                new SpriteLoader.SpriteSpec("no-existe.svg", 22),
+                new SpriteLoader.SpriteSpec("p1-moto.svg", 22)));
+        worker.join(10_000L);
+
+        assertNull(SpriteLoader.tryGetCached("no-existe.svg", 22));
+        assertNotNull(SpriteLoader.tryGetCached("p1-moto.svg", 22),
+                "Un sprite faltante no debe abortar el preload del resto");
     }
 }

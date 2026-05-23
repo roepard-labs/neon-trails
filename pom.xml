@@ -25,6 +25,9 @@
         <!--
             Apache Batik: render de los SVG animados del handoff de Claude Design a BufferedImage.
             Ver docs/multimedia-libraries.md (sección SVG) y view/SpriteLoader.java para uso real.
+            NOTE: Batik registra org.apache.xerces.jaxp.SAXParserFactoryImpl como service provider
+            pero no lo trae como dependencia. Sin xercesImpl explicito, SAXParserFactory.newInstance()
+            falla con FactoryConfigurationError en runtime y los sprites no cargan.
         -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -35,6 +38,11 @@
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-codec</artifactId>
             <version>1.17</version>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.12.2</version>
         </dependency>
 
         <dependency>

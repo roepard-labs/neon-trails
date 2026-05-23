@@ -9,6 +9,7 @@ import org.apache.batik.transcoder.image.ImageTranscoder;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,10 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link BufferedImage} cacheados, listos para dibujar con {@link java.awt.Graphics2D}.
  * <p>
  * NOTE: La transcodificación con Batik captura un frame estático del SVG (instante t=0
- * de las animaciones SMIL). Es suficiente para los sprites pequeños (22×22) de la arena
- * top-down. Si en el futuro se necesita animación viva en el panel, evaluar
- * {@code org.apache.batik.swing.JSVGCanvas} (más pesado) o pre-renderizar varios frames
- * variando {@code KEY_SNAPSHOT_TIME}.
+ * de las animaciones SMIL). El rasterizado del arena floor a 960×640 toma varios segundos:
+ * por eso {@link #load(String, int, int)} NO debe llamarse desde la EDT durante un paint.
+ * Usar {@link #preloadAsync(List)} en construcción y {@link #tryGetCached(String, int)} desde
+ * paintComponent (con fallback geométrico si todavía no se cargó).
  */
 public final class SpriteLoader {
 
@@ -30,10 +31,9 @@ public final class SpriteLoader {
     }
 
     /**
-     * Carga un sprite cuadrado del handoff.
+     * Carga un sprite cuadrado del handoff (BLOQUEANTE — no llamar desde la EDT).
      *
-     * @param spriteName nombre del archivo bajo {@code src/main/resources/assets/sprites/}
-     *                   (ej: {@code "p1-normal.svg"}).
+     * @param spriteName nombre del archivo bajo {@code src/main/resources/assets/sprites/}.
      * @param size lado en píxeles del {@link BufferedImage} resultante.
      * @return imagen lista para dibujar; nunca null.
      */
@@ -42,7 +42,7 @@ public final class SpriteLoader {
     }
 
     /**
-     * Carga un sprite con dimensiones independientes (útil para arena floor estirada).
+     * Carga un sprite con dimensiones independientes (BLOQUEANTE — útil para arena floor).
      *
      * @param spriteName nombre del archivo SVG.
      * @param width ancho objetivo en píxeles.
@@ -50,7 +50,7 @@ public final class SpriteLoader {
      * @return imagen cacheada por la tupla {@code (spriteName, width, height)}.
      */
     public static BufferedImage load(String spriteName, int width, int height) {
-        String key = spriteName + "@" + width + "x" + height;
+        String key = key(spriteName, width, height);
         BufferedImage cached = CACHE.get(key);
         if (cached != null) {
             return cached;
@@ -76,10 +76,75 @@ public final class SpriteLoader {
     }
 
     /**
+     * Lookup NO BLOQUEANTE en la caché. Apto para llamar desde paintComponent.
+     *
+     * @return imagen cacheada o {@code null} si todavía no se preloadeó.
+     */
+    public static BufferedImage tryGetCached(String spriteName, int size) {
+        return tryGetCached(spriteName, size, size);
+    }
+
+    /**
+     * Lookup NO BLOQUEANTE para sprites rectangulares.
+     */
+    public static BufferedImage tryGetCached(String spriteName, int width, int height) {
+        return CACHE.get(key(spriteName, width, height));
+    }
+
+    /**
+     * Pre-carga una lista de sprites en un hilo daemon. Returns inmediatamente. Errores en
+     * sprites individuales no abortan la pre-carga del resto.
+     * <p>
+     * NOTE: Usar en GamePanel constructor para que cuando la pantalla de juego aparezca los
+     * sprites estén en cache y paintComponent pueda obtenerlos vía {@link #tryGetCached}.
+     *
+     * @return el hilo daemon arrancado (útil en tests con {@code thread.join()}).
+     */
+    public static Thread preloadAsync(List<SpriteSpec> sprites) {
+        Thread t = new Thread(() -> {
+            for (SpriteSpec spec : sprites) {
+                try {
+                    load(spec.name, spec.width, spec.height);
+                } catch (Throwable ignored) {
+                    // NOTE: Atrapamos Throwable (no solo RuntimeException) porque
+                    // FactoryConfigurationError de los parsers XML hereda de Error.
+                    // Un sprite roto NO debe abortar el preload del resto ni matar el daemon.
+                }
+            }
+        }, "sprite-preloader");
+        t.setDaemon(true);
+        t.start();
+        return t;
+    }
+
+    /**
      * Vacía la caché de imágenes ya rasterizadas. Útil para tests o cambios de resolución.
      */
     public static void clearCache() {
         CACHE.clear();
+    }
+
+    private static String key(String spriteName, int width, int height) {
+        return spriteName + "@" + width + "x" + height;
+    }
+
+    /**
+     * Especificación de un sprite a pre-cargar: nombre y dimensiones objetivo.
+     */
+    public static final class SpriteSpec {
+        final String name;
+        final int width;
+        final int height;
+
+        public SpriteSpec(String name, int size) {
+            this(name, size, size);
+        }
+
+        public SpriteSpec(String name, int width, int height) {
+            this.name = name;
+            this.width = width;
+            this.height = height;
+        }
     }
 
     /**

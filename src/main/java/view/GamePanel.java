@@ -53,6 +53,27 @@ public class GamePanel extends JPanel {
         this.gameState = new GameState(GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT,
                 gameEventListener);
         KeyboardBindings.install(this, input);
+        // NOTE: Pre-cargar sprites en background. paintComponent NUNCA debe transcodear SVG en la
+        // EDT (el arena floor a 960×640 toma ~2 s y congelaba el juego). Hasta que el preload
+        // termine, paintComponent dibuja fallbacks geométricos.
+        SpriteLoader.preloadAsync(criticalSprites());
+    }
+
+    /** Lista de sprites usados por paintComponent, con sus tamaños exactos de render. */
+    private static List<SpriteLoader.SpriteSpec> criticalSprites() {
+        int playerSize = GameConstants.PLAYER_SIZE * 2;
+        int discSize = GameConstants.DISC_RADIUS * 4;
+        return List.of(
+                new SpriteLoader.SpriteSpec("arena-floor-vaporwave.svg",
+                        GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT),
+                new SpriteLoader.SpriteSpec("p1-normal.svg", playerSize),
+                new SpriteLoader.SpriteSpec("p1-moto.svg", playerSize),
+                new SpriteLoader.SpriteSpec("p2-normal.svg", playerSize),
+                new SpriteLoader.SpriteSpec("p2-moto.svg", playerSize),
+                new SpriteLoader.SpriteSpec("disc-p1-active.svg", discSize),
+                new SpriteLoader.SpriteSpec("disc-p1-stuck.svg", discSize),
+                new SpriteLoader.SpriteSpec("disc-p2-active.svg", discSize),
+                new SpriteLoader.SpriteSpec("disc-p2-stuck.svg", discSize));
     }
 
     /**
@@ -165,8 +186,15 @@ public class GamePanel extends JPanel {
         if (w <= 0 || h <= 0) {
             return;
         }
-        BufferedImage floor = SpriteLoader.load("arena-floor-vaporwave.svg", w, h);
-        g2.drawImage(floor, 0, 0, null);
+        // NOTE: Se cachea al tamaño NOMINAL (DEFAULT_WIDTH × DEFAULT_HEIGHT) y se reescala con
+        // drawImage cuando el panel tiene otra dimensión. Transcodear de nuevo por cada size sería
+        // catastrófico para el framerate (varios segundos por llamada en la EDT).
+        BufferedImage floor = SpriteLoader.tryGetCached("arena-floor-vaporwave.svg",
+                GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT);
+        if (floor != null) {
+            g2.drawImage(floor, 0, 0, w, h, null);
+        }
+        // Si el preload aún no terminó: el background oscuro del JPanel ya cubre el área.
     }
 
     private static void drawTrails(Graphics2D g2, Player p1, Player p2) {
@@ -220,30 +248,54 @@ public class GamePanel extends JPanel {
         }
 
         String spriteName = (p.getId() == 1 ? "p1" : "p2") + (p.isOnBike() ? "-moto" : "-normal") + ".svg";
-        BufferedImage sprite = SpriteLoader.load(spriteName, spriteSize);
-        // Rotación: el SVG apunta al norte (facing 0,-1 = ángulo 0).
-        double angle = Math.atan2(p.getFacingX(), -p.getFacingY());
-        AffineTransform old = g2.getTransform();
-        g2.rotate(angle, cx, cy);
-        g2.drawImage(sprite, cx - half, cy - half, null);
-        g2.setTransform(old);
+        BufferedImage sprite = SpriteLoader.tryGetCached(spriteName, spriteSize);
+        if (sprite != null) {
+            // Rotación: el SVG apunta al norte (facing 0,-1 = ángulo 0).
+            double angle = Math.atan2(p.getFacingX(), -p.getFacingY());
+            AffineTransform old = g2.getTransform();
+            g2.rotate(angle, cx, cy);
+            g2.drawImage(sprite, cx - half, cy - half, null);
+            g2.setTransform(old);
+        } else {
+            // Fallback hasta que el preload termine: figura geométrica del color del jugador.
+            int logicHalf = GameConstants.PLAYER_SIZE / 2;
+            g2.setColor(p.getColor());
+            g2.fillRoundRect(cx - logicHalf, cy - logicHalf,
+                    GameConstants.PLAYER_SIZE, GameConstants.PLAYER_SIZE, 8, 8);
+        }
 
         g2.setColor(Color.WHITE);
         g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
         g2.drawString(label, cx - half + 3, cy - half - 4);
     }
 
-    private static void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
+    private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
         // Tamaño visible del disco: 4x el radio lógico para que el glow del sprite no se recorte.
         int spriteSize = GameConstants.DISC_RADIUS * 4;
         int half = spriteSize / 2;
+        int radius = GameConstants.DISC_RADIUS;
         for (DiscProjectile d : discs) {
             int cx = (int) Math.round(d.getX());
             int cy = (int) Math.round(d.getY());
             String state = d.isStuck() ? "stuck" : "active";
             String spriteName = "disc-p" + d.getOwnerId() + "-" + state + ".svg";
-            BufferedImage sprite = SpriteLoader.load(spriteName, spriteSize);
-            g2.drawImage(sprite, cx - half, cy - half, null);
+            BufferedImage sprite = SpriteLoader.tryGetCached(spriteName, spriteSize);
+            if (sprite != null) {
+                g2.drawImage(sprite, cx - half, cy - half, null);
+            } else {
+                // Fallback: respeta el aspecto original — color del dueño cuando stuck, cyan en vuelo.
+                if (d.isStuck()) {
+                    Player owner = (d.getOwnerId() == 1) ? gameState.getPlayerOne() : gameState.getPlayerTwo();
+                    g2.setColor(owner.getColor());
+                    g2.fillOval(cx - radius, cy - radius, radius * 2, radius * 2);
+                    g2.setColor(Color.WHITE);
+                    g2.setStroke(new BasicStroke(1.5f));
+                    g2.drawOval(cx - radius, cy - radius, radius * 2, radius * 2);
+                } else {
+                    g2.setColor(new Color(0xaa, 0xff, 0xff));
+                    g2.fillOval(cx - radius, cy - radius, radius * 2, radius * 2);
+                }
+            }
         }
     }
 
