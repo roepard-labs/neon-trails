@@ -16,7 +16,7 @@ PDF exige **4 sonidos mínimos**. Formato obligatorio: **`.wav` PCM 16-bit**, mo
 - [x] `gameover.wav` — al entrar a GameOverScreen. Integrado: random entre `gameover_1.wav` y `gameover_2.wav` en `GameOverScreen.onShow()`; detenido en `onHide()`.
 
 **Restricciones técnicas**:
-- Nada de `.mp3` (Java SE no lo soporta sin librería externa, rompería la regla "cero dependencias").
+- Los SFX siguen en `.wav` por latencia (cargados con `javax.sound.sampled` sin dependencias). Para MP3 (música larga) usar JLayer — ver [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md) y [`AGENTS.md`](AGENTS.md#política-de-dependencias).
 - Toda fuente externa debe ser CC0 o licencia compatible (registrar atribución en `CreditsScreen` cuando aplique).
 
 **Hito 4 listo para implementar cuando los 4 archivos estén en `src/resources/sounds/`.** Música de fondo de menú/juego es opcional, no requerida por el PDF — iría a un Hito 5 separado si la pides.
@@ -31,11 +31,11 @@ Esta sección extiende el Hito 4 con TODA la multimedia (música + SFX + imágen
 
 `src/main/resources/audio/init/JourneySeparateWays.mp3` **YA EXISTE** y va como intro / menú principal.
 
-> ⚠️ **Decisión de formato pendiente** (impacta arquitectura, debe aprobarla el dueño del proyecto):
-> - **Opción A — "cero dependencias"**: convertir el MP3 a WAV. Java SE solo lee WAV/AU/AIFF nativos. Un WAV PCM de 5 min pesa ~30 MB; si la canción se recorta a 60–90 s para el menú baja a ~10 MB. OGG tampoco es nativo (necesitaría `vorbisspi`).
-> - **Opción B — agregar `JLayer`**: `com.googlecode.soundlibs:jlayer:1.0.1.4` (~100 KB, LGPL). Permite reproducir MP3 directo. Rompe la regla "cero dependencias de runtime" del proyecto.
+> ⚠️ **Decisión de formato** (ver [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md)):
+> - **Opción A — WAV**: convertir el MP3 a WAV. Java SE solo lee WAV/AU/AIFF nativos. Un WAV PCM de 5 min pesa ~30 MB; recortado a 60–90 s para el menú baja a ~10 MB.
+> - **Opción B — JLayer** (recomendada): `com.googlecode.soundlibs:jlayer:1.0.1.4` (~100 KB, LGPL). Permite reproducir MP3 directo. La política de dependencias del proyecto permite agregar librerías cuando Java SE no soporta el formato nativamente.
 >
-> Hasta que se decida, Jaco prepara los archivos en **WAV** (Opción A) — si después se aprueba JLayer, los MP3 originales se pueden retomar.
+> **Recomendación:** usar JLayer y mantener los MP3 originales (justificar la dependencia en el PDF). Jaco puede preparar las pistas directamente en MP3.
 
 | ID | Pantalla | Archivo sugerido | Mood | Hook donde se carga |
 |----|----------|------------------|------|---------------------|
@@ -101,6 +101,6 @@ Todos `.wav` PCM 16-bit mono, 44.1 kHz, <200 KB. Ubicación: `src/main/resources
 - Fuentes tipográficas tipo Tron: buscar en [dafont.com](https://dafont.com) categoría "Sci-Fi" con licencia libre (`Tr2n`, `TRON.TTF`, etc. — verificar licencia).
 - Atribuciones a registrar en una futura `CreditsScreen`.
 
-**Restricción dura:**
-- Si NO se aprueba JLayer → solo `.wav` PCM 16-bit (la regla "cero dependencias de runtime" del proyecto, ver `pom.xml` y `AGENTS.md`).
-- Si se aprueba JLayer → MP3 válido para música larga (intro / loops de fondo), pero los SFX deben seguir en WAV por latencia.
+**Reglas de formato:**
+- Con JLayer (recomendado) → MP3 válido para música larga (intro / loops de fondo); los SFX siguen en WAV por latencia.
+- Sin JLayer → convertir música a WAV PCM 16-bit. Ver política de dependencias en [`AGENTS.md`](AGENTS.md#política-de-dependencias) y detalles en [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md).

@@ -49,7 +49,7 @@ Convenciones:
 | # | Criterio | Puntos | Estado | Evidencia / Faltante |
 |---|---|---|---|---|
 | 7 | Gestión de recursos (carpeta Resources, imágenes y **sprites**) | 0.2 | ⚠️ | `src/main/resources/` existe con `audio/sfx/` (15 WAV) y `assets/fonts/rajdhani/` (fuentes TTF/WOFF). **Faltan:** logo UAM, imagen de fondo de bienvenida, sprites del jugador (animaciones), no se carga ninguna imagen con `ImageIO`/`BufferedImage` (ver §3.4). El render del juego es geometría (`fillRoundRect`, `fillOval`) → "sprites (animaciones)" del PDF queda **no cumplido**. |
-| 8 | Inclusión de 4 sonidos (Inicio, Juego, Colisión, Game Over) | 0.2 | ✅ | `src/main/resources/audio/sfx/` con 15 WAV (`shoot_1/2/3`, `hit`, `bike_init/loop/end`, `bounce`, `stop`, `pickup`, `respawn`, `gameover_1/2`, `ui_click`, `ui_hover`). Integrado vía `audio/SoundManager.java` y `audio/AudioGameEventListener.java`. **Tip:** justificar el formato WAV PCM en el PDF (regla "cero dependencias de runtime"). |
+| 8 | Inclusión de 4 sonidos (Inicio, Juego, Colisión, Game Over) | 0.2 | ✅ | `src/main/resources/audio/sfx/` con 15 WAV (`shoot_1/2/3`, `hit`, `bike_init/loop/end`, `bounce`, `stop`, `pickup`, `respawn`, `gameover_1/2`, `ui_click`, `ui_hover`). Integrado vía `audio/SoundManager.java` y `audio/AudioGameEventListener.java`. **Tip:** justificar el formato WAV PCM en el PDF (latencia baja con `javax.sound.sampled` sin dependencias extra — ver `docs/multimedia-libraries.md`). |
 
 ### 2.3 Interfaz (0.7 pts)
 
@@ -129,7 +129,7 @@ Producir como mínimo:
 - **Sprite del jugador**: 4 frames de "encendido" (idle / movimiento) por jugador. Cargar con `ImageIO.read(getClass().getResourceAsStream("/assets/images/p1_sprite_0.png"))` en `GamePanel`, alternar frame cada N ticks. Sin esto, "sprites (animaciones)" sigue **no cumplido**.
 - Imágenes de `docs/branding/images/` (ya existen `p1_wins.png`, `p2_wins.png`, `over.png`, etc.) — moverlas a `src/main/resources/assets/images/` y usarlas en `GameOverScreen` y `WelcomeScreen`.
 
-> **NOTA:** según `docs/multimedia-libraries.md` y `TODO.md`, hay un debate de formatos pendiente (MP3 vs WAV, SVG vs PNG). Mantener PNG/WAV para no romper la regla "cero dependencias de runtime" del `pom.xml`.
+> **NOTA:** PNG/WAV son los formatos base (sin dependencias). MP3/SVG/JSON están disponibles vía dependencias justificadas según la política de [`AGENTS.md`](AGENTS.md#política-de-dependencias). Ver detalles y ejemplos en [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md).
 
 ### 3.5 Ventana de Bienvenida — refuerzo (criterio 9 — 0.2 pts)
 
@@ -186,12 +186,14 @@ Recomendado el **escudo** o **curación** porque la curación cubre también la 
 ### 3.11 Persistencia + Top 3 (criterio 15 — 0.3 pts)
 
 Crear `logic/RankingManager.java`:
-- Carga al inicio `ranking.dat` (serialización Java) o `ranking.csv` desde el directorio de usuario (no del classpath, para que sea escribible — `System.getProperty("user.home") + "/.neontrails/ranking.dat"`).
+- Carga al inicio `ranking.json` desde el directorio de usuario (no del classpath, para que sea escribible — `System.getProperty("user.home") + "/.neontrails/ranking.json"`).
 - Lista de `RankingEntry { String nombre; int puntaje; long tiempoMs; }`.
 - Insertar nueva entrada tras cada partida (desde `GameOverScreen#onShow` o `GameScreen#onGameOver`).
 - Ordenar con **quicksort recursivo propio** (§3.1, §3.2).
 - Exponer `getTop3(): List<RankingEntry>`.
 - Persistir al disco tras cada inserción.
+
+> **Librería recomendada:** Gson 2.11.0 (~300 KB, sin dependencias transitivas) — ver [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md#-json--gson). Serializar JSON a mano es frágil (escapado de strings, Unicode, anidamiento); Gson lo resuelve con `new Gson().toJson(entries, writer)`.
 
 Conectar:
 - `GameOverScreen` lee `rankingManager.getTop3()` y dibuja la tabla.
@@ -205,7 +207,7 @@ Crear documento **fuera del repo** (o en `docs/entregable/`) llamado `PROYECTO P
 3. **Descripción del proyecto** — qué es, género, mecánica principal.
 4. **Capturas de la interfaz** — 1 por pantalla (Bienvenida, Instrucciones, NameInput, Juego, GameOver) y opcionalmente in-game (modo moto, disco rebotando).
 5. **Explicación de clases** — diagrama de paquetes + tabla con cada clase importante: `Player`, `DiscProjectile`, `GameState`, `GameLoop`, `GamePanel`, `ScreenManager`, `SoundManager`, `RankingManager`, etc.
-6. **Librerías utilizadas y justificación** — Java SE Swing (sin dependencias externas, salvo JUnit 5 en test). Justificar por qué no se usa motor de juegos / por qué cero dependencias de runtime (regla del PDF + portabilidad).
+6. **Librerías utilizadas y justificación** — Java SE Swing + dependencias justificadas según la política de [`AGENTS.md`](AGENTS.md#política-de-dependencias) (ver detalles y ejemplos en [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md)). Justificar por qué no se usa motor de juegos y por qué cada dependencia (p. ej. Batik para SVG, JLayer para MP3, Gson para JSON) es necesaria.
 7. **Manual de usuario** — ver §3.13.
 8. **Conclusiones individuales** — ver §3.14.
 9. **Referencias APA séptima** — fuentes consultadas (Oracle Java docs, jsfxr para SFX, etc.).
