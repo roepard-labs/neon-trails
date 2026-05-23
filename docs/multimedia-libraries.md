@@ -1,6 +1,17 @@
 # Librerías multimedia recomendadas — Neon Trails
 
-Proyecto: Java 17 + Swing, Maven, sin dependencias de runtime hasta ahora.
+Proyecto: Java 17 + Swing, Maven.
+
+## Política de dependencias
+
+**Se permite agregar dependencias de runtime cuando el beneficio lo justifique:**
+
+- ✅ **Sí**: cuando Java SE no lo soporta nativamente (MP3, MP4) o la implementación manual es frágil/compleja (SVG, JSON).
+- ✅ **Sí**: cuando la librería es ligera, madura y con pocas dependencias transitivas.
+- ❌ **No**: "porque sí" o cuando se puede resolver con ≤20 líneas de código estándar.
+
+Cada dependencia debe **justificarse en el PDF entregable** (sección "Librerías utilizadas y justificación") y, cuando aplique, anotar su licencia para incluirla en `CreditsScreen`.
+
 Cada sección cubre **una** librería, la más adecuada para el formato.
 
 ---
@@ -125,6 +136,49 @@ mediaPlayer.mediaPlayer().media().play("/ruta/al/video.mp4");
 
 ---
 
+## 📄 JSON — Gson
+
+**Maven:**
+```xml
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.11.0</version>
+</dependency>
+```
+
+**Por qué esta:** Serializar/deserializar JSON a mano es frágil (escapado de strings, Unicode, anidamiento de objetos, fechas). Gson (~300 KB, sin dependencias transitivas) es la opción más ligera y madura para Java SE. Mantenida por Google, API mínima (`new Gson().toJson(...)` y `.fromJson(...)`).
+
+**Ejemplo mínimo (leer y escribir `leaderboard.json`):**
+```java
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.util.List;
+
+Gson gson = new Gson();
+Path file = Path.of(System.getProperty("user.home"), ".neontrails", "leaderboard.json");
+
+// Leer
+Type listType = new TypeToken<List<RankingEntry>>(){}.getType();
+List<RankingEntry> entries;
+try (FileReader reader = new FileReader(file.toFile())) {
+    entries = gson.fromJson(reader, listType);
+}
+
+// Escribir
+try (FileWriter writer = new FileWriter(file.toFile())) {
+    gson.toJson(entries, writer);
+}
+```
+
+**Alternativa más potente:** `com.fasterxml.jackson.core:jackson-databind:2.17.x` (~1.5 MB con dependencias). Más rápido en payloads grandes pero overkill para un leaderboard de Top 3.
+
+---
+
 ## Resumen
 
 | Formato | Librería | Peso | ¿Requiere nativos? |
@@ -132,5 +186,6 @@ mediaPlayer.mediaPlayer().media().play("/ruta/al/video.mp4");
 | SVG | Apache Batik 1.17 | ~8 MB | No |
 | MP3 | JLayer 1.0.1 | ~120 KB | No |
 | MP4 | VLCJ 4.x | ~2 MB + VLC | Sí (VLC instalado o empaquetado) |
+| JSON | Gson 2.11.0 | ~300 KB | No |
 
 Si se necesita video **sin dependencias nativas**, evaluar `jcodec` (MP4 puro Java) o `JavaFX` (`JFXPanel` + `MediaPlayer`).
