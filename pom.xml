@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>Neon Trails</name>
-    <description>Arena local 2 jugadores estilo Tron (Java Swing, sin dependencias de runtime).</description>
+    <description>Arena local 2 jugadores estilo Tron (Java 17 + Swing + dependencias justificadas).</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

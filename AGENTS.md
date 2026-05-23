@@ -14,6 +14,27 @@ La entrega debe alinearse con [**docs/rules/Proyecto Técnicas de Programación.
 
 **Importante:** el PDF menciona políticas académicas estrictas (p. ej. sobre uso de IA y sustentación). Quien entrega el curso es responsable de cumplirlas; este archivo no sustituye las normas del docente.
 
+## Política de dependencias
+
+El proyecto puede incluir dependencias Maven de runtime cuando:
+
+- Java SE **no soporta** el formato/capacidad de forma nativa (MP3, MP4, SVG).
+- La implementación manual sería **frágil o excesivamente compleja** (JSON, parsers, codificación).
+- La librería es **ligera, madura** y con pocas dependencias transitivas.
+
+**Cada dependencia debe justificarse en el PDF entregable** (`PROYECTO POO - NEON TRAILS.pdf`, sección "Librerías utilizadas y justificación"). Detalles y ejemplos en [`docs/multimedia-libraries.md`](docs/multimedia-libraries.md).
+
+**Ejemplos aprobados:**
+
+| Formato | Librería | Peso | Justificación |
+|---------|----------|------|---------------|
+| MP3 | JLayer 1.0.1 | ~120 KB | Java SE no soporta MP3 nativamente |
+| SVG | Apache Batik 1.17 | ~8 MB (~3 MB con `batik-transcoder` + `batik-codec`) | Renderizado SVG → `BufferedImage` |
+| MP4 | VLCJ 4.x | ~2 MB + VLC nativo | Decodificación de video (requiere VLC instalado) |
+| JSON | Gson 2.11.0 | ~300 KB | Serialización robusta del ranking |
+
+**No requiere dependencia** para: WAV (`javax.sound.sampled`), PNG/JPEG (`javax.imageio.ImageIO`), CSV simple (`Files.readAllLines` + `String.split`).
+
 ## Estructura de código (mantener)
 
 | Paquete / área | Ruta | Rol |
