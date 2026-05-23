@@ -1,6 +1,10 @@
 package logic;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Jugador controlable: posición, dirección de movimiento, disparo y modo moto temporal.
@@ -25,6 +29,12 @@ public class Player {
     private long bikeUntilNanos;
     private int score;
     private int lives = INITIAL_LIVES;
+    /** Puntos del rastro del modo moto en orden de grabación (cola = más viejo, cabeza = más nuevo). */
+    private final List<Point2D.Double> motoTrail = new ArrayList<>();
+    /** Fin de la ventana de invulnerabilidad post-hit del rastro, en escala {@link System#nanoTime()}. */
+    private long trailInvulnUntilNanos;
+    /** True mientras el rastro se está erosionando (la moto expiró y los puntos van desapareciendo). */
+    private boolean trailEroding;
 
     /**
      * @param id identificador 1 o 2
@@ -151,7 +161,7 @@ public class Player {
     }
 
     /**
-     * Restablece vidas, score y enfriamiento para iniciar una nueva partida.
+     * Restablece vidas, score, enfriamiento y rastro para iniciar una nueva partida.
      */
     public void resetForNewGame() {
         this.lives = INITIAL_LIVES;
@@ -160,6 +170,107 @@ public class Player {
         this.bikeUntilNanos = 0L;
         this.moveX = 0;
         this.moveY = 0;
+        this.trailInvulnUntilNanos = 0L;
+        clearTrail();
+    }
+
+    /**
+     * Añade un punto al rastro del modo moto. Salta si la posición coincide con la del último
+     * punto (evita inflar la lista cuando el jugador se queda quieto sobre el mismo pixel).
+     *
+     * @param x coordenada absoluta en píxeles
+     * @param y coordenada absoluta en píxeles
+     */
+    public void addTrailPoint(double x, double y) {
+        if (!motoTrail.isEmpty()) {
+            Point2D.Double last = motoTrail.get(motoTrail.size() - 1);
+            if (last.x == x && last.y == y) {
+                return;
+            }
+        }
+        motoTrail.add(new Point2D.Double(x, y));
+    }
+
+    /**
+     * @return vista inmutable de los puntos del rastro, en orden de grabación (cola = más viejo).
+     */
+    public List<Point2D.Double> getMotoTrail() {
+        return Collections.unmodifiableList(motoTrail);
+    }
+
+    /**
+     * Vacía el rastro y cancela cualquier erosión en curso. Usado en respawn y reset.
+     */
+    public void clearTrail() {
+        motoTrail.clear();
+        trailEroding = false;
+    }
+
+    /**
+     * @return true si el jugador todavía está dentro de la ventana de invulnerabilidad al trail
+     *         tras un golpe reciente.
+     */
+    public boolean isTrailInvuln() {
+        return System.nanoTime() < trailInvulnUntilNanos;
+    }
+
+    /**
+     * Activa la ventana de invulnerabilidad al trail por
+     * {@link GameConstants#TRAIL_INVULN_SEC} segundos a partir de ahora.
+     */
+    public void setTrailInvuln() {
+        trailInvulnUntilNanos = System.nanoTime() + (long) (GameConstants.TRAIL_INVULN_SEC * 1_000_000_000L);
+    }
+
+    /**
+     * Marca el rastro para comenzar a erosionarse en el próximo tick. Idempotente; si el rastro
+     * está vacío no hace nada.
+     */
+    public void startTrailErosion() {
+        if (!motoTrail.isEmpty()) {
+            trailEroding = true;
+        }
+    }
+
+    /**
+     * @return true si el rastro está erosionándose actualmente.
+     */
+    public boolean isTrailEroding() {
+        return trailEroding;
+    }
+
+    /**
+     * Elimina puntos desde la cola (los más viejos) a un ritmo que vacía la lista en
+     * {@link GameConstants#TRAIL_EROSION_SEC} segundos a ~60 Hz.
+     * <p>
+     * NOTE: Pensado para llamarse una vez por tick mientras {@link #isTrailEroding()} sea true.
+     */
+    public void erodeTrail() {
+        if (!trailEroding) {
+            return;
+        }
+        if (motoTrail.isEmpty()) {
+            trailEroding = false;
+            return;
+        }
+        int totalTicks = Math.max(1, (int) Math.round(GameConstants.TRAIL_EROSION_SEC * 60.0));
+        int pointsToRemove = Math.max(1, motoTrail.size() / totalTicks);
+        for (int i = 0; i < pointsToRemove && !motoTrail.isEmpty(); i++) {
+            motoTrail.remove(0);
+        }
+        if (motoTrail.isEmpty()) {
+            trailEroding = false;
+        }
+    }
+
+    /**
+     * Fija directamente el instante en que termina la invulnerabilidad al trail.
+     * <p>
+     * NOTE: Visibilidad de paquete a propósito: sólo para pruebas dentro de {@code logic/}
+     * (forzar expiración inmediata sin esperar 0.5 s reales).
+     */
+    void setTrailInvulnUntilNanos(long nanos) {
+        this.trailInvulnUntilNanos = nanos;
     }
 
     /**

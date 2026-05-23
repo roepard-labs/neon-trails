@@ -31,6 +31,10 @@ public interface GameEventListener {
     default void onHit(int victimId) {
     }
 
+    /** Un jugador recibió daño por tocar un rastro de moto (propio fuera de la gracia o enemigo). */
+    default void onTrailHit(int victimId) {
+    }
+
     /** Tras un golpe no letal: jugadores reposicionados en esquinas opuestas. */
     default void onRespawn() {
     }

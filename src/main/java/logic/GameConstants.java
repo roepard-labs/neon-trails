@@ -38,4 +38,18 @@ public final class GameConstants {
 
     /** Período del bucle de juego (ms). */
     public static final int GAME_TICK_MS = 16;
+
+    /** Tiempo que tarda en erosionarse el rastro de moto completo desde la cola (s). */
+    public static final double TRAIL_EROSION_SEC = 3.0;
+    /** Ventana de invulnerabilidad tras recibir daño del rastro de moto (s). */
+    public static final double TRAIL_INVULN_SEC = 0.5;
+    /**
+     * Cantidad de puntos más recientes del propio rastro que no dañan al dueño.
+     * <p>
+     * NOTE: Gracia para evitar auto-daño instantáneo al activar la moto. Operar en índices
+     * (no en distancia euclídea) simplifica la colisión y es estable ante velocidad variable.
+     */
+    public static final int TRAIL_GRACE_POINTS = 4;
+    /** Grosor de la polilínea del rastro de moto (px). */
+    public static final float TRAIL_LINE_WIDTH = 3.0f;
 }
