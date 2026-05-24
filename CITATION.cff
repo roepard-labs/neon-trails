@@ -4,7 +4,7 @@ title: "Neon Trails"
 abstract: "Juego tipo arena local de 2 jugadores estilo Tron (Java Swing) con discos, modo moto y ranking persistente."
 authors:
   - given-names: "Juan Esteban"
-    family-names: "Muñoz Giraldo"
+    family-names: "Manrique Giraldo"
     email: "murksopps@gmail.com"
     orcid: ""
 repository-code: "https://github.com/jemgdevp/neon-trails"
