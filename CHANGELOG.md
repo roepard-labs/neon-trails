@@ -5,7 +5,14 @@ Todas las modificaciones notables a este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## [0.1.0] — En desarrollo
+## [0.2.0] - Nanana
+- Mejoras en los diseños de los jugadores.
+- Incluir dockerizacion.
+- Implementacion mejorada de la documentacion con Vue3-Radix.
+- Linea de rastro en los jugadores.
+
+
+## [0.1.0] — El Despertar de las Bestias.
 
 ### Agregado
 - Arena de juego 2D con bordes colisionables (`view/GamePanel`)
