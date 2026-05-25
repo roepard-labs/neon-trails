@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { Play, Download, RefreshCw, Trophy } from 'lucide-vue-next'
+import {
+  Gamepad2,
+  ShieldCheck,
+  Plug,
+  Download,
+  Github,
+  ExternalLink,
+  RefreshCw,
+  Trophy,
+  type LucideIcon,
+} from 'lucide-vue-next'
 import PageHeader from '@/components/layout/PageHeader.vue'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -19,8 +29,51 @@ useSectionAnimation()
 
 const { entries, loading, error, load } = useLeaderboard()
 
-const GAME_URL = '/game/'
-const JAR_URL = 'https://github.com/roepard-labs/neon-trails/releases'
+const REPO_URL = 'https://github.com/roepard-labs/neon-trails'
+
+// Enlaces a todas las superficies del despliegue. Las rutas internas son
+// relativas: resuelven contra el dominio que sirve la SPA (mismo origen).
+interface EndpointLink {
+  label: string
+  desc: string
+  href: string
+  icon: LucideIcon
+  acento?: boolean
+}
+
+const endpoints: EndpointLink[] = [
+  {
+    label: 'Jugar en el navegador',
+    desc: 'El juego Swing vía noVNC',
+    href: '/game/vnc.html?autoconnect=true&resize=remote',
+    icon: Gamepad2,
+    acento: true,
+  },
+  {
+    label: 'Panel de administración',
+    desc: 'Filament · CRUD del leaderboard (/admin)',
+    href: '/admin',
+    icon: ShieldCheck,
+  },
+  {
+    label: 'API · ranking (JSON)',
+    desc: 'GET /api/scores?limit=20',
+    href: '/api/scores?limit=20',
+    icon: Plug,
+  },
+  {
+    label: 'Descargar .jar',
+    desc: 'Ejecutable del juego (releases)',
+    href: `${REPO_URL}/releases`,
+    icon: Download,
+  },
+  {
+    label: 'Repositorio',
+    desc: 'Código fuente en GitHub',
+    href: REPO_URL,
+    icon: Github,
+  },
+]
 
 const fechaFmt = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium' })
 function formatFecha(iso: string | null): string {
@@ -43,28 +96,40 @@ onMounted(() => load(20))
     <PageHeader
       :numero="8"
       titulo="Leaderboard"
-      subtitulo="Ranking en vivo del juego. Cada partida envía su puntaje al backend (POST /api/scores); aquí se consume GET /api/scores en el mismo origen."
+      subtitulo="Ranking en vivo del juego y acceso directo a todas las superficies del despliegue (juego, panel admin y API), servidas en el mismo dominio."
     />
 
-    <!-- Acciones -->
-    <div data-anim class="mb-8 flex flex-wrap gap-3">
-      <a :href="GAME_URL" :class="buttonVariants()">
-        <Play class="size-4" />
-        Jugar en el navegador
-      </a>
-      <a
-        :href="JAR_URL"
-        target="_blank"
-        rel="noreferrer"
-        :class="buttonVariants({ variant: 'outline' })"
-      >
-        <Download class="size-4" />
-        Descargar .jar
-      </a>
-      <Button variant="ghost" :disabled="loading" @click="load(20)">
-        <RefreshCw class="size-4" :class="{ 'animate-spin': loading }" />
-        Recargar
-      </Button>
+    <!-- Endpoints en vivo -->
+    <div data-anim class="mb-8">
+      <h2 class="mb-3 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <ExternalLink class="size-3.5" />
+        Endpoints en vivo
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          v-for="e in endpoints"
+          :key="e.href"
+          :href="e.href"
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center gap-3 rounded-xl border bg-card p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          :class="e.acento ? 'border-brand/50 hover:border-brand hover:bg-brand/5' : 'border-border hover:border-brand/60 hover:bg-accent/40'"
+        >
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg"
+            :class="e.acento ? 'bg-brand text-brand-foreground' : 'bg-brand/15 text-brand'"
+          >
+            <component :is="e.icon" class="size-5" />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="flex items-center gap-1.5 font-medium">
+              {{ e.label }}
+              <ExternalLink class="size-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
+            <span class="block truncate text-sm text-muted-foreground">{{ e.desc }}</span>
+          </span>
+        </a>
+      </div>
     </div>
 
     <!-- Tabla del ranking -->
@@ -72,8 +137,14 @@ onMounted(() => load(20))
       <div class="flex items-center gap-2 border-b border-border px-5 py-3">
         <Trophy class="size-5 text-brand" />
         <h2 class="font-heading text-lg font-bold">Ranking Top 20</h2>
-        <span class="ml-auto rounded border border-border bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
-          GET /api/scores
+        <span class="ml-auto flex items-center gap-3">
+          <span class="hidden rounded border border-border bg-muted/40 px-2 py-0.5 font-mono text-[11px] text-muted-foreground sm:inline">
+            GET /api/scores
+          </span>
+          <Button variant="ghost" size="sm" :disabled="loading" @click="load(20)">
+            <RefreshCw class="size-4" :class="{ 'animate-spin': loading }" />
+            Recargar
+          </Button>
         </span>
       </div>
 

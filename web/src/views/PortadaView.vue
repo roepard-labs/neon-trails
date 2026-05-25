@@ -215,7 +215,12 @@ const tituloWords = projectInfo.titulo.split(' ')
 
       <!-- Acciones rápidas: jugar y ranking -->
       <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a :href="'/game/'" :class="buttonVariants({ variant: 'outline' })">
+        <a
+          href="/game/vnc.html?autoconnect=true&resize=remote"
+          target="_blank"
+          rel="noopener"
+          :class="buttonVariants({ variant: 'outline' })"
+        >
           <Play class="size-4" />
           Jugar en el navegador
         </a>
