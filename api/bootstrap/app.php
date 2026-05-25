@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Detrás de Traefik/nginx (Dokploy): confiar en los proxies para detectar
+        // correctamente HTTPS, host y IP del cliente desde las cabeceras X-Forwarded-*.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
