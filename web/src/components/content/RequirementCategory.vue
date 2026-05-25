@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { gsap } from '@/lib/gsap'
 import { Briefcase, User, Cog, ListChecks, Shield, type LucideIcon } from 'lucide-vue-next'
 import {
   Popover,
@@ -8,7 +6,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import type { RequirementGroup } from '@/types/domain'
-import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 
 interface Props {
   group: RequirementGroup
@@ -16,9 +13,9 @@ interface Props {
 
 defineProps<Props>()
 
-const root = ref<HTMLElement | null>(null)
-const prefersReducedMotion = usePrefersReducedMotion()
-
+// Sin animación JS de entrada: los chips se renderizan visibles siempre. Antes
+// una animación de opacidad (con ScrollTrigger) los dejaba atascados en opacity:0
+// dentro de los tabs inactivos y desaparecían al cambiar de pestaña.
 const iconMap: Record<string, LucideIcon> = {
   negocio: Briefcase,
   usuario: User,
@@ -26,29 +23,10 @@ const iconMap: Record<string, LucideIcon> = {
   funcional: ListChecks,
   'no-funcional': Shield,
 }
-
-onMounted(() => {
-  const items = root.value?.querySelectorAll('[data-req-item]') ?? []
-  if (!items.length) return
-  if (prefersReducedMotion.value) {
-    gsap.set(items, { opacity: 1, y: 0, clearProps: 'all' })
-    return
-  }
-  // Animación al montar (NO scroll-trigger): dentro de los tabs, los paneles
-  // inactivos no tienen layout y un ScrollTrigger jamás dispararía, dejando los
-  // chips atascados en opacity:0 al cambiar de pestaña. Al montar siempre terminan visibles.
-  gsap.from(items, {
-    opacity: 0,
-    y: 12,
-    duration: 0.4,
-    stagger: 0.03,
-    ease: 'power2.out',
-  })
-})
 </script>
 
 <template>
-  <article ref="root" class="rounded-2xl border border-border bg-card">
+  <article class="rounded-2xl border border-border bg-card">
     <header class="flex items-center gap-4 border-b border-border p-5 sm:p-6">
       <span class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand/12 text-brand">
         <component :is="iconMap[group.categoria] ?? ListChecks" class="size-7" />
