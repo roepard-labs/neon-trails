@@ -1,4 +1,7 @@
 {
     "terminal.integrated.defaultLocation": "editor",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "files.associations": {
+        "*.css": "tailwindcss"
+    }
 }

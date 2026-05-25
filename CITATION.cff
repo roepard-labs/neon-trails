@@ -10,8 +10,8 @@ authors:
 repository-code: "https://github.com/jemgdevp/neon-trails"
 url: "https://github.com/jemgdevp/neon-trails"
 license: MIT
-version: 0.2.0
-date-released: "2026-05-01"
+version: 0.3.0
+date-released: "2026-05-25"
 keywords:
   - "java"
   - "swing"

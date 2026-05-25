@@ -5,6 +5,8 @@
 
 # Maven build output
 target/
+# Artefacto del shade plugin (se regenera en cada package)
+dependency-reduced-pom.xml
 
 # Legacy javac output (reemplazado por Maven)
 out/
@@ -15,3 +17,48 @@ out/
 
 # Bundles de handoff (extraer y commitear sólo los assets útiles, no el tarball)
 *.tar.gz
+
+
+# Logs
+web/logs
+web/*.log
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/pnpm-debug.log*
+web/lerna-debug.log*
+
+web/node_modules
+web/.DS_Store
+web/dist
+web/dist-ssr
+web/coverage
+web/*.local
+
+# Editor directories and files
+web/.vscode/*
+web/!.vscode/extensions.json
+web/.idea
+web/*.suo
+web/*.ntvs*
+web/*.njsproj
+web/*.sln
+web/*.sw?
+
+web/*.tsbuildinfo
+
+web/.eslintcache
+
+# Cypress
+web/cypress/videos/
+web/cypress/screenshots/
+
+# Vitest
+web/__screenshots__/
+
+# Vite
+web/*.timestamp-*-*.mjs
+
+# jemg
+web/.env
+.sessions.yml
