@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager — Arquitectura</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        TaskManager
+        <span>Exposición · Teoría de Sistemas</span>
+      </div>
+      <nav class="nav-main" aria-label="Secciones">
+        <div class="progress-dots" aria-hidden="true">
+          <span></span><span class="is-active"></span><span></span><span></span><span></span>
+        </div>
+        <a href="index.html">1 · Portada</a>
+        <a href="arquitectura.html" class="is-active">2 · Arquitectura</a>
+        <a href="casos-uso.html">3 · Casos de uso</a>
+        <a href="mockups.html">4 · Mockups</a>
+        <a href="descripciones.html">5 · Descripciones</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">☾</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <span class="tag">Vista técnica</span>
+      <h1 class="slide-title">Arquitectura del sistema</h1>
+      <p class="lead">
+        Patrón <strong>cliente-servidor</strong> con API REST JSON: el frontend Vue consume la API Laravel;
+        la capa de <strong>broadcasting</strong> notifica cambios de tareas por WebSockets (Reverb) a clientes
+        suscritos vía Echo.
+      </p>
+
+      <div class="grid-2">
+        <div class="card" style="margin-bottom: 0">
+          <h3>Backend (Laravel)</h3>
+          <ul class="list-check">
+            <li>Rutas <code>/api/*</code> con middleware <code>auth:sanctum</code> en recursos protegidos.</li>
+            <li>Autenticación por token; verificación de correo en flujos registrados.</li>
+            <li>
+              <strong>Scramble</strong> (<code>dedoc/scramble</code>): UI en <code>/docs/api</code>, especificación OpenAPI en
+              <code>/docs/api.json</code>; atributos <code>@Endpoint</code> en controladores; acceso con
+              <code>SCRAMBLE_PUBLIC_DOCS</code> / <code>SCRAMBLE_ALLOWED_EMAILS</code> en <code>config/scramble.php</code>.
+            </li>
+            <li>Eventos de dominio hacia canales <code>tasks</code> y <code>user.{id}.tasks</code>.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-bottom: 0">
+          <h3>Frontend (Vue 3)</h3>
+          <ul class="list-check">
+            <li>Pinia para estado (auth, tasks); Axios con token en <code>Authorization</code>.</li>
+            <li>
+              <strong>Vue Router</strong> (<code>src/router/index.js</code>): historial HTML5, rutas nombradas y
+              <code>meta.requiresAuth</code> / <code>meta.guestOnly</code>; guarda global <code>beforeEach</code>.
+            </li>
+            <li>Echo escucha <code>TaskCreated</code>, <code>TaskUpdated</code>, <code>TaskDeleted</code>.</li>
+            <li>UI con componentes tipo “card” y hero alineados a la identidad del producto.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>De requerimientos a software (RF / RNF)</h2>
+        <p style="margin: 0 0 0.65rem; font-size: 0.9rem; color: var(--text-muted)">
+          Según la guía de la asignatura, los <strong>requerimientos funcionales</strong> se modelan con casos de uso;
+          los <strong>no funcionales</strong> restringen calidad, seguridad y operación. Aquí se relacionan con piezas del
+          repositorio.
+        </p>
+        <table class="req-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Requerimiento (resumen)</th>
+              <th>Dónde se materializa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>RF</td>
+              <td>Registrar e iniciar sesión; emitir token</td>
+              <td><code>routes/api.php</code>, controladores Auth, <code>stores/auth.js</code></td>
+            </tr>
+            <tr>
+              <td>RF</td>
+              <td>CRUD de tareas con validación</td>
+              <td><code>TaskController</code>, <code>stores/task.js</code>, vistas <code>/tasks</code></td>
+            </tr>
+            <tr>
+              <td>RF</td>
+              <td>Publicar y consultar contrato HTTP (OpenAPI)</td>
+              <td>Scramble <code>/docs/api</code>, atributos en controladores, export JSON</td>
+            </tr>
+            <tr>
+              <td>RF</td>
+              <td>Autorizar canales de broadcasting</td>
+              <td><code>POST /api/broadcasting/auth</code>, Echo en <code>plugins/echo.js</code></td>
+            </tr>
+            <tr>
+              <td>RNF</td>
+              <td>Seguridad de acceso y transporte</td>
+              <td>HTTPS en prod, Bearer Sanctum, restricción de docs por env</td>
+            </tr>
+            <tr>
+              <td>RNF</td>
+              <td>Rendimiento en listados</td>
+              <td>Paginación <code>GET /api/tasks?page=</code></td>
+            </tr>
+            <tr>
+              <td>RNF</td>
+              <td>Usabilidad básica</td>
+              <td>UI responsive Vue + feedback de errores Axios</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Flujo general</h2>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart LR
+  subgraph client [Cliente]
+    U[Usuario]
+    V[Vue3_SPA]
+    E[Echo]
+  end
+  subgraph server [Servidor]
+    A[Laravel_API]
+    S[Sanctum]
+    R[Reverb]
+    D[(Base_de_datos)]
+  end
+  U --> V
+  V -->|HTTP_JSON| A
+  A --> S
+  A --> D
+  A -->|broadcast| R
+  E -->|WebSocket| R
+  R --> E
+  E --> V
+          </pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Documentación OpenAPI (Scramble)</h2>
+        <p style="margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.95rem">
+          Scramble analiza rutas y controladores y expone una UI interactiva más el JSON OpenAPI 3.
+        </p>
+        <ul class="code-list" style="list-style: none; padding-left: 0">
+          <li><code>GET /docs/api</code> — interfaz de documentación (Scramble UI)</li>
+          <li><code>GET /docs/api.json</code> — especificación OpenAPI generada</li>
+          <li><code>GET /docs</code> → redirección a <code>/docs/api</code> (<code>routes/web.php</code>)</li>
+          <li>
+            <code>/api/documentation</code> → <code>/docs/api</code> · <code>/api/documentation.json</code> → spec JSON
+            (<code>routes/api.php</code>, prefijo <code>/api</code>)
+          </li>
+          <li>Export estático: <code>php artisan scramble:export --path=storage/api-docs/api-docs.json</code></li>
+          <li>Análisis CI: <code>php artisan scramble:analyze</code></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Rutas Vue (Vue Router)</h2>
+        <p style="margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.95rem">
+          Fuente: <code>task-manager-web/src/router/index.js</code>. Base: <code>createWebHistory(import.meta.env.BASE_URL)</code>.
+        </p>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border); text-align: left">
+              <th style="padding: 0.4rem 0.5rem">Ruta</th>
+              <th style="padding: 0.4rem 0.5rem">Nombre</th>
+              <th style="padding: 0.4rem 0.5rem">Meta / notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border)">
+              <td style="padding: 0.45rem 0.5rem"><code>/</code></td>
+              <td style="padding: 0.45rem 0.5rem"><code>guest.home</code></td>
+              <td style="padding: 0.45rem 0.5rem; color: var(--text-muted)">Landing; enlace a docs abre <code>VITE_API_URL + '/docs'</code></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border)">
+              <td style="padding: 0.45rem 0.5rem"><code>/tasks</code></td>
+              <td style="padding: 0.45rem 0.5rem"><code>tasks.index</code></td>
+              <td style="padding: 0.45rem 0.5rem; color: var(--text-muted)"><code>requiresAuth: true</code> — sin token → redirección a <code>guest.home</code></td>
+            </tr>
+            <tr>
+              <td style="padding: 0.45rem 0.5rem"><code>/verify-email</code></td>
+              <td style="padding: 0.45rem 0.5rem"><code>auth.verify-email</code></td>
+              <td style="padding: 0.45rem 0.5rem; color: var(--text-muted)">Flujo de verificación de correo (<code>query status</code>)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin: 0.75rem 0 0; font-size: 0.88rem; color: var(--text-muted)">
+          <strong>beforeEach:</strong> si la ruta tiene <code>requiresAuth</code> y no hay token en <code>localStorage</code>, navega a
+          <code>guest.home</code>. Si <code>guestOnly</code> y hay sesión: si el email no está verificado →
+          <code>auth.verify-email</code>; si está verificado → <code>tasks.index</code>.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Endpoints API relevantes</h2>
+        <ul class="code-list" style="list-style: none; padding-left: 0">
+          <li><code>GET /api/status</code> — estado del servicio</li>
+          <li><code>POST /api/register</code> · <code>POST /api/login</code> · <code>POST /api/logout</code></li>
+          <li><code>GET|POST /api/tasks</code> · <code>GET|PUT|PATCH|DELETE /api/tasks/{id}</code></li>
+          <li><code>POST /api/broadcasting/auth</code> — autorización de canales privados (Sanctum)</li>
+          <li><code>GET /api/email/verify/{id}/{hash}</code> — verificación firmada</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Secuencia: login y tarea con realtime (resumen)</h2>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+sequenceDiagram
+  participant U as Usuario
+  participant V as Vue_SPA
+  participant A as Laravel_API
+  participant R as Reverb
+  U->>V: Credenciales
+  V->>A: POST /api/login
+  A-->>V: token + usuario
+  V->>A: GET /api/tasks (Bearer)
+  A-->>V: lista paginada
+  V->>R: suscripcion Echo (auth broadcasting)
+  U->>V: crear tarea
+  V->>A: POST /api/tasks
+  A->>R: evento TaskCreated
+  R-->>V: payload
+  V-->>U: lista actualizada
+          </pre>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="index.html">← Portada</a>
+        <a class="btn btn-primary" href="casos-uso.html">Casos de uso →</a>
+      </div>
+    </main>
+
+    <footer class="slide-footer">
+      <a class="btn btn-ghost" href="index.html">← Anterior</a>
+      <small>Diapositiva 2 de 5</small>
+      <a class="btn btn-primary" href="casos-uso.html">Siguiente →</a>
+    </footer>
+
+    <script src="assets/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="assets/mermaid-init.js"></script>
+  </body>
+</html>

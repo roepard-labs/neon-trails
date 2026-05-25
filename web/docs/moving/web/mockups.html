@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager — Mockups de casos de uso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        TaskManager
+        <span>Exposición · Teoría de Sistemas</span>
+      </div>
+      <nav class="nav-main" aria-label="Secciones">
+        <div class="progress-dots" aria-hidden="true">
+          <span></span><span></span><span></span><span class="is-active"></span><span></span>
+        </div>
+        <a href="index.html">1 · Portada</a>
+        <a href="arquitectura.html">2 · Arquitectura</a>
+        <a href="casos-uso.html">3 · Casos de uso</a>
+        <a href="mockups.html" class="is-active">4 · Mockups</a>
+        <a href="descripciones.html">5 · Descripciones</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">☾</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <span class="tag">Diseño de interfaz</span>
+      <h1 class="slide-title">Mockups de casos de uso</h1>
+      <p class="lead">
+        Cada mockup enlaza un <strong>caso de uso</strong> del diagrama con pantallas concretas de la SPA (Vue Router).
+        Convención del curso: casos <strong>primarios</strong> cubren el objetivo principal del sistema; los
+        <strong>secundarios</strong> complementan (docs, tiempo real).
+      </p>
+
+      <section class="mockup-section" aria-labelledby="mu-1">
+        <h2 id="mu-1">
+          CU-01 · Registrarse / Iniciar sesión
+          <span class="badge-cu badge-cu--p" title="Caso de uso primario">Primario</span>
+        </h2>
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <span class="mockup-dot"></span><span class="mockup-dot"></span><span class="mockup-dot"></span>
+            TaskManager — Home
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-hero">
+              <h4>Task Manager</h4>
+              <p>Organiza tu trabajo, sincroniza en tiempo real con Reverb.</p>
+              <div class="mockup-actions">
+                <button type="button" class="mockup-btn mockup-btn--primary">Login / Register</button>
+                <button type="button" class="mockup-btn mockup-btn--ghost">See API documentation</button>
+              </div>
+            </div>
+            <div class="mockup-meta">
+              <div><strong>Pantalla:</strong> ruta nombrada <code>guest.home</code> · path <code>/</code> (<code>router/index.js</code>)</div>
+              <div><strong>Entrada:</strong> Login/Register → modal · Docs → <code>window.open(VITE_API_URL + '/docs')</code> → Scramble en <code>/docs/api</code>.</div>
+              <div><strong>Resultado esperado:</strong> token en <code>localStorage</code>; redirección a <code>tasks.index</code> o <code>auth.verify-email</code>.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mockup-section" aria-labelledby="mu-2">
+        <h2 id="mu-2">
+          CU-02 · Listar y paginar tareas
+          <span class="badge-cu badge-cu--p" title="Incluye validación de sesión">Primario</span>
+        </h2>
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <span class="mockup-dot"></span><span class="mockup-dot"></span><span class="mockup-dot"></span>
+            TaskManager — Tasks
+          </div>
+          <div class="mockup-body">
+            <div
+              style="
+                border: 1px solid var(--border);
+                border-radius: var(--radius-field);
+                padding: 0.75rem;
+                background: var(--bg-card);
+              "
+            >
+              <div style="font-weight: 700; margin-bottom: 0.5rem">Mis tareas</div>
+              <div
+                style="
+                  display: grid;
+                  gap: 0.35rem;
+                  font-size: 0.8rem;
+                  color: var(--text-muted);
+                "
+              >
+                <div style="padding: 0.5rem; background: var(--bg-page); border-radius: 6px">
+                  □ Revisar informe — <em>pending</em> · vence 12/05
+                </div>
+                <div style="padding: 0.5rem; background: var(--bg-page); border-radius: 6px">
+                  □ API docs — <em>in_progress</em>
+                </div>
+                <div style="padding: 0.5rem; background: var(--bg-page); border-radius: 6px">
+                  □ Deploy Dokploy — <em>done</em>
+                </div>
+              </div>
+              <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted)">
+                Página 1 de 3 · Anterior · Siguiente
+              </div>
+            </div>
+            <div class="mockup-meta">
+              <div><strong>Pantalla:</strong> <code>tasks.index</code> · path <code>/tasks</code> (<code>meta.requiresAuth</code>)</div>
+              <div><strong>Entrada:</strong> guard permite acceso solo con token; <code>GET /api/tasks?page=1</code> con Bearer.</div>
+              <div><strong>Resultado esperado:</strong> lista paginada; sin token el router envía a <code>/</code>.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mockup-section" aria-labelledby="mu-3">
+        <h2 id="mu-3">
+          CU-03 · Crear / editar / eliminar tarea
+          <span class="badge-cu badge-cu--p" title="CRUD principal">Primario</span>
+        </h2>
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <span class="mockup-dot"></span><span class="mockup-dot"></span><span class="mockup-dot"></span>
+            Modal — Nueva tarea
+          </div>
+          <div class="mockup-body">
+            <div
+              style="
+                max-width: 320px;
+                margin: 0 auto;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-box);
+                padding: 1rem;
+                background: var(--bg-card);
+              "
+            >
+              <div style="font-weight: 800; margin-bottom: 0.75rem">Crear tarea</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem">Título</div>
+              <div
+                style="
+                  height: 2rem;
+                  background: var(--bg-page);
+                  border-radius: 6px;
+                  border: 1px solid var(--border);
+                  margin-bottom: 0.5rem;
+                "
+              ></div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem">Descripción</div>
+              <div
+                style="
+                  height: 3rem;
+                  background: var(--bg-page);
+                  border-radius: 6px;
+                  border: 1px solid var(--border);
+                  margin-bottom: 0.5rem;
+                "
+              ></div>
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.75rem">
+                <button type="button" class="mockup-btn mockup-btn--ghost">Cancelar</button>
+                <button type="button" class="mockup-btn mockup-btn--primary">Guardar</button>
+              </div>
+            </div>
+            <div class="mockup-meta">
+              <div><strong>Operaciones:</strong> POST / PUT/PATCH / DELETE sobre <code>/api/tasks</code>.</div>
+              <div><strong>Resultado esperado:</strong> fila actualizada; en tiempo real, otros clientes reciben el evento.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mockup-section" aria-labelledby="mu-4">
+        <h2 id="mu-4">
+          CU-04 · Sincronización en tiempo real
+          <span class="badge-cu badge-cu--s" title="Complementa la vista de tareas">Secundario</span>
+        </h2>
+        <div class="mockup-frame">
+          <div class="mockup-chrome">
+            <span class="mockup-dot"></span><span class="mockup-dot"></span><span class="mockup-dot"></span>
+            DevTools / estado — Echo conectado
+          </div>
+          <div class="mockup-body">
+            <div
+              style="
+                font-family: ui-monospace, monospace;
+                font-size: 0.72rem;
+                background: var(--bg-page);
+                padding: 0.75rem;
+                border-radius: 8px;
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+              "
+            >
+              [Echo] channel: tasks<br />
+              [Echo] private user.42.tasks<br />
+              &lt; TaskCreated { id: 108, title: "Demo" }<br />
+              &lt; TaskUpdated { id: 101, status: "done" }
+            </div>
+            <div class="mockup-meta">
+              <div><strong>Canal público:</strong> <code>tasks</code> · <strong>privado:</strong> <code>user.{id}.tasks</code></div>
+              <div><strong>Entrada:</strong> eventos emitidos por Laravel tras persistir en BD.</div>
+              <div><strong>Resultado esperado:</strong> lista coherente sin recargar la página.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="casos-uso.html">← Casos de uso</a>
+        <a class="btn btn-primary" href="descripciones.html">Descripciones formales →</a>
+      </div>
+    </main>
+
+    <footer class="slide-footer">
+      <a class="btn btn-ghost" href="casos-uso.html">← Anterior</a>
+      <small>Diapositiva 4 de 5</small>
+      <a class="btn btn-primary" href="descripciones.html">Siguiente →</a>
+    </footer>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

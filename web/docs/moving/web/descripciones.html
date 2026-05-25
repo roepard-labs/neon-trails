@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager — Descripción de casos de uso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        TaskManager
+        <span>Exposición · Teoría de Sistemas</span>
+      </div>
+      <nav class="nav-main" aria-label="Secciones">
+        <div class="progress-dots" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span class="is-active"></span>
+        </div>
+        <a href="index.html">1 · Portada</a>
+        <a href="arquitectura.html">2 · Arquitectura</a>
+        <a href="casos-uso.html">3 · Casos de uso</a>
+        <a href="mockups.html">4 · Mockups</a>
+        <a href="descripciones.html" class="is-active">5 · Descripciones</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">☾</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <span class="tag">Especificación</span>
+      <h1 class="slide-title">Descripción de casos de uso</h1>
+      <p class="lead">
+        Parte <strong>textual</strong> del modelo de casos de uso (curso): flujo normal paso a paso (camino feliz),
+        <strong>flujos alternos</strong> cuando cambia la condición y <strong>excepciones</strong> ante fallos o datos
+        inválidos. Las fichas siguen la idea del documento de clase y se anclan al código real (Laravel + Vue).
+      </p>
+      <p class="pdf-note">
+        <strong>Plantilla guía:</strong> nombre del caso, actor(es), tipo primario/secundario, precondiciones,
+        descripción, <strong>flujo normal de eventos</strong> (paso numerado con interacción actor–sistema), flujos
+        alternos, postcondiciones y excepciones etiquetadas (p. ej. EX-01).
+      </p>
+
+      <div class="card" style="margin-bottom: 1.5rem">
+        <h2 style="margin-top: 0">Referencias en el código</h2>
+        <ul class="list-check" style="margin: 0">
+          <li>
+            <strong>OpenAPI / Scramble:</strong> UI <code>GET /docs/api</code>, JSON <code>GET /docs/api.json</code>;
+            <code>Route::redirect('/docs', '/docs/api')</code> en <code>routes/web.php</code>;
+            alias bajo API <code>/api/documentation</code> → <code>/docs/api</code> en <code>routes/api.php</code>.
+          </li>
+          <li>
+            <strong>Vue Router:</strong> <code>task-manager-web/src/router/index.js</code> —
+            <code>guest.home</code>, <code>tasks.index</code> (<code>requiresAuth</code>),
+            <code>auth.verify-email</code>; guarda en <code>beforeEach</code> usando token y usuario en
+            <code>localStorage</code>.
+          </li>
+        </ul>
+      </div>
+
+      <article class="uc-card">
+        <h3>CU-DOC-00 — Consultar documentación de la API (Scramble) <span class="badge-cu badge-cu--s">Secundario</span></h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Desarrollador o usuario técnico</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Conocer la URL base de la API (<code>APP_URL</code> o <code>VITE_API_URL</code>). Acceso sujeto a <code>SCRAMBLE_PUBLIC_DOCS</code> / <code>SCRAMBLE_ALLOWED_EMAILS</code>.</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            1) En <code>guest.home</code>, pulsar “See API documentation”. 2) El navegador abre <code>VITE_API_URL/docs</code>.
+            3) Laravel redirige a <code>/docs/api</code> (Scramble). 4) Opcional: descargar contrato en <code>/docs/api.json</code>.
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Docs privadas: el usuario debe autenticarse en la UI de Scramble según política del servidor.</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Contrato OpenAPI 3 visible o serializable para integración.</div>
+          <span class="uc-label">Excepciones</span>
+          <div>
+            <ul class="exc-list">
+              <li><strong>EX-01:</strong> dominio API mal configurado en <code>.env</code> → página en blanco o CORS; revisar <code>VITE_API_URL</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-REG-01 — Registrarse <span class="badge-cu badge-cu--p">Primario</span></h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Invitado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>No posee sesión válida; el correo no está registrado (o el backend devuelve error de validación).</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            1) Solicita registro en la SPA (ruta <code>guest.home</code>). 2) <code>POST /api/register</code>.
+            3) Token y usuario vía store Pinia. 4) Persistencia en <code>localStorage</code>. 5) Navegación a
+            <code>auth.verify-email</code> o <code>tasks.index</code> según <code>email_verified</code> (ver <code>HomeView</code> / <code>auth</code> store).
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>
+            A) Token ausente pero usuario creado: el cliente puede reintentar login. B) Error 422: muestra mensajes de validación.
+          </div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Cuenta creada; sesión iniciada si el token fue emitido; usuario almacenado en estado local.</div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Contraseña confirmada; políticas de validación definidas en el Form Request del backend.</div>
+        </div>
+      </article>
+
+      <article class="uc-card" id="cu-auth-02">
+        <h3>CU-AUTH-02 — Iniciar sesión <span class="badge-cu badge-cu--p">Primario</span></h3>
+        <p style="margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--text-muted)">
+          <strong>Descripción:</strong> el invitado se autentica contra la API y obtiene un token Sanctum para activar los
+          casos de uso que <strong>incluyen</strong> validación de sesión (gestión de tareas).
+        </p>
+        <div class="uc-grid">
+          <span class="uc-label">Actor(es)</span>
+          <div>Invitado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Existe una cuenta registrada; la SPA está cargada y el usuario puede acceder al modal de login (<code>AuthModal.vue</code>).</div>
+        </div>
+        <h4 style="margin: 1rem 0 0.35rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted)">Flujo normal de eventos</h4>
+        <table class="uc-flow-table">
+          <thead>
+            <tr>
+              <th>Paso</th>
+              <th class="col-actor">Actor</th>
+              <th>Sistema</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>En la ruta <code>guest.home</code>, abre login y envía email y contraseña.</td>
+              <td>Muestra formulario y, al enviar, ejecuta <code>POST /api/login</code> con Axios.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>—</td>
+              <td>Laravel valida credenciales; responde con token y usuario (Sanctum).</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>—</td>
+              <td>El store Pinia guarda token y usuario; persiste en <code>localStorage</code>.</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>—</td>
+              <td>Vue Router navega a <code>tasks.index</code> si el correo está verificado; si no, a <code>auth.verify-email</code> (según <code>HomeView</code> / auth store).</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="uc-grid" style="margin-top: 0.75rem">
+          <span class="uc-label">Flujos alternos</span>
+          <div>
+            <strong>FA-1</strong> (paso 1–2): credenciales incorrectas → la API responde error; la UI muestra mensaje y no guarda token (permanece en flujo de login).
+          </div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Sesión iniciada: token enviado en <code>Authorization: Bearer</code> en llamadas posteriores; rutas con <code>requiresAuth</code> accesibles.</div>
+          <span class="uc-label">Excepciones</span>
+          <div>
+            <ul class="exc-list">
+              <li><strong>EX-01</strong> (paso 2): respuesta sin token cuando se esperaba → el store lanza error controlado (“Authentication token missing”).</li>
+              <li><strong>EX-02</strong> (paso 2): error de red → mensaje en UI; no se asume sesión válida.</li>
+            </ul>
+          </div>
+          <span class="uc-label">Reglas / notas</span>
+          <div><code>router.beforeEach</code> impide entrar a <code>/tasks</code> sin token; coincide con el caso incluido “validar sesión” del diagrama.</div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-VER-03 — Verificar correo electrónico <span class="badge-cu badge-cu--s">Secundario</span></h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Usuario autenticado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Sesión activa; email marcado como no verificado en el modelo de usuario.</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            1) Vista <code>auth.verify-email</code> (<code>/verify-email</code>). 2) <code>POST /api/email/verification-notification</code>.
+            3) Enlace firmado <code>GET /api/email/verify/{id}/{hash}</code>. 4) <code>refreshCurrentUser</code> en store auth.
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Enlace expirado o inválido: mensaje de error; posible nuevo envío sujeto a throttle.</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Campo <code>email_verified</code> coherente en cliente y servidor.</div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Rutas firmadas y límites de frecuencia en el endpoint de notificación.</div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-TASK-04 — Listar tareas (paginado) <span class="badge-cu badge-cu--p">Primario</span></h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Usuario autenticado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Token válido; permisos de acceso a la colección de tareas del usuario.</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            1) Navega a <code>tasks.index</code> (<code>/tasks</code>). 2) <code>GET /api/tasks?page=n</code>. 3) Store Pinia + vista lista.
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Página vacía: la colección llega sin ítems; la UI muestra lista vacía (no es error).</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Estado Pinia actualizado con tareas y página actual.</div>
+          <span class="uc-label">Excepciones</span>
+          <div>
+            <ul class="exc-list">
+              <li><strong>EX-01:</strong> HTTP 401 → sesión inválida; conviene limpiar token y volver a <code>guest.home</code>.</li>
+              <li><strong>EX-02:</strong> error de red o 5xx → mensaje de error en store; lista puede quedar desactualizada hasta nuevo intento.</li>
+            </ul>
+          </div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Solo se listan tareas autorizadas por políticas del backend. Este caso <strong>incluye</strong> validación de token (Sanctum).</div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-TASK-05 — Crear / editar / eliminar tarea</h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Usuario autenticado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Sesión válida; formulario completo según reglas (título, estado, fecha, etc.).</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            Crear: <code>POST /api/tasks</code>. Editar: <code>PUT/PATCH /api/tasks/{id}</code>. Eliminar:
+            <code>DELETE /api/tasks/{id}</code>. Tras respuesta OK, actualiza lista local y escucha eventos realtime.
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Validación fallida o 404 en recurso: mensaje en UI sin corromper lista.</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Recurso persistido o eliminado; vista coherente con el servidor.</div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Los eventos broadcast complementan pero no sustituyen la confirmación HTTP.</div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-RT-06 — Sincronizar en tiempo real</h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Usuario autenticado (y sistema de broadcasting)</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Echo inicializado; para canales privados, <code>POST /api/broadcasting/auth</code> autorizado.</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>
+            1) Suscripción a <code>tasks</code> y <code>user.{id}.tasks</code>. 2) Recepción de
+            <code>TaskCreated</code>, <code>TaskUpdated</code>, <code>TaskDeleted</code>. 3) Actualización optimista del store.
+          </div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Reverb no disponible: CRUD por HTTP sigue operativo; la UI puede mostrar estado degradado.</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>Listado refleja cambios externos sin recarga manual.</div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Los payloads deben mapear a los mismos identificadores que la API REST.</div>
+        </div>
+      </article>
+
+      <article class="uc-card">
+        <h3>CU-AUTH-07 — Cerrar sesión</h3>
+        <div class="uc-grid">
+          <span class="uc-label">Actor principal</span>
+          <div>Usuario autenticado</div>
+          <span class="uc-label">Precondiciones</span>
+          <div>Token almacenado localmente.</div>
+          <span class="uc-label">Flujo principal</span>
+          <div>1) Solicita logout. 2) <code>POST /api/logout</code> (best-effort). 3) Limpia token y usuario en cliente.</div>
+          <span class="uc-label">Flujos alternos</span>
+          <div>Error de red: igualmente se limpia la sesión local para evitar estado inconsistente.</div>
+          <span class="uc-label">Postcondiciones</span>
+          <div>No se envían peticiones autenticadas hasta un nuevo login.</div>
+          <span class="uc-label">Reglas de negocio</span>
+          <div>Desconexión de canales Echo al salir de la vista de tareas (implementación en store).</div>
+        </div>
+      </article>
+
+      <div class="card">
+        <h2>Cierre</h2>
+        <p style="margin: 0; color: var(--text-muted)">
+          Este conjunto de casos de uso cubre el núcleo del sistema TaskManager y conecta la exposición académica con
+          decisiones de implementación reales (Sanctum, rutas API, Echo/Reverb). Para despliegue estático, sirve la carpeta
+          <code>web/</code> en la ruta <code>/web</code> de tu reverse proxy o plataforma.
+        </p>
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="mockups.html">← Mockups</a>
+        <a class="btn btn-primary" href="index.html">Volver al inicio</a>
+      </div>
+    </main>
+
+    <footer class="slide-footer">
+      <a class="btn btn-ghost" href="mockups.html">← Anterior</a>
+      <small>Diapositiva 5 de 5 · Fin</small>
+      <a class="btn btn-primary" href="index.html">Inicio →</a>
+    </footer>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

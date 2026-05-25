@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager — Diagrama de casos de uso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        TaskManager
+        <span>Exposición · Teoría de Sistemas</span>
+      </div>
+      <nav class="nav-main" aria-label="Secciones">
+        <div class="progress-dots" aria-hidden="true">
+          <span></span><span></span><span class="is-active"></span><span></span><span></span>
+        </div>
+        <a href="index.html">1 · Portada</a>
+        <a href="arquitectura.html">2 · Arquitectura</a>
+        <a href="casos-uso.html" class="is-active">3 · Casos de uso</a>
+        <a href="mockups.html">4 · Mockups</a>
+        <a href="descripciones.html">5 · Descripciones</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">☾</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <span class="tag">Análisis</span>
+      <h1 class="slide-title">Diagrama de casos de uso</h1>
+      <p class="lead">
+        Modelo en línea con la materia de <strong>requerimientos</strong>: actores fuera del rectángulo del sistema,
+        casos de uso <strong>primarios</strong> (objetivo central del software) y <strong>secundarios</strong> (apoyo),
+        relaciones <strong>&laquo;include&raquo;</strong> (siempre se ejecuta el incluido) y mensajes en tiempo real.
+      </p>
+
+      <div class="card">
+        <h2>Elementos del diagrama (UML — curso)</h2>
+        <ul class="list-check">
+          <li><strong>Sistema:</strong> rectángulo que agrupa los casos de uso del software TaskManager.</li>
+          <li><strong>Actores:</strong> quien interactúa con el sistema (personas u otros sistemas).</li>
+          <li>
+            <strong>Casos de uso primarios:</strong> registrar/iniciar sesión, gestionar tareas (listar, crear, editar,
+            borrar), cerrar sesión.
+          </li>
+          <li>
+            <strong>Casos de uso secundarios:</strong> consultar documentación OpenAPI (Scramble), verificar correo,
+            sincronización en tiempo real vía Reverb/Echo.
+          </li>
+          <li>
+            <strong>&laquo;Include&raquo;:</strong> operaciones sobre tareas <strong>siempre</strong> requieren validar
+            sesión/token (Sanctum + guards). En el diagrama: flecha <code>include</code> hacia el caso reutilizado.
+          </li>
+          <li>
+            <strong>Extend</strong> (opcional): aquí no se grafica para no saturar; ejemplos de flujo opcional serían
+            “activar notificaciones” o pasos condicionales ya cubiertos en la descripción textual.
+          </li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Diagrama (Mermaid)</h2>
+        <p style="margin: 0 0 0.75rem; font-size: 0.88rem; color: var(--text-muted)">
+          <strong>P</strong> = primario · <strong>S</strong> = secundario · <code>Validar_sesion</code> = caso incluido por
+          las operaciones protegidas sobre tareas.
+        </p>
+        <div class="diagram-wrap">
+          <pre class="mermaid">
+flowchart TB
+  G((Invitado))
+  U((Usuario_autenticado))
+  subgraph SYS[Sistema_TaskManager]
+    UC0[Consultar_doc_API_sec]
+    UC1[Registrarse_prim]
+    UC2[Iniciar_sesion_prim]
+    UC3[Verificar_email_sec]
+    UC4[Listar_tareas_prim]
+    UC5[Crear_tarea_prim]
+    UC6[Editar_tarea_prim]
+    UC7[Eliminar_tarea_prim]
+    UC8[Sincronizar_realtime_sec]
+    UC9[Cerrar_sesion_sec]
+    UCv[Validar_token_include]
+  end
+  G --> UC0
+  G --> UC1
+  G --> UC2
+  U --> UC3
+  U --> UC4
+  U --> UC5
+  U --> UC6
+  U --> UC7
+  U --> UC8
+  U --> UC9
+  UC4 -->|include| UCv
+  UC5 -->|include| UCv
+  UC6 -->|include| UCv
+  UC7 -->|include| UCv
+  UC8 -.->|eventos| UC4
+  UC8 -.->|eventos| UC5
+  UC8 -.->|eventos| UC6
+  UC8 -.->|eventos| UC7
+          </pre>
+        </div>
+        <p style="margin: 0.75rem 0 0; font-size: 0.9rem; color: var(--text-muted)">
+          Las líneas punteadas muestran que los eventos broadcast <strong>refrescan</strong> la vista y el estado local,
+          sin reemplazar las peticiones REST del flujo principal.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card" style="margin-bottom: 0">
+          <h3>Invitado</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem">
+            Casos de acceso inicial y consulta de contrato (<strong>RF usuario</strong>). Entrada típica:
+            <code>guest.home</code>; docs en <code>VITE_API_URL/docs</code> → Scramble <code>/docs/api</code>.
+          </p>
+        </div>
+        <div class="card" style="margin-bottom: 0">
+          <h3>Usuario autenticado</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem">
+            Ejecuta los RF de negocio sobre tareas y sesión; la verificación de correo puede ser condición previa según
+            política (<strong>RNF</strong> seguridad / flujo de cuenta).
+          </p>
+        </div>
+        <div class="card" style="margin-bottom: 0">
+          <h3>Tiempo real</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem">
+            Caso de soporte <strong>secundario</strong>: Echo + Reverb; broadcast auth con el mismo token Sanctum
+            (<strong>RF sistema</strong> + <strong>RNF</strong> coherencia en vivo).
+          </p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="arquitectura.html">← Arquitectura</a>
+        <a class="btn btn-primary" href="mockups.html">Mockups →</a>
+      </div>
+    </main>
+
+    <footer class="slide-footer">
+      <a class="btn btn-ghost" href="arquitectura.html">← Anterior</a>
+      <small>Diapositiva 3 de 5</small>
+      <a class="btn btn-primary" href="mockups.html">Siguiente →</a>
+    </footer>
+
+    <script src="assets/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="assets/mermaid-init.js"></script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager — Exposición | Portada</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        TaskManager
+        <span>Exposición · Teoría de Sistemas</span>
+      </div>
+      <nav class="nav-main" aria-label="Secciones">
+        <div class="progress-dots" aria-hidden="true">
+          <span class="is-active"></span><span></span><span></span><span></span><span></span>
+        </div>
+        <a href="index.html" class="is-active">1 · Portada</a>
+        <a href="arquitectura.html">2 · Arquitectura</a>
+        <a href="casos-uso.html">3 · Casos de uso</a>
+        <a href="mockups.html">4 · Mockups</a>
+        <a href="descripciones.html">5 · Descripciones</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">☾</button>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <span class="tag">Proyecto integrador</span>
+      <h1 class="slide-title">TaskManager</h1>
+      <p class="lead">
+        Sistema de gestión de tareas <strong>API-first</strong>: organizar el trabajo personal o de equipo,
+        con sincronización en tiempo real y enfoque en cerrar tareas pendientes.
+      </p>
+
+      <div class="card">
+        <h2>Contexto y problema</h2>
+        <p class="lead" style="margin-bottom: 0.75rem">
+          En entornos académicos y profesionales se pierde visibilidad sobre prioridades, fechas límite y
+          cambios hechos por otros. Se necesita un sistema coherente que separe claramente
+          <strong>presentación</strong>, <strong>lógica de negocio</strong> y <strong>datos</strong>, y que
+          permita evolucionar el frontend sin acoplarlo al detalle del servidor.
+        </p>
+        <ul class="list-check">
+          <li><strong>Objetivo:</strong> centralizar tareas con estados, vencimiento y actualizaciones en vivo.</li>
+          <li><strong>Alcance:</strong> autenticación con token, CRUD de tareas, canales realtime (Echo + Reverb).</li>
+          <li><strong>Valor:</strong> arquitectura desacoplada, documentación OpenAPI y despliegue reproducible.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Requerimientos (marco del curso)</h2>
+        <p class="pdf-note" style="margin-bottom: 0.75rem">
+          Alineado con la guía académica <em>Requerimientos y casos de uso</em>: los requerimientos se clasifican por
+          <strong>nivel</strong> (negocio, usuario, sistema) y por tipo <strong>funcional (RF)</strong> vs
+          <strong>no funcional (RNF)</strong>. Los casos de uso modelan los RF y se documentan aparte (diagrama + texto).
+        </p>
+        <table class="req-table">
+          <thead>
+            <tr>
+              <th>Nivel</th>
+              <th>Pregunta guía</th>
+              <th>Ejemplo en TaskManager</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Negocio</strong></td>
+              <td>¿Por qué existe el sistema?</td>
+              <td>Reducir retrabajo por tareas desactualizadas; visibilidad de vencimientos y estado.</td>
+            </tr>
+            <tr>
+              <td><strong>Usuario</strong></td>
+              <td>¿Qué debe poder hacer el actor?</td>
+              <td>Registrarse, iniciar sesión, CRUD de tareas, ver cambios en tiempo real, consultar API docs.</td>
+            </tr>
+            <tr>
+              <td><strong>Sistema</strong></td>
+              <td>¿Cómo lo cumple técnicamente?</td>
+              <td>REST con Sanctum, Vue Router + Pinia, Reverb/Echo, OpenAPI con Scramble, HTTPS en producción.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 style="margin: 1rem 0 0.35rem; font-size: 0.95rem">RF y RNF aplicados</h3>
+        <ul class="list-check">
+          <li>
+            <strong>RF:</strong> autenticación con usuario/contraseña y token; CRUD de tareas; verificación de correo;
+            broadcasting auth; documentación de endpoints (Scramble).
+          </li>
+          <li>
+            <strong>RNF:</strong> seguridad (HTTPS, token Bearer, acceso restringido a docs según env); rendimiento
+            razonable vía API paginada; disponibilidad dependiente del despliegue; usabilidad responsive básica en la SPA.
+          </li>
+        </ul>
+      </div>
+
+      <div class="grid-3">
+        <div class="card" style="margin-bottom: 0">
+          <h3>Stack</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem">
+            <strong>Laravel 12</strong> (API), <strong>Vue 3</strong> + Vite, <strong>Sanctum</strong>,
+            <strong>Laravel Echo</strong> + <strong>Reverb</strong>.
+          </p>
+        </div>
+        <div class="card" style="margin-bottom: 0">
+          <h3>Contrato y docs</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem">
+            La API se describe con <strong>OpenAPI</strong> generada por <strong>Dedoc Scramble</strong>
+            (<code>/docs/api</code>, JSON en <code>/docs/api.json</code>). El front abre
+            <code>${VITE_API_URL}/docs</code> desde <code>HomeView.vue</code>; en Laravel, <code>routes/web.php</code> redirige <code>/docs</code> → <code>/docs/api</code> (UI Scramble).
+            Export CI: <code>php artisan scramble:export --path=storage/api-docs/api-docs.json</code>.
+          </p>
+        </div>
+        <div class="card" style="margin-bottom: 0">
+          <h3>Esta presentación</h3>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem">
+            Cinco secciones navegables (también con ← →). Lista para servirse como sitio estático bajo
+            <code>/web</code> en Dokploy.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Vue Router en la SPA</h2>
+        <p style="margin: 0 0 0.75rem; color: var(--text-muted); font-size: 0.95rem">
+          Rutas definidas en <code>src/router/index.js</code> con <code>createWebHistory(import.meta.env.BASE_URL)</code>:
+          <code>guest.home</code> (<code>/</code>),
+          <code>tasks.index</code> (<code>/tasks</code>, <code>requiresAuth</code>),
+          <code>auth.verify-email</code> (<code>/verify-email</code>).
+          El <code>beforeEach</code> redirige sin token desde rutas protegidas al home y gestiona verificación de correo.
+        </p>
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="arquitectura.html">Siguiente: Arquitectura →</a>
+        <span style="color: var(--text-muted); font-size: 0.85rem">Universidad Autónoma · Teoría de Sistemas</span>
+      </div>
+    </main>
+
+    <footer class="slide-footer">
+      <a class="btn btn-ghost" href="descripciones.html">← Anterior</a>
+      <small>Diapositiva 1 de 5 · <kbd>→</kbd> avanzar</small>
+      <a class="btn btn-primary" href="arquitectura.html">Siguiente →</a>
+    </footer>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

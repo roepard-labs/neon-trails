@@ -1,37 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Neon Trails — panel mock</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <header>
-    <h1>Neon Trails</h1>
-    <p class="subtitle">Estado mock de partida / ranking (sin conexión al JAR aún)</p>
-  </header>
-
-  <main>
-    <section class="card" id="match-state">
-      <h2>Partida simulada</h2>
-      <dl>
-        <dt>P1</dt><dd id="p1-score">—</dd>
-        <dt>P2</dt><dd id="p2-score">—</dd>
-        <dt>Modo moto</dt><dd id="bike-hint">Activa con Q / U en el juego Swing</dd>
-      </dl>
-    </section>
-
-    <section class="card">
-      <h2>Top 3 (mock JSON)</h2>
-      <ol id="leaderboard"></ol>
-    </section>
-  </main>
-
-  <footer>
-    <small>Stub frontend para evolución futura (API o exportación de puntajes).</small>
-  </footer>
-
-  <script src="app.js" type="module"></script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c20">
+    <meta name="description" content="Neon Trails — proyecto final de Técnicas de Programación (UAM): arena local 2 jugadores tipo Tron en Java Swing, con leaderboard persistente en Laravel + MariaDB y jugable en el navegador vía noVNC.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Neon Trails · Técnicas de Programación</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
