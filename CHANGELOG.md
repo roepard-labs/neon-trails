@@ -5,7 +5,16 @@ Todas las modificaciones notables a este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.3.0] - Tal vez lo que emerge de lo desconocido no sea tan aterrador después de todo.
+### Agregado
+- Dockerizacion completa, un setup inigualable.
+- Los assets de jaco implementados.
+- Hacer que el jugador no se muera en moto al ir a su rumbo opuesto.
+- API Laravel 13 , Base de datos MariaDB 11.
+- Landing Page en Vue 3 con Shadcn-vue.
+
 ## [0.2.0] - Nanana
+### Agregado
 - Mejoras en los diseños de los jugadores.
 - Incluir dockerizacion.
 - Implementacion mejorada de la documentacion con Vue3-Radix.
