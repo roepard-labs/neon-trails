@@ -6,12 +6,10 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import RequirementCategory from '@/components/content/RequirementCategory.vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useSectionAnimation } from '@/composables/useSectionAnimation'
-import { useScrollReveal } from '@/composables/useScrollReveal'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { requirementGroups } from '@/data/requirements'
 
 useSectionAnimation()
-useScrollReveal('[data-reveal]')
 
 const prefersReducedMotion = usePrefersReducedMotion()
 
@@ -113,9 +111,7 @@ onMounted(() => {
         :value="g.categoria"
         class="mt-6 focus-visible:ring-0"
       >
-        <div data-reveal>
-          <RequirementCategory :group="g" />
-        </div>
+        <RequirementCategory :group="g" />
       </TabsContent>
     </Tabs>
 

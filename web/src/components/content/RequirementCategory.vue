@@ -34,17 +34,15 @@ onMounted(() => {
     gsap.set(items, { opacity: 1, y: 0, clearProps: 'all' })
     return
   }
+  // Animación al montar (NO scroll-trigger): dentro de los tabs, los paneles
+  // inactivos no tienen layout y un ScrollTrigger jamás dispararía, dejando los
+  // chips atascados en opacity:0 al cambiar de pestaña. Al montar siempre terminan visibles.
   gsap.from(items, {
     opacity: 0,
     y: 12,
     duration: 0.4,
     stagger: 0.03,
     ease: 'power2.out',
-    scrollTrigger: {
-      trigger: root.value,
-      start: 'top 85%',
-      toggleActions: 'play none none none',
-    },
   })
 })
 </script>
