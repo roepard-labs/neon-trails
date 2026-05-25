@@ -1,0 +1,40 @@
+# Contexto de build del Dockerfile central. Las dependencias y artefactos se
+# reconstruyen en sus stages, así que no se envían desde el host.
+
+# Control de versiones y herramientas de agentes
+.git
+.github
+.gitignore
+.cursor
+.claude
+.claude-flow
+.agents
+.sisyphus
+
+# Java (se reconstruye en el stage java-builder)
+target/
+out/
+dependency-reduced-pom.xml
+
+# Vue (se reconstruye en el stage web-builder)
+web/node_modules/
+web/dist/
+web/dist-ssr/
+web/coverage/
+web/.vite/
+
+# Laravel (vendor se reconstruye en el stage php-deps)
+api/vendor/
+api/node_modules/
+api/storage/logs/*.log
+
+# Secretos / entorno (se inyectan por variables en runtime)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Misc
+*.tar.gz
+**/.DS_Store
+.vscode/
+.idea/
