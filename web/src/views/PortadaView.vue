@@ -5,9 +5,10 @@ import { MapPin, ArrowRight, Play, Trophy } from 'lucide-vue-next'
 import { projectInfo } from '@/data/project'
 import { buttonVariants } from '@/components/ui/button'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
-import portadaPhoto from '@/assets/jemgdevp.jpeg'
+import logoJemg from '@/assets/logo-jemg.png'
+import logoJaco from '@/assets/logo-jaco.svg'
 
-const photo = ref<HTMLElement | null>(null)
+const logos = ref<HTMLElement | null>(null)
 const eyebrow = ref<HTMLElement | null>(null)
 const title = ref<HTMLElement | null>(null)
 const subtitle = ref<HTMLElement | null>(null)
@@ -20,7 +21,7 @@ const prefersReducedMotion = usePrefersReducedMotion()
 onMounted(() => {
   if (prefersReducedMotion.value) {
     const targets = [
-      photo.value,
+      logos.value,
       eyebrow.value,
       accentLine.value,
       ...(title.value?.querySelectorAll('.split-word') ?? []),
@@ -34,7 +35,13 @@ onMounted(() => {
 
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-  tl.from(photo.value, { opacity: 0, scale: 0.85, duration: 0.9 })
+  tl.from(logos.value?.children ?? [], {
+    opacity: 0,
+    scale: 0.8,
+    y: 12,
+    duration: 0.8,
+    stagger: 0.14,
+  })
     .from(eyebrow.value, { opacity: 0, y: 12, duration: 0.5 }, '-=0.4')
     .from(
       accentLine.value,
@@ -78,28 +85,39 @@ const tituloWords = projectInfo.titulo.split(' ')
     />
 
     <div class="relative mx-auto flex max-w-3xl flex-col items-center">
-      <!-- Foto + halo difuminado -->
-      <div ref="photo" class="relative mb-10 size-28 sm:size-32 md:size-40 lg:size-44">
-        <!-- Halo difuminado rotando (misma foto, escalada y borrosa) -->
-        <div class="pointer-events-none absolute inset-0 animate-orbit-slow" aria-hidden="true">
+      <!-- Logos del equipo (JEMG × Jaco) — atados a los colores de los 2 jugadores -->
+      <div ref="logos" class="mb-10 flex items-center justify-center gap-4 sm:gap-6">
+        <!-- P1 · cian -->
+        <div
+          class="flex h-20 items-center justify-center rounded-xl border border-cyan-400/30 bg-black px-6 shadow-[0_0_38px_-10px_rgba(34,211,238,0.55)] sm:h-24 sm:px-8"
+        >
           <img
-            :src="portadaPhoto"
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
+            :src="logoJemg"
+            alt="Logo de Juan Esteban Manrique Giraldo"
+            loading="eager"
             decoding="async"
-            class="absolute inset-0 size-full scale-[1.7] rounded-full object-cover opacity-50 blur-3xl saturate-150"
+            fetchpriority="high"
+            class="h-9 w-auto object-contain sm:h-11"
           />
         </div>
-        <!-- Foto principal -->
-        <img
-          :src="portadaPhoto"
-          alt="Neon Trails"
-          loading="eager"
-          decoding="async"
-          fetchpriority="high"
-          class="relative size-full rounded-full object-cover shadow-2xl ring-4 ring-background ring-offset-2 ring-offset-brand/40"
-        />
+
+        <span
+          class="select-none font-mono text-xl font-light text-muted-foreground/50"
+          aria-hidden="true"
+        >×</span>
+
+        <!-- P2 · magenta -->
+        <div
+          class="flex h-20 items-center justify-center rounded-xl border border-fuchsia-500/30 bg-black px-6 shadow-[0_0_38px_-10px_rgba(217,70,239,0.55)] sm:h-24 sm:px-8"
+        >
+          <img
+            :src="logoJaco"
+            alt="Logo de Jacobo López Patiño"
+            loading="eager"
+            decoding="async"
+            class="h-12 w-auto object-contain sm:h-16"
+          />
+        </div>
       </div>
 
       <!-- Eyebrow + accent line -->
