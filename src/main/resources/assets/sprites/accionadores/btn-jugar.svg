@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="56" viewBox="0 0 280 56">
+  <defs>
+    <filter id="glow-btn" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+  <!-- Shadow layers -->
+  <polygon points="6,6 278,6 282,10 282,52 10,52 6,48" fill="#004444"/>
+  <polygon points="4,4 276,4 280,8 280,50 8,50 4,46"   fill="#007777"/>
+  <!-- Glow halo -->
+  <polygon points="2,2 274,2 278,6 278,48 6,48 2,44"   fill="#00ffff" filter="url(#glow-btn)" opacity="0.45"/>
+  <!-- Body -->
+  <polygon points="2,2 274,2 278,6 278,48 6,48 2,44"   fill="#00ffff"/>
+  <!-- Highlight -->
+  <polygon points="2,2 274,2 278,6 278,18 2,18"         fill="#ffffff" fill-opacity="0.16"/>
+  <!-- Text -->
+  <text x="140" y="31"
+        font-family="'Courier New', Courier, monospace"
+        font-weight="700" font-size="16" letter-spacing="4"
+        fill="#0a0a12" text-anchor="middle" dominant-baseline="middle">JUGAR</text>
+</svg>

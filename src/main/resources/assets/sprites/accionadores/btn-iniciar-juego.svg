@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80" viewBox="0 0 300 80">
+  <defs>
+    <filter id="glow-cyan" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="b1"/>
+      <feGaussianBlur stdDeviation="8" result="b2"/>
+      <feMerge>
+        <feMergeNode in="b2"/>
+        <feMergeNode in="b1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="b1"/>
+      <feMerge>
+        <feMergeNode in="b1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shadow layers (pixel-style offset) -->
+  <polygon points="12,12 296,12 300,16 300,76 16,76 12,72"
+           fill="#004444"/>
+  <polygon points="10,10 294,10 298,14 298,74 14,74 10,70"
+           fill="#007777"/>
+
+  <!-- Main button body (clipped corners) -->
+  <polygon points="8,8 292,8 296,12 296,72 12,72 8,68"
+           fill="#00ffff" filter="url(#glow-soft)"/>
+
+  <!-- Subtle inner highlight -->
+  <polygon points="8,8 292,8 296,12 296,28 8,28"
+           fill="#ffffff" fill-opacity="0.15"/>
+
+  <!-- Button text -->
+  <text x="152" y="47"
+        font-family="'Courier New', Courier, monospace"
+        font-weight="700"
+        font-size="16"
+        letter-spacing="3"
+        fill="#0a0a12"
+        text-anchor="middle"
+        dominant-baseline="middle">INICIAR JUEGO</text>
+
+  <!-- Pixel corner accents on button -->
+  <rect x="8"   y="8"  width="4" height="4" fill="#004444"/>
+  <rect x="288" y="8"  width="4" height="4" fill="#004444"/>
+  <rect x="8"   y="60" width="4" height="4" fill="#004444"/>
+  <rect x="288" y="60" width="4" height="4" fill="#004444"/>
+</svg>

@@ -1,0 +1,258 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <!-- Background -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset="55%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.75)"/>
+    </radialGradient>
+
+    <!-- Cyan glow filter -->
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="10" result="blur2"/>
+      <feGaussianBlur stdDeviation="20" result="blur3"/>
+      <feMerge>
+        <feMergeNode in="blur3"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Pink glow filter -->
+    <filter id="glow-pink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="10" result="blur2"/>
+      <feGaussianBlur stdDeviation="20" result="blur3"/>
+      <feMerge>
+        <feMergeNode in="blur3"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Button clip path -->
+    <clipPath id="btnClip">
+      <polygon points="0,0 176,0 184,8 184,44 8,44 0,36"/>
+    </clipPath>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#0d2a2a" stroke-width="1"/>
+    </pattern>
+
+    <!-- Scanlines pattern -->
+    <pattern id="scanlines" x="0" y="0" width="1" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="2" width="1" height="2" fill="rgba(0,0,0,0.18)"/>
+    </pattern>
+
+    <!-- Trail gradients -->
+    <linearGradient id="trail1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="trail2" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff3399" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ff3399" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="trail3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="trail4" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff3399" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ff3399" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="topBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="20%" stop-color="#00ffff"/>
+      <stop offset="50%" stop-color="#00ffff"/>
+      <stop offset="80%" stop-color="#ff3399"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <linearGradient id="bottomBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="20%" stop-color="#ff3399"/>
+      <stop offset="50%" stop-color="#ff3399"/>
+      <stop offset="80%" stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <linearGradient id="dividerLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="30%" stop-color="#00ffff"/>
+      <stop offset="70%" stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── BACKGROUND ── -->
+  <rect width="800" height="500" fill="#0a0a12"/>
+
+  <!-- ── GRID (perspective retro floor effect) ── -->
+  <g opacity="0.55" transform="translate(0,170) scale(1.4,1) skewX(0)">
+    <rect x="-100" y="0" width="1000" height="400" fill="url(#grid)"/>
+  </g>
+
+  <!-- ── LIGHT TRAILS ── -->
+  <!-- Cyan trails (left→right) -->
+  <line x1="0" y1="80" x2="260" y2="80" stroke="url(#trail1)" stroke-width="2" filter="url(#glow-cyan)" opacity="0.6"/>
+  <line x1="0" y1="82" x2="200" y2="82" stroke="url(#trail1)" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.35"/>
+  <line x1="0" y1="390" x2="280" y2="390" stroke="url(#trail3)" stroke-width="1.5" filter="url(#glow-cyan)" opacity="0.5"/>
+  <line x1="0" y1="310" x2="140" y2="310" stroke="url(#trail1)" stroke-width="1" opacity="0.3"/>
+
+  <!-- Pink trails (right→left) -->
+  <line x1="800" y1="140" x2="530" y2="140" stroke="url(#trail2)" stroke-width="2" filter="url(#glow-pink)" opacity="0.6"/>
+  <line x1="800" y1="142" x2="580" y2="142" stroke="url(#trail2)" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.35"/>
+  <line x1="800" y1="420" x2="510" y2="420" stroke="url(#trail4)" stroke-width="1.5" filter="url(#glow-pink)" opacity="0.5"/>
+  <line x1="800" y1="340" x2="640" y2="340" stroke="url(#trail2)" stroke-width="1" opacity="0.3"/>
+
+  <!-- ── SCANLINES ── -->
+  <rect width="800" height="500" fill="url(#scanlines)" opacity="0.7"/>
+
+  <!-- ── VIGNETTE ── -->
+  <rect width="800" height="500" fill="url(#vignette)"/>
+
+  <!-- ── TOP / BOTTOM BARS ── -->
+  <rect x="0" y="0" width="800" height="3" fill="url(#topBar)"/>
+  <rect x="0" y="497" width="800" height="3" fill="url(#bottomBar)"/>
+
+  <!-- ── CORNER DECORATIONS ── -->
+  <!-- TL -->
+  <polyline points="16,60 16,16 60,16" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <!-- TR -->
+  <polyline points="740,16 784,16 784,60" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <!-- BL -->
+  <polyline points="16,440 16,484 60,484" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <!-- BR -->
+  <polyline points="740,484 784,484 784,440" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+
+  <!-- ── PIXEL BIKE P1 (cyan) ── -->
+  <!-- Body pixels at scale 4 -->
+  <g transform="translate(182, 88)" filter="url(#glow-cyan)">
+    <!-- row y=4 -->
+    <rect x="8"  y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="12" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="16" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="20" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="24" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="28" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="32" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="36" y="11.2" width="3" height="2.8" fill="#00ffff"/>
+    <!-- row y=5 -->
+    <rect x="4"  y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="12" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="16" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="20" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="24" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="28" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="40" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <rect x="44" y="14"   width="3" height="2.8" fill="#00ffff"/>
+    <!-- row y=6 -->
+    <rect x="8"  y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="12" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="16" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="20" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="24" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="28" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="32" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="36" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="40" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+    <rect x="44" y="16.8" width="3" height="2.8" fill="#00ffff"/>
+  </g>
+  <!-- P1 label -->
+  <text x="206" y="128" font-family="monospace" font-size="8" fill="#00ffff" text-anchor="middle" filter="url(#glow-cyan)" letter-spacing="1">P1</text>
+
+  <!-- ── PIXEL BIKE P2 (pink) ── -->
+  <g transform="translate(566, 88)" filter="url(#glow-pink)">
+    <rect x="8"  y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="12" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="16" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="20" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="24" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="28" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="32" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="36" y="11.2" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="4"  y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="12" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="16" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="20" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="24" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="28" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="40" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="44" y="14"   width="3" height="2.8" fill="#ff3399"/>
+    <rect x="8"  y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="12" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="16" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="20" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="24" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="28" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="32" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="36" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="40" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+    <rect x="44" y="16.8" width="3" height="2.8" fill="#ff3399"/>
+  </g>
+  <text x="590" y="128" font-family="monospace" font-size="8" fill="#ff3399" text-anchor="middle" filter="url(#glow-pink)" letter-spacing="1">P2</text>
+
+  <!-- ── LOGO: NEON ── -->
+  <text x="400" y="165"
+    font-family="'Arial Black', 'Impact', sans-serif"
+    font-weight="900"
+    font-size="96"
+    letter-spacing="18"
+    fill="#00ffff"
+    text-anchor="middle"
+    filter="url(#glow-cyan)">NEON</text>
+
+  <!-- ── LOGO: TRAILS ── -->
+  <text x="400" y="210"
+    font-family="'Courier New', monospace"
+    font-weight="700"
+    font-size="36"
+    letter-spacing="6"
+    fill="#ff3399"
+    text-anchor="middle"
+    filter="url(#glow-pink)">TRAILS</text>
+
+  <!-- ── TAGLINE ── -->
+  <text x="400" y="242"
+    font-family="'Courier New', monospace"
+    font-size="9"
+    letter-spacing="4"
+    fill="#00ffff"
+    text-anchor="middle"
+    opacity="0.7">▸ ARENA 2 JUGADORES ◂</text>
+
+  <!-- ── SCORE ROW ── -->
+  <text x="310" y="272" font-family="'Courier New', monospace" font-size="10" fill="#00ffff" text-anchor="middle" filter="url(#glow-cyan)">♥ ♥ ♥</text>
+  <text x="400" y="272" font-family="'Courier New', monospace" font-size="10" fill="#eeeeff" text-anchor="middle" opacity="0.35">VS</text>
+  <text x="490" y="272" font-family="'Courier New', monospace" font-size="10" fill="#ff3399" text-anchor="middle" filter="url(#glow-pink)">♥ ♥ ♥</text>
+
+  <!-- ── PIXEL DIVIDER ── -->
+  <rect x="212" y="286" width="376" height="2" fill="url(#dividerLine)"/>
+  <!-- Square decorations -->
+  <text x="325" y="284" font-family="monospace" font-size="10" fill="#00ffff" filter="url(#glow-cyan)">■</text>
+  <text x="465" y="284" font-family="monospace" font-size="10" fill="#00ffff" filter="url(#glow-cyan)">■</text>
+
+  <!-- ── START BUTTON ── -->
+  <g transform="translate(308, 300)">
+    <!-- Shadow layers (pixel style) -->
+    <polygon points="4,4 184,4 188,8 188,48 8,48 4,44" fill="#004444"/>
+    <polygon points="2,2 182,2 186,6 186,46 6,46 2,42" fill="#008888"/>
+    <!-- Main button -->
+    <polygon points="0,0 180,0 184,4 184,44 4,44 0,40" fill="#00ffff"/>
+    <!-- Button text -->
+    <text x="92" y="27" font-family="'Courier New', monospace" font-weight="700" font-size="12"
+      fill="#0a0a12" text-anchor="middle" letter-spacing="2">INICIAR JUEGO</text>
+  </g>
+
+  <!-- ── CONTROLS ── -->
+  <text x="400" y="370" font-family="'Courier New', monospace" font-size="7" fill="#00ffff" text-anchor="middle" letter-spacing="1">P1: WASD + E (DISCO) + Q (MOTO)</text>
+  <text x="400" y="384" font-family="'Courier New', monospace" font-size="7" fill="#ff3399" text-anchor="middle" letter-spacing="1">P2: ↑↓←→ + ENTER (DISCO) + U (MOTO)</text>
+  <text x="400" y="398" font-family="'Courier New', monospace" font-size="7" fill="#eeeeff" text-anchor="middle" letter-spacing="1" opacity="0.5">MODO MOTO: 5 SEGUNDOS · DISCOS: 3 REBOTES</text>
+
+  <!-- ── FOOTER ── -->
+  <text x="400" y="456" font-family="'Courier New', monospace" font-size="6" fill="#eeeeff" text-anchor="middle" letter-spacing="2" opacity="0.3">TÉCNICAS DE PROGRAMACIÓN · DOCENTE: LEONARDO MONTES</text>
+  <text x="400" y="468" font-family="'Courier New', monospace" font-size="6" fill="#eeeeff" text-anchor="middle" letter-spacing="2" opacity="0.3">JAVA 17 + SWING · UNIVERSIDAD AUTÓNOMA DE MANIZALES</text>
+
+</svg>

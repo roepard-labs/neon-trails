@@ -7,7 +7,7 @@
 
     <groupId>org.neontrails</groupId>
     <artifactId>neon-trails</artifactId>
-    <version>0.2.0-STABLE</version>
+    <version>0.3.0-STABLE</version>
     <packaging>jar</packaging>
 
     <name>Neon Trails</name>

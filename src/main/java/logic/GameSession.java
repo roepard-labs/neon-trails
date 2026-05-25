@@ -14,6 +14,10 @@ public class GameSession {
     private String playerTwoName = "P2";
     /** Identificador del jugador ganador (1 o 2); 0 si la partida no terminó. */
     private int winnerId;
+    /** Puntaje final del jugador 1 (se publica en el leaderboard al terminar la partida). */
+    private int playerOneScore;
+    /** Puntaje final del jugador 2 (se publica en el leaderboard al terminar la partida). */
+    private int playerTwoScore;
 
     public String getPlayerOneName() {
         return playerOneName;
@@ -37,6 +41,22 @@ public class GameSession {
 
     public void setWinnerId(int winnerId) {
         this.winnerId = winnerId;
+    }
+
+    public int getPlayerOneScore() {
+        return playerOneScore;
+    }
+
+    public void setPlayerOneScore(int playerOneScore) {
+        this.playerOneScore = playerOneScore;
+    }
+
+    public int getPlayerTwoScore() {
+        return playerTwoScore;
+    }
+
+    public void setPlayerTwoScore(int playerTwoScore) {
+        this.playerTwoScore = playerTwoScore;
     }
 
     /** Devuelve el nombre del ganador según {@link #winnerId}, o cadena vacía si no aplica. */

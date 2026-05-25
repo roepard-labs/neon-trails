@@ -40,6 +40,9 @@ public class GameScreen extends BaseScreen {
     private void onGameOver(int winnerId) {
         GameSession session = screens().getSession();
         session.setWinnerId(winnerId);
+        // Captura los puntajes finales para que GameOverScreen los publique en el leaderboard.
+        session.setPlayerOneScore(panel.getPlayerOneScore());
+        session.setPlayerTwoScore(panel.getPlayerTwoScore());
         screens().mostrar("gameover");
     }
 }

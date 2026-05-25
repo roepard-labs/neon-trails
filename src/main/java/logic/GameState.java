@@ -192,15 +192,24 @@ public class GameState {
     }
 
     /**
-     * Evita movimiento diagonal más rápido que en un solo eje.
+     * Traduce el input del tick a la dirección de movimiento. Evita que la diagonal sea más rápida
+     * que un solo eje (signum) y, en modo moto, bloquea la reversa directa (180°) al estilo culebrita:
+     * el opuesto exacto del rumbo actual se ignora para que el jugador no se invierta sobre su propia
+     * estela; para volver hay que girar primero (perpendicular o diagonal). Fuera de moto: movimiento
+     * libre, incluida la inversión instantánea.
      */
     private static void normalizeMovement(int mx, int my, Player p) {
-        if (mx != 0 && my != 0) {
-            // NOTE: Movimiento en diagonal: mantener dirección pero no duplicar rapidez.
-            p.setMove(Integer.signum(mx), Integer.signum(my));
-        } else {
-            p.setMove(mx, my);
+        int dx = (mx != 0 && my != 0) ? Integer.signum(mx) : mx;
+        int dy = (mx != 0 && my != 0) ? Integer.signum(my) : my;
+
+        if (p.isOnBike()
+                && (p.getMoveX() != 0 || p.getMoveY() != 0)
+                && dx == -p.getMoveX() && dy == -p.getMoveY()) {
+            // NOTE: Reversa directa en moto → se ignora; conserva el rumbo (hay que girar para volver).
+            // Detenerse (0,0) nunca es el opuesto de un rumbo no nulo, así que soltar teclas sí frena.
+            return;
         }
+        p.setMove(dx, dy);
     }
 
     private void tryShoot(Player p, boolean wantsShoot, int width, int height) {

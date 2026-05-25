@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Trails — Instrucciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cyan:  #00ffff;
+    --pink:  #ff3399;
+    --white: #eeeeff;
+    --dim:   #aabbcc;
+    --bg:    #0a0a12;
+    --card:  #0d1520;
+    --grid:  #0d2a2a;
+    --glow-c: 0 0 6px #00ffff, 0 0 18px #00ffff66;
+    --glow-p: 0 0 6px #ff3399, 0 0 18px #ff339966;
+    --pixel:   "Press Start 2P", monospace;
+    --display: "Rajdhani", sans-serif;
+  }
+
+  html, body { width:100%; min-height:100%; background: var(--bg); color: var(--white); }
+
+  /* grid bg */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.5;
+  }
+
+  /* scanlines */
+  .scanlines {
+    position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.13) 2px, rgba(0,0,0,0.13) 4px
+    );
+  }
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 3;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* bars */
+  .top-bar, .bottom-bar {
+    position: fixed; left:0; right:0; height:3px; z-index:20;
+  }
+  .top-bar    { top:0; background: linear-gradient(90deg, transparent, var(--cyan) 30%, var(--pink) 70%, transparent); }
+  .bottom-bar { bottom:0; background: linear-gradient(90deg, transparent, var(--pink) 30%, var(--cyan) 70%, transparent); }
+
+  /* corners */
+  .corner { position:fixed; width:50px; height:50px; border-color:var(--cyan); border-style:solid; opacity:0.5; z-index:20; }
+  .corner-tl { top:14px; left:14px; border-width:2px 0 0 2px; }
+  .corner-tr { top:14px; right:14px; border-width:2px 2px 0 0; }
+  .corner-bl { bottom:14px; left:14px; border-width:0 0 2px 2px; }
+  .corner-br { bottom:14px; right:14px; border-width:0 2px 2px 0; }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative; z-index: 10;
+    max-width: 960px; margin: 0 auto;
+    padding: 48px 24px 64px;
+    display: flex; flex-direction: column; align-items: center; gap: 32px;
+  }
+
+  /* header */
+  .page-header {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    border-bottom: 1px solid rgba(0,255,255,0.2);
+    padding-bottom: 24px; width: 100%;
+  }
+  .page-eyebrow {
+    font-family: var(--pixel); font-size: 8px; letter-spacing: 0.3em;
+    color: var(--pink); text-shadow: var(--glow-p);
+    animation: blink-slow 5s step-end infinite;
+  }
+  @keyframes blink-slow { 0%,80%,100%{opacity:1} 82%,98%{opacity:0.2} }
+
+  .page-title {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(36px, 6vw, 60px);
+    letter-spacing: 0.15em; color: var(--cyan);
+    text-shadow: var(--glow-c);
+    line-height: 1;
+  }
+  .page-sub {
+    font-family: var(--pixel); font-size: 7px;
+    color: var(--dim); letter-spacing: 0.2em; opacity: 0.6;
+  }
+
+  /* ── SECTION HEADING ── */
+  .section-title {
+    font-family: var(--pixel); font-size: 10px; letter-spacing: 0.2em;
+    color: var(--pink); text-shadow: var(--glow-p);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+  }
+  .section-title::after {
+    content: "";
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--pink), transparent);
+    opacity: 0.4;
+  }
+
+  /* ── CONTROLS GRID ── */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+  .ctrl-card {
+    background: var(--card);
+    border: 1px solid;
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 14px;
+    position: relative; overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .ctrl-card.p1 { border-color: rgba(0,255,255,0.35); }
+  .ctrl-card.p2 { border-color: rgba(255,51,153,0.35); }
+  .ctrl-card::before {
+    content: "";
+    position: absolute; top:0; left:0; right:0; height:2px;
+  }
+  .ctrl-card.p1::before { background: var(--cyan); box-shadow: var(--glow-c); }
+  .ctrl-card.p2::before { background: var(--pink); box-shadow: var(--glow-p); }
+
+  .ctrl-player {
+    font-family: var(--pixel); font-size: 10px; letter-spacing: 0.15em;
+  }
+  .ctrl-card.p1 .ctrl-player { color: var(--cyan); text-shadow: var(--glow-c); }
+  .ctrl-card.p2 .ctrl-player { color: var(--pink); text-shadow: var(--glow-p); }
+
+  .key-rows { display: flex; flex-direction: column; gap: 8px; }
+  .key-row {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--pixel); font-size: 7px;
+    color: var(--dim);
+  }
+  .key-row .action { color: var(--white); min-width: 80px; }
+
+  /* pixel keys */
+  .keys { display: flex; gap: 4px; }
+  .key {
+    font-family: var(--pixel); font-size: 7px;
+    padding: 4px 7px; min-width: 24px; text-align: center;
+    background: #1a2030; border: 1px solid #334;
+    box-shadow: 0 2px 0 0 #111, 0 3px 0 0 #0a0a15;
+    line-height: 1.2;
+    transition: transform 0.05s, box-shadow 0.05s;
+  }
+  .ctrl-card.p1 .key { color: var(--cyan); border-color: rgba(0,255,255,0.4); }
+  .ctrl-card.p2 .key { color: var(--pink); border-color: rgba(255,51,153,0.4); }
+  .key:hover { transform: translateY(1px); box-shadow: 0 1px 0 0 #111; }
+
+  /* wasd visual cluster */
+  .wasd { display: grid; grid-template-columns: repeat(3,24px); grid-template-rows: repeat(2,24px); gap:3px; }
+  .wasd .key { padding:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+  .wasd .w   { grid-column:2; grid-row:1; }
+  .wasd .a   { grid-column:1; grid-row:2; }
+  .wasd .s   { grid-column:2; grid-row:2; }
+  .wasd .d   { grid-column:3; grid-row:2; }
+
+  /* arrow cluster */
+  .arrows { display:grid; grid-template-columns:repeat(3,24px); grid-template-rows:repeat(2,24px); gap:3px; }
+  .arrows .key { padding:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:10px; }
+  .arrows .up    { grid-column:2; grid-row:1; }
+  .arrows .left  { grid-column:1; grid-row:2; }
+  .arrows .down  { grid-column:2; grid-row:2; }
+  .arrows .right { grid-column:3; grid-row:2; }
+
+  /* ── RULES GRID ── */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    width: 100%;
+  }
+  @media (max-width: 600px) { .rules-grid { grid-template-columns: 1fr; } .controls-grid { grid-template-columns: 1fr; } }
+
+  .rule-card {
+    background: var(--card);
+    border: 1px solid rgba(0,255,255,0.15);
+    padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    transition: border-color 0.2s;
+  }
+  .rule-card:hover { border-color: rgba(0,255,255,0.4); }
+
+  .rule-icon {
+    font-size: 22px; line-height: 1;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  .rule-icon.cyan { color: var(--cyan); }
+  .rule-icon.pink { color: var(--pink); }
+  .rule-icon.white { color: var(--white); }
+
+  .rule-title {
+    font-family: var(--pixel); font-size: 8px;
+    color: var(--white); letter-spacing: 0.1em;
+    line-height: 1.6;
+  }
+  .rule-body {
+    font-family: var(--display); font-weight: 400; font-size: 14px;
+    color: var(--dim); line-height: 1.5;
+  }
+  .rule-body b { font-weight: 600; color: var(--white); }
+  .rule-body .c { color: var(--cyan); font-weight: 600; }
+  .rule-body .p { color: var(--pink); font-weight: 600; }
+
+  /* ── LIVES BAR ── */
+  .lives-demo {
+    display: flex; gap: 6px; align-items: center; margin-top: 4px;
+  }
+  .heart { font-size: 16px; }
+  .heart.full.c  { color: var(--cyan);  text-shadow: var(--glow-c); }
+  .heart.full.p  { color: var(--pink);  text-shadow: var(--glow-p); }
+  .heart.empty   { color: #334; }
+
+  /* ── DISC DIAGRAM ── */
+  .disc-diagram {
+    width: 100%; background: var(--card);
+    border: 1px solid rgba(0,255,255,0.15);
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 16px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .disc-diagram canvas { image-rendering: pixelated; flex-shrink: 0; }
+  .disc-text {
+    font-family: var(--display); font-weight: 400; font-size: 15px;
+    color: var(--dim); line-height: 1.6;
+  }
+  .disc-text b  { color: var(--white); font-weight: 600; }
+  .disc-text .c { color: var(--cyan);  font-weight: 600; }
+  .disc-text .p { color: var(--pink);  font-weight: 600; }
+
+  /* ── BACK BUTTON ── */
+  .btn-back {
+    font-family: var(--pixel); font-size: 9px; letter-spacing: 0.12em;
+    color: var(--bg); background: var(--cyan); border: none; cursor: pointer;
+    padding: 12px 28px;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    box-shadow: 4px 4px 0 0 #008888, 0 0 16px #00ffff44;
+    transition: transform 0.07s, box-shadow 0.07s;
+  }
+  .btn-back:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 0 #008888, 0 0 24px #00ffff66; }
+  .btn-back:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 0 #008888; }
+
+  /* pixel separator */
+  .px-sep {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    font-family: var(--pixel); font-size: 8px; color: var(--cyan); opacity: 0.4;
+  }
+  .px-sep::before, .px-sep::after {
+    content:""; flex:1; height:1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+<div class="bottom-bar"></div>
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="page-eyebrow">▸ NEON TRAILS ◂</div>
+    <div class="page-title">INSTRUCCIONES</div>
+    <div class="page-sub">LEE ANTES DE JUGAR · MODO ARENA 2 JUGADORES</div>
+  </div>
+
+  <!-- CONTROLES -->
+  <div class="section-title">■ CONTROLES</div>
+  <div class="controls-grid">
+
+    <!-- P1 -->
+    <div class="ctrl-card p1">
+      <div class="ctrl-player">◈ JUGADOR 1 — CIAN</div>
+      <div class="key-rows">
+        <div class="key-row">
+          <span class="action">MOVER</span>
+          <div class="wasd">
+            <div class="key w">W</div>
+            <div class="key a">A</div>
+            <div class="key s">S</div>
+            <div class="key d">D</div>
+          </div>
+        </div>
+        <div class="key-row">
+          <span class="action">DISCO</span>
+          <div class="keys"><div class="key">E</div></div>
+        </div>
+        <div class="key-row">
+          <span class="action">MOTO 5s</span>
+          <div class="keys"><div class="key">Q</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 -->
+    <div class="ctrl-card p2">
+      <div class="ctrl-player">◈ JUGADOR 2 — ROSA</div>
+      <div class="key-rows">
+        <div class="key-row">
+          <span class="action">MOVER</span>
+          <div class="arrows">
+            <div class="key up">▲</div>
+            <div class="key left">◀</div>
+            <div class="key down">▼</div>
+            <div class="key right">▶</div>
+          </div>
+        </div>
+        <div class="key-row">
+          <span class="action">DISCO</span>
+          <div class="keys"><div class="key">ENTER</div></div>
+        </div>
+        <div class="key-row">
+          <span class="action">MOTO 5s</span>
+          <div class="keys"><div class="key">U</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DISCO EXPLICADO -->
+  <div class="section-title">■ EL DISCO</div>
+  <div class="disc-diagram">
+    <canvas id="discCanvas" width="240" height="80" style="width:240px;height:80px"></canvas>
+    <div class="disc-text">
+      Cada jugador tiene <b>1 disco</b> a la vez. Al lanzarlo, viaja en la dirección que miras
+      y <span class="c">rebota hasta 3 veces</span> contra las paredes.
+      Tras el último rebote <b>queda quieto</b> — solo <b>tú</b> puedes recogerlo tocándolo.
+      Si golpea al rival <span class="p">antes de quedarse quieto</span>, le quita una vida.
+      Un disco en vuelo no puede hacer daño a su propio dueño durante los primeros instantes.
+    </div>
+  </div>
+
+  <!-- MODO MOTO -->
+  <div class="section-title">■ MODO MOTO</div>
+  <div class="disc-diagram">
+    <canvas id="motoCanvas" width="240" height="80" style="width:240px;height:80px"></canvas>
+    <div class="disc-text">
+      Al activar la moto tu velocidad aumenta <span class="c">×1.75</span>
+      durante exactamente <b>5 segundos</b>. Mientras corres dejas un
+      <span class="p">rastro de luz</span> en el suelo.
+      Cualquiera que pise ese rastro — incluido tú mismo — pierde una vida.
+      Al expirar el tiempo, el rastro se desvanece gradualmente.
+      Hay una breve <b>zona de gracia</b> al activar la moto para que no te dañes solo al arrancar.
+    </div>
+  </div>
+
+  <div class="px-sep">■ ■ ■</div>
+
+  <!-- REGLAS EN TARJETAS -->
+  <div class="section-title">■ REGLAS DE LA PARTIDA</div>
+  <div class="rules-grid">
+
+    <div class="rule-card">
+      <div class="rule-icon cyan">♥</div>
+      <div class="rule-title">VIDAS</div>
+      <div class="rule-body">Cada jugador empieza con <b>3 vidas</b>.<br>
+        <div class="lives-demo">
+          <span class="heart full c">♥</span><span class="heart full c">♥</span><span class="heart full c">♥</span>
+        </div>
+        Al recibir daño se pierde una vida y ambos reaparecen en esquinas opuestas.
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon pink">☠</div>
+      <div class="rule-title">FIN DE PARTIDA</div>
+      <div class="rule-body">La partida termina cuando un jugador llega a <class class="p">0 vidas</class>.
+        El otro jugador es declarado <b>ganador</b>. Puedes jugar de nuevo sin cerrar la app.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon cyan">◎</div>
+      <div class="rule-title">REAPARICIÓN</div>
+      <div class="rule-body">Tras cada golpe, <b>ambos jugadores</b> vuelven a las esquinas opuestas y todos los discos en vuelo desaparecen. El marcador se acumula durante toda la partida.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon pink">⚡</div>
+      <div class="rule-title">INVULNERABILIDAD</div>
+      <div class="rule-body">Tras recibir daño de un <span class="p">rastro de moto</span>, tienes
+        <b>0.5 segundos</b> de invulnerabilidad. Así no recibes doble daño en el mismo punto del rastro.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon white">↻</div>
+      <div class="rule-title">COOLDOWN DE DISPARO</div>
+      <div class="rule-body">Después de lanzar un disco hay un breve tiempo de espera antes de poder disparar de nuevo. También debes <b>recoger tu disco quieto</b> para volver a disparar.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-icon cyan">▣</div>
+      <div class="rule-title">BORDES DEL ARENA</div>
+      <div class="rule-body">Los <b>jugadores</b> no pueden salir del arena — rebotan en los bordes. Los <b>discos</b> sí rebotan, consumiendo un rebote cada vez hasta quedar quietos.</div>
+    </div>
+
+  </div>
+
+  <!-- TIPS -->
+  <div class="section-title">■ TIPS</div>
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-title" style="color:var(--cyan)">TIP 1</div>
+      <div class="rule-body">Puedes usar el rastro de moto como <b>barrera</b>: actívalo, rodea a tu rival y oblígalo a pisar tu propio rastro.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-title" style="color:var(--pink)">TIP 2</div>
+      <div class="rule-body">Un disco <b>quieto en el suelo</b> bloquea el camino. Tu rival no puede recogerlo — úsalo como obstáculo mientras te reposicionas.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-title" style="color:var(--cyan)">TIP 3</div>
+      <div class="rule-body">El disco sale en la dirección que estás mirando. Muévete en diagonal y suelta el disco para ángulos de <b>45°</b> difíciles de esquivar.</div>
+    </div>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <button class="btn-back" onclick="window.history.back()">◂ VOLVER AL MENÚ</button>
+
+</div>
+
+<script>
+/* ── DISC BOUNCE DIAGRAM ── */
+(function(){
+  const c = document.getElementById('discCanvas');
+  const ctx = c.getContext('2d');
+  const W = 240, H = 80;
+  let t = 0;
+
+  // pre-compute bounce path
+  const path = [];
+  let x = 30, y = 40, vx = 2.2, vy = -1.4, bounces = 0;
+  for (let i = 0; i < 300 && bounces <= 3; i++) {
+    path.push({x, y, bounced: false});
+    x += vx; y += vy;
+    let b = false;
+    if (x <= 8)  { x = 8;  vx = Math.abs(vx);  b = true; }
+    if (x >= 232){ x = 232; vx = -Math.abs(vx); b = true; }
+    if (y <= 8)  { y = 8;  vy = Math.abs(vy);  b = true; }
+    if (y >= 72) { y = 72; vy = -Math.abs(vy); b = true; }
+    if (b) { bounces++; path[path.length-1].bounced = true; }
+    if (bounces > 3) break;
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    // arena border
+    ctx.strokeStyle = '#00ffff44'; ctx.lineWidth = 1;
+    ctx.strokeRect(4,4,W-8,H-8);
+
+    // trail
+    const head = Math.min(path.length - 1, Math.floor(t * 0.6));
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+    for (let i = 1; i <= head; i++) ctx.lineTo(path[i].x, path[i].y);
+    ctx.strokeStyle = '#00ffff99'; ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+
+    // bounce markers
+    for (let i = 0; i <= head; i++) {
+      if (path[i].bounced) {
+        ctx.beginPath();
+        ctx.arc(path[i].x, path[i].y, 5, 0, Math.PI*2);
+        ctx.strokeStyle = '#ff339988'; ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+
+    // disc head
+    const pos = path[Math.min(head, path.length-1)];
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#00ffff';
+    ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 8;
+    ctx.fill(); ctx.shadowBlur = 0;
+
+    // bounce count label
+    ctx.font = '6px "Press Start 2P"';
+    ctx.fillStyle = '#ff3399'; ctx.shadowColor = '#ff3399'; ctx.shadowBlur = 4;
+    const bc = path.slice(0, head+1).filter(p=>p.bounced).length;
+    ctx.fillText('REBOTES: ' + bc + '/3', 10, H-8);
+    ctx.shadowBlur = 0;
+
+    t = (t + 1) % (path.length * 1.8 + 60);
+    if (t > path.length * 1.8) t = 0;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── MOTO TRAIL DIAGRAM ── */
+(function(){
+  const c = document.getElementById('motoCanvas');
+  const ctx = c.getContext('2d');
+  const W = 240, H = 80;
+  let t = 0;
+  const speed = 1.6, trailLen = 60;
+  const trail = [];
+  let x = 20, y = 40, vx = speed, vy = 0;
+  let elapsed = 0;
+
+  function tick() {
+    elapsed++;
+    // simple serpentine
+    if (elapsed % 50 === 0) vy = (Math.random()-0.5)*2;
+    x += vx; y += vy;
+    if (x > 220) { x = 20; y = 40; trail.length = 0; elapsed = 0; }
+    if (y < 12) { y = 12; vy = Math.abs(vy); }
+    if (y > 68) { y = 68; vy = -Math.abs(vy); }
+    trail.push({x, y});
+    if (trail.length > trailLen) trail.shift();
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = '#00ffff44'; ctx.lineWidth = 1;
+    ctx.strokeRect(4,4,W-8,H-8);
+
+    // draw trail with fade
+    if (trail.length > 1) {
+      for (let i = 1; i < trail.length; i++) {
+        const a = i / trail.length;
+        ctx.beginPath();
+        ctx.moveTo(trail[i-1].x, trail[i-1].y);
+        ctx.lineTo(trail[i].x, trail[i].y);
+        ctx.strokeStyle = `rgba(255,51,153,${a * 0.9})`;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#ff3399'; ctx.shadowBlur = a * 8;
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+    }
+
+    // player dot
+    if (trail.length) {
+      const h = trail[trail.length-1];
+      ctx.beginPath(); ctx.arc(h.x, h.y, 6, 0, Math.PI*2);
+      ctx.fillStyle = '#ff3399';
+      ctx.shadowColor = '#ff3399'; ctx.shadowBlur = 10;
+      ctx.fill(); ctx.shadowBlur = 0;
+      // speed lines
+      for (let i=0;i<3;i++) {
+        ctx.beginPath();
+        ctx.moveTo(h.x - 8 - i*4, h.y - 3 + i*3);
+        ctx.lineTo(h.x - 14 - i*4, h.y - 3 + i*3);
+        ctx.strokeStyle = `rgba(255,51,153,${0.6 - i*0.18})`;
+        ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+
+    // timer bar
+    const barW = 200, barH = 6;
+    const barX = 20, barY = H - 14;
+    const pct = 1 - (elapsed % 120) / 120;
+    ctx.fillStyle = '#1a2030';
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = pct > 0.4 ? '#ff3399' : '#ff6600';
+    ctx.shadowColor = '#ff3399'; ctx.shadowBlur = 4;
+    ctx.fillRect(barX, barY, barW * pct, barH);
+    ctx.shadowBlur = 0;
+    ctx.font = '5px "Press Start 2P"';
+    ctx.fillStyle = '#ff3399';
+    ctx.fillText('MOTO 5s', barX, barY - 3);
+
+    for (let i=0; i<3; i++) tick();
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

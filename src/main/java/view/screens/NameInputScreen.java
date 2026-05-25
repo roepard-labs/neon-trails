@@ -5,6 +5,8 @@ import audio.Sfx;
 import audio.UiSound;
 import logic.GameSession;
 import view.BaseScreen;
+import view.FontLoader;
+import view.SpriteButton;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 
 /**
  * Captura nombres de P1 y P2 antes de la partida.
@@ -46,7 +47,7 @@ public class NameInputScreen extends BaseScreen {
 
     private JLabel buildHeader() {
         JLabel l = new JLabel("¿Quiénes juegan?", SwingConstants.CENTER);
-        l.setFont(new Font(Font.MONOSPACED, Font.BOLD, 36));
+        l.setFont(FontLoader.bold(36f));
         l.setForeground(CYAN);
         l.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 20));
         return l;
@@ -64,8 +65,7 @@ public class NameInputScreen extends BaseScreen {
 
         form.add(Box.createVerticalStrut(36));
 
-        JButton play = neonButton("Jugar");
-        play.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton play = SpriteButton.create("accionadores/btn-jugar.svg", "Jugar", 280, 56);
         UiSound.attachClick(play);
         play.addActionListener(e -> empezar());
         // UiSound.attachHover(play); // opcional
@@ -81,13 +81,13 @@ public class NameInputScreen extends BaseScreen {
         row.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel l = new JLabel(label);
-        l.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+        l.setFont(FontLoader.regular(14f));
         l.setForeground(accent);
         l.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         field.setMaximumSize(new Dimension(280, 32));
         field.setAlignmentX(Component.CENTER_ALIGNMENT);
-        field.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
+        field.setFont(FontLoader.regular(16f));
         field.setBackground(new Color(0x14, 0x14, 0x22));
         field.setForeground(TEXT);
         field.setCaretColor(accent);
@@ -107,7 +107,7 @@ public class NameInputScreen extends BaseScreen {
 
     private JLabel buildFooter() {
         JLabel l = new JLabel("Enter en cualquier campo también inicia la partida", SwingConstants.CENTER);
-        l.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        l.setFont(FontLoader.regular(11f));
         l.setForeground(TEXT);
         l.setBorder(BorderFactory.createEmptyBorder(0, 20, 24, 20));
         return l;
@@ -142,16 +142,5 @@ public class NameInputScreen extends BaseScreen {
             t = t.substring(0, MAX_NAME);
         }
         return t;
-    }
-
-    private static JButton neonButton(String text) {
-        JButton b = new JButton(text);
-        b.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-        b.setForeground(BG);
-        b.setBackground(CYAN);
-        b.setFocusPainted(false);
-        b.setBorder(BorderFactory.createEmptyBorder(10, 28, 10, 28));
-        b.setMaximumSize(new Dimension(220, 50));
-        return b;
     }
 }

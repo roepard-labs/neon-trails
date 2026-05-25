@@ -2,6 +2,8 @@ package view.screens;
 
 import audio.UiSound;
 import view.BaseScreen;
+import view.FontLoader;
+import view.SpriteButton;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -13,8 +15,6 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 
 /**
  * Pantalla de bienvenida / menú principal.
@@ -43,12 +43,12 @@ public class WelcomeScreen extends BaseScreen {
         p.setBorder(BorderFactory.createEmptyBorder(40, 20, 10, 20));
 
         JLabel title = new JLabel("NEON TRAILS", SwingConstants.CENTER);
-        title.setFont(new Font(Font.MONOSPACED, Font.BOLD, 56));
+        title.setFont(FontLoader.bold(56f));
         title.setForeground(CYAN);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel subtitle = new JLabel("arena 2 jugadores", SwingConstants.CENTER);
-        subtitle.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 16));
+        subtitle.setFont(FontLoader.regular(16f));
         subtitle.setForeground(PINK);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -64,10 +64,9 @@ public class WelcomeScreen extends BaseScreen {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
 
-        JButton play = neonButton("Iniciar Juego");
+        JButton play = SpriteButton.create("accionadores/btn-iniciar-juego.svg", "Iniciar Juego", 300, 80);
         UiSound.attachClick(play);
         play.addActionListener(e -> screens().mostrar("nameinput"));
-        play.setAlignmentX(Component.CENTER_ALIGNMENT);
         // UiSound.attachHover(play); // opcional: hover suave si se quiere más vivo
 
         p.add(Box.createVerticalGlue());
@@ -84,33 +83,19 @@ public class WelcomeScreen extends BaseScreen {
 
         JLabel materia = centeredLabel("Técnicas de Programación", 13);
         JLabel docente = centeredLabel("Docente: Leonardo Montes", 12);
-        JLabel hint = centeredLabel("Pulsa Enter para iniciar", 11);
-        hint.setForeground(CYAN);
 
         p.add(materia);
         p.add(Box.createVerticalStrut(4));
         p.add(docente);
         p.add(Box.createVerticalStrut(12));
-        p.add(hint);
         return p;
     }
 
     private static JLabel centeredLabel(String text, int size) {
         JLabel l = new JLabel(text, SwingConstants.CENTER);
-        l.setFont(new Font(Font.MONOSPACED, Font.PLAIN, size));
+        l.setFont(FontLoader.regular(size));
         l.setForeground(TEXT);
         l.setAlignmentX(Component.CENTER_ALIGNMENT);
         return l;
-    }
-
-    private static JButton neonButton(String text) {
-        JButton b = new JButton(text);
-        b.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-        b.setForeground(BG);
-        b.setBackground(CYAN);
-        b.setFocusPainted(false);
-        b.setBorder(BorderFactory.createEmptyBorder(12, 28, 12, 28));
-        b.setMaximumSize(new Dimension(280, 56));
-        return b;
     }
 }

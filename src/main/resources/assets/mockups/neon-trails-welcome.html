@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Trails — Pantalla de Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cyan:   #00ffff;
+    --pink:   #ff3399;
+    --white:  #eeeeff;
+    --bg:     #0a0a12;
+    --grid:   #0d2a2a;
+    --glow-c: 0 0 8px #00ffff, 0 0 20px #00ffff88, 0 0 40px #00ffff44;
+    --glow-p: 0 0 8px #ff3399, 0 0 20px #ff339988, 0 0 40px #ff339944;
+    --pixel: "Press Start 2P", monospace;
+    --display: "Rajdhani", sans-serif;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  /* ── PIXEL GRID BACKGROUND ── */
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    animation: grid-scroll 20s linear infinite;
+    perspective: 600px;
+    transform: perspective(600px) rotateX(30deg) scaleX(1.4);
+    transform-origin: bottom center;
+    top: 30%;
+    opacity: 0.7;
+  }
+  @keyframes grid-scroll {
+    from { background-position: 0 0; }
+    to   { background-position: 0 320px; }
+  }
+
+  /* ── SCANLINES ── */
+  .scanlines {
+    position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 4px
+    );
+  }
+
+  /* ── CRT VIGNETTE ── */
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 3;
+    background: radial-gradient(ellipse at center,
+      transparent 55%,
+      rgba(0,0,0,0.7) 100%
+    );
+  }
+
+  /* ── LIGHT TRAILS (decorative) ── */
+  .trails-canvas {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .screen {
+    position: relative; z-index: 10;
+    width: 100%; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0;
+    padding: 20px;
+  }
+
+  /* ── CORNER DECORATIONS ── */
+  .corner {
+    position: fixed; width: 60px; height: 60px;
+    border-color: var(--cyan); border-style: solid; opacity: 0.6;
+  }
+  .corner-tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 16px; right: 16px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 16px; left: 16px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; }
+
+  /* ── PIXEL TOP BAR ── */
+  .top-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      var(--cyan) 20%,
+      var(--cyan) 50%,
+      var(--pink) 80%,
+      transparent 100%
+    );
+    animation: bar-pulse 3s ease-in-out infinite;
+  }
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      var(--pink) 20%,
+      var(--pink) 50%,
+      var(--cyan) 80%,
+      transparent 100%
+    );
+    animation: bar-pulse 3s ease-in-out infinite reverse;
+  }
+  @keyframes bar-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* ── LOGO BLOCK ── */
+  .logo-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0;
+    margin-bottom: 8px;
+  }
+
+  /* "NEON" in Rajdhani — giant */
+  .logo-neon {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(72px, 12vw, 120px);
+    letter-spacing: 0.18em;
+    color: var(--cyan);
+    text-shadow: var(--glow-c);
+    line-height: 1;
+    animation: flicker-c 6s ease-in-out infinite;
+    position: relative;
+  }
+  /* 8-bit pixel outline effect via text-stroke */
+  .logo-neon::before {
+    content: "NEON";
+    position: absolute; inset: 0;
+    font-family: var(--pixel);
+    font-size: clamp(72px, 12vw, 120px);
+    color: transparent;
+    -webkit-text-stroke: 3px rgba(0,255,255,0.15);
+    letter-spacing: 0.18em;
+    pointer-events: none;
+  }
+
+  /* "TRAILS" in Press Start 2P — pixelated */
+  .logo-trails {
+    font-family: var(--pixel);
+    font-size: clamp(28px, 5vw, 52px);
+    letter-spacing: 0.08em;
+    color: var(--pink);
+    text-shadow: var(--glow-p);
+    line-height: 1.1;
+    animation: flicker-p 7s ease-in-out infinite 0.4s;
+    margin-top: -8px;
+  }
+
+  @keyframes flicker-c {
+    0%, 93%, 97%, 100% { opacity: 1; text-shadow: var(--glow-c); }
+    94%, 96% { opacity: 0.85; text-shadow: 0 0 4px #00ffff44; }
+  }
+  @keyframes flicker-p {
+    0%, 89%, 93%, 100% { opacity: 1; text-shadow: var(--glow-p); }
+    90%, 92% { opacity: 0.8; text-shadow: 0 0 4px #ff339944; }
+  }
+
+  /* ── TAGLINE ── */
+  .tagline {
+    font-family: var(--pixel);
+    font-size: clamp(8px, 1.2vw, 11px);
+    color: var(--cyan);
+    letter-spacing: 0.25em;
+    opacity: 0.7;
+    margin-top: 12px;
+    margin-bottom: 32px;
+    animation: blink-slow 4s step-end infinite;
+  }
+  @keyframes blink-slow {
+    0%, 80%, 100% { opacity: 0.7; }
+    82%, 98% { opacity: 0.2; }
+  }
+
+  /* ── PIXEL DIVIDER ── */
+  .divider {
+    width: min(380px, 80vw);
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent, var(--cyan) 30%, var(--cyan) 70%, transparent
+    );
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: "■";
+    position: absolute; top: -7px;
+    font-size: 10px; color: var(--cyan);
+    text-shadow: var(--glow-c);
+  }
+  .divider::before { left: calc(30% - 6px); }
+  .divider::after  { right: calc(30% - 6px); }
+
+  /* ── START BUTTON ── */
+  .btn-start {
+    font-family: var(--pixel);
+    font-size: clamp(10px, 1.6vw, 14px);
+    color: var(--bg);
+    background: var(--cyan);
+    border: none;
+    padding: 14px 36px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    position: relative;
+    /* pixel/chunky shadow */
+    box-shadow:
+      4px 4px 0 0 #008888,
+      8px 8px 0 0 #004444;
+    transition: transform 0.08s, box-shadow 0.08s;
+    animation: btn-glow 2s ease-in-out infinite;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .btn-start:hover {
+    transform: translate(-2px, -2px);
+    box-shadow:
+      6px 6px 0 0 #008888,
+      10px 10px 0 0 #004444,
+      0 0 20px #00ffff88;
+  }
+  .btn-start:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  @keyframes btn-glow {
+    0%, 100% { box-shadow: 4px 4px 0 0 #008888, 8px 8px 0 0 #004444; }
+    50% { box-shadow: 4px 4px 0 0 #008888, 8px 8px 0 0 #004444, 0 0 24px #00ffff66; }
+  }
+
+  /* ── BLINK CURSOR ── */
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ── CONTROLS ── */
+  .controls {
+    font-family: var(--pixel);
+    font-size: clamp(6px, 0.9vw, 8px);
+    color: var(--white);
+    opacity: 0.5;
+    text-align: center;
+    margin-top: 32px;
+    line-height: 2;
+    letter-spacing: 0.08em;
+  }
+  .ctrl-p1 { color: var(--cyan); opacity: 1; }
+  .ctrl-p2 { color: var(--pink); opacity: 1; }
+
+  /* ── FOOTER ── */
+  .footer {
+    position: fixed; bottom: 24px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .footer-line {
+    font-family: var(--pixel);
+    font-size: clamp(5px, 0.75vw, 7px);
+    color: var(--white);
+    opacity: 0.3;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+  /* ── P1 / P2 PIXEL BIKES ── */
+  .bikes {
+    display: flex; align-items: center; gap: 48px;
+    margin-bottom: 20px;
+  }
+  .bike {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .bike canvas { image-rendering: pixelated; }
+  .bike-label {
+    font-family: var(--pixel);
+    font-size: 7px;
+    letter-spacing: 0.1em;
+  }
+  .bike-label.p1 { color: var(--cyan); text-shadow: 0 0 6px var(--cyan); }
+  .bike-label.p2 { color: var(--pink); text-shadow: 0 0 6px var(--pink); }
+
+  /* ── SCORE BOARD PIXEL ── */
+  .score-row {
+    display: flex; gap: 32px; align-items: center;
+    font-family: var(--pixel); font-size: 9px;
+    margin-bottom: 24px;
+  }
+  .score-p1 { color: var(--cyan); text-shadow: var(--glow-c); }
+  .score-sep { color: var(--white); opacity: 0.3; }
+  .score-p2 { color: var(--pink); text-shadow: var(--glow-p); }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+<div class="bottom-bar"></div>
+<div class="grid-bg"></div>
+<canvas class="trails-canvas" id="trailsCanvas"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<div class="screen">
+
+  <!-- Pixel bikes -->
+  <div class="bikes">
+    <div class="bike">
+      <canvas id="bikeP1" width="48" height="32" style="width:48px;height:32px"></canvas>
+      <span class="bike-label p1">P1</span>
+    </div>
+    <div class="logo-wrap">
+      <div class="logo-neon">NEON</div>
+      <div class="logo-trails">TRAILS</div>
+    </div>
+    <div class="bike">
+      <canvas id="bikeP2" width="48" height="32" style="width:48px;height:32px"></canvas>
+      <span class="bike-label p2">P2</span>
+    </div>
+  </div>
+
+  <div class="tagline">▸ ARENA 2 JUGADORES ◂</div>
+
+  <div class="score-row">
+    <span class="score-p1">♥ ♥ ♥</span>
+    <span class="score-sep">VS</span>
+    <span class="score-p2">♥ ♥ ♥</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="btn-start" onclick="this.textContent='LOADING…'">INICIAR JUEGO</button>
+
+  <div class="controls">
+    <div><span class="ctrl-p1">P1: WASD + E (DISCO) + Q (MOTO)</span></div>
+    <div><span class="ctrl-p2">P2: ↑↓←→ + ENTER (DISCO) + U (MOTO)</span></div>
+    <div>MODO MOTO: 5 SEGUNDOS · DISCOS: 3 REBOTES</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-line">TÉCNICAS DE PROGRAMACIÓN · DOCENTE: LEONARDO MONTES</div>
+  <div class="footer-line">JAVA 17 + SWING · UNIVERSIDAD AUTÓNOMA DE MANIZALES</div>
+</div>
+
+<script>
+/* ── PIXEL BIKES ── */
+function drawBike(canvasId, color) {
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  const S = 4; // pixel size
+  ctx.clearRect(0, 0, 48, 32);
+  // simple pixel bike shape
+  const pixels = [
+    [2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],
+    [1,5],[10,5],[11,5],
+    [2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],[11,6],
+    [3,7],[4,7],[5,7],[6,7],[7,7],
+    [3,5],[4,5],[5,5],[6,5],[7,5],
+  ];
+  ctx.fillStyle = color;
+  pixels.forEach(([x,y]) => {
+    ctx.fillRect(x*S - (S/2), y*(S*0.7), S-1, S*0.7 - 1);
+  });
+  // glow
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 6;
+  pixels.forEach(([x,y]) => {
+    ctx.fillRect(x*S - (S/2), y*(S*0.7), S-1, S*0.7 - 1);
+  });
+  ctx.shadowBlur = 0;
+}
+drawBike('bikeP1', '#00ffff');
+drawBike('bikeP2', '#ff3399');
+
+/* ── LIGHT TRAILS CANVAS ── */
+const canvas = document.getElementById('trailsCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const trails = [];
+const COLORS = ['#00ffff', '#ff3399'];
+
+function makeTrail(color) {
+  const startX = Math.random() < 0.5 ? 0 : canvas.width;
+  const startY = Math.random() * canvas.height;
+  const dir = startX === 0 ? 1 : -1;
+  return {
+    x: startX, y: startY,
+    vx: dir * (1 + Math.random() * 2),
+    vy: (Math.random() - 0.5) * 1.5,
+    color,
+    points: [[startX, startY]],
+    life: 0,
+    maxLife: 180 + Math.random() * 120,
+    width: 1.5 + Math.random() * 1.5,
+    turning: false,
+    turnTimer: 0,
+    turnInterval: 40 + Math.floor(Math.random() * 60),
+  };
+}
+
+for (let i = 0; i < 6; i++) {
+  trails.push(makeTrail(COLORS[i % 2]));
+}
+
+function animateTrails() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = trails.length - 1; i >= 0; i--) {
+    const t = trails[i];
+    t.life++;
+    t.turnTimer++;
+    if (t.turnTimer >= t.turnInterval && !t.turning) {
+      const prev_vx = t.vx;
+      t.vx = t.vy > 0 ? Math.abs(t.vx) * Math.sign(t.vx) : t.vx;
+      t.vy = (Math.random() - 0.5) * 2;
+      t.turnTimer = 0;
+      t.turnInterval = 40 + Math.floor(Math.random() * 80);
+    }
+    t.x += t.vx; t.y += t.vy;
+    t.points.push([t.x, t.y]);
+    if (t.points.length > 80) t.points.shift();
+
+    if (t.life > t.maxLife || t.x < -50 || t.x > canvas.width + 50 ||
+        t.y < -50 || t.y > canvas.height + 50) {
+      trails[i] = makeTrail(COLORS[i % 2]);
+      continue;
+    }
+
+    const fade = Math.min(1, (t.maxLife - t.life) / 40);
+    ctx.globalAlpha = 0.35 * fade;
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth = t.width;
+    ctx.shadowColor = t.color;
+    ctx.shadowBlur = 10;
+    ctx.lineCap = 'square';
+    ctx.beginPath();
+    for (let p = 0; p < t.points.length; p++) {
+      if (p === 0) ctx.moveTo(t.points[p][0], t.points[p][1]);
+      else ctx.lineTo(t.points[p][0], t.points[p][1]);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(animateTrails);
+}
+animateTrails();
+</script>
+</body>
+</html>

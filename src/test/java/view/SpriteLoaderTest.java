@@ -51,6 +51,25 @@ class SpriteLoaderTest {
     }
 
     @Test
+    void accionadorButtonsLoadAtNativeSize() {
+        // NOTE: Regresión — estos SVG traían fill="rgba(255,255,255,0.15)", que Batik 1.17 rechaza
+        // (la función rgba() no es válida en el atributo fill de SVG 1.1; lo correcto es fill +
+        // fill-opacity). Rasterizarlos de verdad aquí evita que un re-export del handoff reintroduzca
+        // el valor inválido sin que nadie lo note hasta el runtime.
+        assertButtonLoads("accionadores/btn-iniciar-juego.svg", 300, 80);
+        assertButtonLoads("accionadores/btn-jugar.svg", 280, 56);
+        assertButtonLoads("accionadores/btn-reintentar.svg", 220, 56);
+        assertButtonLoads("accionadores/btn-menu-principal.svg", 220, 56);
+    }
+
+    private static void assertButtonLoads(String name, int width, int height) {
+        BufferedImage img = SpriteLoader.load(name, width, height);
+        assertNotNull(img, "Botón no cargó: " + name);
+        assertEquals(width, img.getWidth(), "Ancho esperado en " + name);
+        assertEquals(height, img.getHeight(), "Alto esperado en " + name);
+    }
+
+    @Test
     void loadCachesByExactDimensions() {
         BufferedImage a = SpriteLoader.load("p1-normal.svg", 22);
         BufferedImage b = SpriteLoader.load("p1-normal.svg", 22);

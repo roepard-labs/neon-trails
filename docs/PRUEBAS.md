@@ -7,6 +7,18 @@ Marca cada ítem al validar manualmente en tu máquina.
 - [ ] `make verify` pasa (compila + tests JUnit + package) sin errores.
 - [ ] `make run` levanta la ventana con borde cian y los dos jugadores.
 
+## Botones (interfaz SVG)
+
+Los 4 botones de menú son sprites SVG (`assets/sprites/accionadores/`) rasterizados por
+`view.SpriteButton` vía Batik; deben verse como la imagen neón (no como botón de texto plano).
+
+- [ ] **WelcomeScreen**: el botón se ve como el SVG cian "INICIAR JUEGO" (con su glow), no como un botón de texto.
+- [ ] **NameInputScreen**: el botón se ve como el SVG cian "JUGAR".
+- [ ] **GameOverScreen**: se ven los SVG "REINTENTAR" (cian) y "MENÚ PRINCIPAL" (rosa).
+- [ ] El cursor cambia a mano al pasar sobre cualquiera de ellos.
+- [ ] Activación por teclado: **Tab** enfoca el botón y **Espacio/Enter** lo dispara igual que el click.
+- [ ] Degradación: si faltara un SVG, el botón cae a texto neón legible en vez de romper el arranque.
+
 ## Controles simultáneos
 
 - [ ] **P1** se mueve con **W/A/S/D** mientras **P2** se mueve con **flechas** al mismo tiempo.
@@ -18,6 +30,8 @@ Marca cada ítem al validar manualmente en tu máquina.
 - [ ] **P1** con **Q** entra en modo moto: HUD muestra `[MOTO]` y hay halo visual.
 - [ ] **P2** con **U** entra en modo moto igual.
 - [ ] Tras ~5 s el modo moto termina solo (sin reiniciar la partida).
+- [ ] En moto, la reversa directa (ibas a la derecha y pulsas izquierda) **no** te invierte: sigues avanzando; para volver hay que girar (arriba/abajo o diagonal) primero — como la culebrita.
+- [ ] Fuera de moto, el movimiento sigue siendo libre (puedes invertir la dirección al instante).
 
 ## Discos: rebote, límite y recuperación
 

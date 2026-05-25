@@ -84,6 +84,24 @@ public class GamePanel extends JPanel {
     }
 
     /**
+     * Puntaje actual del jugador 1 (lectura sincronizada, para publicarlo en el leaderboard).
+     */
+    public int getPlayerOneScore() {
+        synchronized (stateLock) {
+            return gameState.getPlayerOne().getScore();
+        }
+    }
+
+    /**
+     * Puntaje actual del jugador 2 (lectura sincronizada, para publicarlo en el leaderboard).
+     */
+    public int getPlayerTwoScore() {
+        synchronized (stateLock) {
+            return gameState.getPlayerTwo().getScore();
+        }
+    }
+
+    /**
      * Registra el callback que se dispara una vez cuando un jugador llega a 0 vidas.
      *
      * @param onGameOver recibe el id (1 o 2) del jugador ganador
@@ -265,7 +283,7 @@ public class GamePanel extends JPanel {
         }
 
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
+        g2.setFont(FontLoader.bold(11f));
         g2.drawString(label, cx - half + 3, cy - half - 4);
     }
 
@@ -301,14 +319,37 @@ public class GamePanel extends JPanel {
 
     private void drawHud(Graphics2D g2, int w, int h) {
         g2.setColor(new Color(0xee, 0xee, 0xff));
-        g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        Font texto = FontLoader.regular(13f);
+        // NOTE: Rajdhani no incluye ♥/♡ (U+2665/U+2661); los símbolos de vidas se dibujan con una
+        // fuente lógica de respaldo para que se vean igual que antes (Java NO sustituye glifos
+        // faltantes en fuentes físicas, a diferencia de las lógicas tipo MONOSPACED).
+        Font corazonesFont = new Font(Font.MONOSPACED, Font.PLAIN, 13);
         Player p1 = gameState.getPlayerOne();
         Player p2 = gameState.getPlayerTwo();
-        g2.drawString(labelFor(1) + "  " + hearts(p1.getLives()) + (p1.isOnBike() ? "  [MOTO]" : ""), 12, 22);
-        g2.drawString(labelFor(2) + "  " + hearts(p2.getLives()) + (p2.isOnBike() ? "  [MOTO]" : ""), 12, 40);
-        g2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
+        drawHudVidas(g2, 12, 22, labelFor(1), hearts(p1.getLives()), p1.isOnBike(), texto, corazonesFont);
+        drawHudVidas(g2, 12, 40, labelFor(2), hearts(p2.getLives()), p2.isOnBike(), texto, corazonesFont);
+        g2.setFont(FontLoader.regular(11f));
         String help = "P1: WASD | disco: E | moto 5s: Q   —   P2: flechas | disco: Enter | moto 5s: U";
         g2.drawString(help, 12, h - 12);
+    }
+
+    /**
+     * Dibuja una línea de HUD {@code "label  ♥♥♡  [MOTO]"} avanzando la x por segmento, de modo que
+     * el texto use Rajdhani y los corazones la fuente de respaldo que sí los contiene.
+     */
+    private void drawHudVidas(Graphics2D g2, int x, int y, String label, String corazonesTexto,
+                              boolean onBike, Font texto, Font corazonesFont) {
+        String pre = label + "  ";
+        g2.setFont(texto);
+        g2.drawString(pre, x, y);
+        x += g2.getFontMetrics(texto).stringWidth(pre);
+        g2.setFont(corazonesFont);
+        g2.drawString(corazonesTexto, x, y);
+        x += g2.getFontMetrics(corazonesFont).stringWidth(corazonesTexto);
+        if (onBike) {
+            g2.setFont(texto);
+            g2.drawString("  [MOTO]", x, y);
+        }
     }
 
     /** Representación visual de vidas como serie de corazones llenos / vacíos. */

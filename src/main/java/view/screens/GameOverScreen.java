@@ -4,7 +4,10 @@ import audio.Sfx;
 import audio.SoundManager;
 import audio.UiSound;
 import logic.GameSession;
+import net.LeaderboardClient;
 import view.BaseScreen;
+import view.FontLoader;
+import view.SpriteButton;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,8 +19,6 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -45,25 +46,23 @@ public class GameOverScreen extends BaseScreen {
         center.setBorder(BorderFactory.createEmptyBorder(60, 20, 60, 20));
 
         JLabel title = new JLabel("GAME OVER", SwingConstants.CENTER);
-        title.setFont(new Font(Font.MONOSPACED, Font.BOLD, 48));
+        title.setFont(FontLoader.bold(48f));
         title.setForeground(PINK);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        headline.setFont(new Font(Font.MONOSPACED, Font.BOLD, 28));
+        headline.setFont(FontLoader.bold(28f));
         headline.setForeground(CYAN);
         headline.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        detail.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+        detail.setFont(FontLoader.regular(14f));
         detail.setForeground(TEXT);
         detail.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton back = neonButton("Volver al menú");
-        back.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton back = SpriteButton.create("accionadores/btn-menu-principal.svg", "Volver al menú", 220, 56);
         UiSound.attachClick(back);
         back.addActionListener(e -> screens().mostrar("welcome"));
 
-        JButton replay = neonButton("Jugar de nuevo");
-        replay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton replay = SpriteButton.create("accionadores/btn-reintentar.svg", "Jugar de nuevo", 220, 56);
         UiSound.attachClick(replay);
         replay.addActionListener(e -> screens().mostrar("game"));
 
@@ -89,6 +88,9 @@ public class GameOverScreen extends BaseScreen {
             detail.setText(w == 1
                     ? s.getPlayerTwoName() + " se quedó sin vidas"
                     : s.getPlayerOneName() + " se quedó sin vidas");
+            // Publica ambos puntajes en el leaderboard (asíncrono y tolerante a fallos).
+            LeaderboardClient.submitAsync(s.getPlayerOneName(), s.getPlayerOneScore(), w == 1 ? "win" : "loss");
+            LeaderboardClient.submitAsync(s.getPlayerTwoName(), s.getPlayerTwoScore(), w == 2 ? "win" : "loss");
         } else {
             headline.setText("Partida finalizada");
             detail.setText("");
@@ -105,16 +107,5 @@ public class GameOverScreen extends BaseScreen {
             SoundManager.stop(activeGameOverSfx);
             activeGameOverSfx = null;
         }
-    }
-
-    private static JButton neonButton(String text) {
-        JButton b = new JButton(text);
-        b.setFont(new Font(Font.MONOSPACED, Font.BOLD, 18));
-        b.setForeground(BG);
-        b.setBackground(CYAN);
-        b.setFocusPainted(false);
-        b.setBorder(BorderFactory.createEmptyBorder(10, 24, 10, 24));
-        b.setMaximumSize(new Dimension(260, 48));
-        return b;
     }
 }

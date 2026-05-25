@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <!-- Glow cyan -->
+    <filter id="glow-c" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="b1"/>
+      <feGaussianBlur stdDeviation="12" result="b2"/>
+      <feGaussianBlur stdDeviation="22" result="b3"/>
+      <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Glow pink -->
+    <filter id="glow-p" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="b1"/>
+      <feGaussianBlur stdDeviation="12" result="b2"/>
+      <feGaussianBlur stdDeviation="22" result="b3"/>
+      <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Button glow -->
+    <filter id="glow-btn" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <!-- Input field glow cyan -->
+    <filter id="glow-field-c" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Input field glow pink -->
+    <filter id="glow-field-p" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Scanlines -->
+    <pattern id="scan" x="0" y="0" width="1" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="2" width="1" height="2" fill="rgba(0,0,0,0.18)"/>
+    </pattern>
+    <!-- Vignette -->
+    <radialGradient id="vig" cx="50%" cy="50%" r="70%">
+      <stop offset="50%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.78)"/>
+    </radialGradient>
+    <!-- Top/bottom bars -->
+    <linearGradient id="topBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="transparent"/>
+      <stop offset="20%"  stop-color="#00ffff"/>
+      <stop offset="50%"  stop-color="#00ffff"/>
+      <stop offset="80%"  stop-color="#ff3399"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <linearGradient id="botBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="transparent"/>
+      <stop offset="20%"  stop-color="#ff3399"/>
+      <stop offset="50%"  stop-color="#ff3399"/>
+      <stop offset="80%"  stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <!-- Field fills -->
+    <linearGradient id="field-c-fill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#001a1a"/>
+      <stop offset="100%" stop-color="#002626"/>
+    </linearGradient>
+    <linearGradient id="field-p-fill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#1a0011"/>
+      <stop offset="100%" stop-color="#26001a"/>
+    </linearGradient>
+    <!-- Divider -->
+    <linearGradient id="div-c" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="transparent"/>
+      <stop offset="25%"  stop-color="#00ffff"/>
+      <stop offset="75%"  stop-color="#00ffff"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <linearGradient id="div-p" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="transparent"/>
+      <stop offset="25%"  stop-color="#ff3399"/>
+      <stop offset="75%"  stop-color="#ff3399"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── BACKGROUND ── -->
+  <rect width="800" height="500" fill="#0a0a12"/>
+
+  <!-- ── RETRO GRID ── -->
+  <g opacity="0.45">
+    <!-- Vertical lines converging to VP -->
+    <line x1="40"  y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="120" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="200" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="280" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="360" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="440" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="520" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="600" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="680" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="760" y1="500" x2="400" y2="220" stroke="#0d2a2a" stroke-width="1"/>
+    <!-- Horizontal rows -->
+    <line x1="0" y1="260" x2="800" y2="260" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="0" y1="344" x2="800" y2="344" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="0" y1="392" x2="800" y2="392" stroke="#0d2a2a" stroke-width="1"/>
+    <line x1="0" y1="444" x2="800" y2="444" stroke="#0d2a2a" stroke-width="1"/>
+  </g>
+
+  <!-- ── AMBIENT TRAILS ── -->
+  <line x1="0"   y1="110" x2="190" y2="110" stroke="#00ffff" stroke-width="2" opacity="0.4" filter="url(#glow-c)"/>
+  <line x1="0"   y1="112" x2="130" y2="112" stroke="#00ffff" stroke-width="1" opacity="0.18"/>
+  <line x1="800" y1="160" x2="610" y2="160" stroke="#ff3399" stroke-width="2" opacity="0.4" filter="url(#glow-p)"/>
+  <line x1="800" y1="162" x2="660" y2="162" stroke="#ff3399" stroke-width="1" opacity="0.18"/>
+  <line x1="0"   y1="440" x2="150" y2="440" stroke="#00ffff" stroke-width="1.5" opacity="0.28" filter="url(#glow-c)"/>
+  <line x1="800" y1="420" x2="640" y2="420" stroke="#ff3399" stroke-width="1.5" opacity="0.28" filter="url(#glow-p)"/>
+
+  <!-- ── SCANLINES ── -->
+  <rect width="800" height="500" fill="url(#scan)" opacity="0.7"/>
+
+  <!-- ── VIGNETTE ── -->
+  <rect width="800" height="500" fill="url(#vig)"/>
+
+  <!-- ── TOP / BOTTOM BARS ── -->
+  <rect x="0" y="0"   width="800" height="3" fill="url(#topBar)"/>
+  <rect x="0" y="497" width="800" height="3" fill="url(#botBar)"/>
+
+  <!-- ── CORNERS ── -->
+  <polyline points="16,76 16,16 76,16"    fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <polyline points="724,16 784,16 784,76" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <polyline points="16,424 16,484 76,484" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+  <polyline points="724,484 784,484 784,424" fill="none" stroke="#00ffff" stroke-width="2" opacity="0.6"/>
+
+  <!-- ── TITLE ── -->
+  <!-- Glow layer -->
+  <text x="400" y="88"
+        font-family="'Courier New', Courier, monospace"
+        font-weight="900" font-size="52" letter-spacing="4"
+        fill="#00ffff" text-anchor="middle"
+        filter="url(#glow-c)">¿Quiénes juegan?</text>
+  <!-- Crisp layer -->
+  <text x="400" y="88"
+        font-family="'Courier New', Courier, monospace"
+        font-weight="900" font-size="52" letter-spacing="4"
+        fill="#00ffff" text-anchor="middle">¿Quiénes juegan?</text>
+
+  <!-- ── DIVIDER UNDER TITLE ── -->
+  <rect x="160" y="104" width="480" height="2" fill="url(#div-c)"/>
+  <text x="268" y="102" font-family="monospace" font-size="10" fill="#00ffff" filter="url(#glow-c)">■</text>
+  <text x="520" y="102" font-family="monospace" font-size="10" fill="#00ffff" filter="url(#glow-c)">■</text>
+
+  <!-- ── LABEL P1 ── -->
+  <text x="400" y="144"
+        font-family="'Courier New', Courier, monospace"
+        font-size="11" letter-spacing="4"
+        fill="#00ffff" text-anchor="middle" opacity="0.7">JUGADOR 1  (CIAN · WASD)</text>
+
+  <!-- ── FIELD P1 ── -->
+  <!-- Glow border -->
+  <rect x="238" y="156" width="324" height="44" rx="0"
+        fill="none" stroke="#00ffff" stroke-width="2"
+        filter="url(#glow-field-c)"/>
+  <!-- Field background -->
+  <rect x="240" y="158" width="320" height="40" fill="url(#field-c-fill)"/>
+  <!-- Inner top highlight line -->
+  <rect x="240" y="158" width="320" height="1" fill="#00ffff" opacity="0.12"/>
+  <!-- Pixel corner accents -->
+  <rect x="238" y="156" width="4" height="4" fill="#00ffff" opacity="0.5"/>
+  <rect x="558" y="156" width="4" height="4" fill="#00ffff" opacity="0.5"/>
+  <rect x="238" y="196" width="4" height="4" fill="#00ffff" opacity="0.5"/>
+  <rect x="558" y="196" width="4" height="4" fill="#00ffff" opacity="0.5"/>
+  <!-- Placeholder text -->
+  <text x="256" y="184"
+        font-family="'Courier New', Courier, monospace"
+        font-size="16" letter-spacing="1"
+        fill="#00ffff" opacity="0.75">P1</text>
+  <!-- Cursor blink -->
+  <rect x="280" y="165" width="2" height="22" fill="#00ffff" opacity="0.9"/>
+
+  <!-- ── LABEL P2 ── -->
+  <text x="400" y="232"
+        font-family="'Courier New', Courier, monospace"
+        font-size="11" letter-spacing="4"
+        fill="#ff3399" text-anchor="middle" opacity="0.7">JUGADOR 2  (ROSA · FLECHAS)</text>
+
+  <!-- ── FIELD P2 ── -->
+  <!-- Glow border -->
+  <rect x="238" y="244" width="324" height="44" rx="0"
+        fill="none" stroke="#ff3399" stroke-width="2"
+        filter="url(#glow-field-p)"/>
+  <!-- Field background -->
+  <rect x="240" y="246" width="320" height="40" fill="url(#field-p-fill)"/>
+  <!-- Inner top highlight line -->
+  <rect x="240" y="246" width="320" height="1" fill="#ff3399" opacity="0.12"/>
+  <!-- Pixel corner accents -->
+  <rect x="238" y="244" width="4" height="4" fill="#ff3399" opacity="0.5"/>
+  <rect x="558" y="244" width="4" height="4" fill="#ff3399" opacity="0.5"/>
+  <rect x="238" y="284" width="4" height="4" fill="#ff3399" opacity="0.5"/>
+  <rect x="558" y="284" width="4" height="4" fill="#ff3399" opacity="0.5"/>
+  <!-- Placeholder text -->
+  <text x="256" y="272"
+        font-family="'Courier New', Courier, monospace"
+        font-size="16" letter-spacing="1"
+        fill="#ff3399" opacity="0.75">P2</text>
+  <!-- Cursor blink -->
+  <rect x="280" y="253" width="2" height="22" fill="#ff3399" opacity="0.9"/>
+
+  <!-- ── DIVIDER ── -->
+  <rect x="200" y="306" width="400" height="2" fill="url(#div-c)" opacity="0.5"/>
+
+  <!-- ── BUTTON JUGAR ── -->
+  <!-- Shadow layers -->
+  <polygon points="266,320 538,320 542,324 542,364 270,364 266,360" fill="#004444"/>
+  <polygon points="264,318 536,318 540,322 540,362 268,362 264,358" fill="#007777"/>
+  <!-- Glow halo -->
+  <polygon points="262,316 534,316 538,320 538,360 266,360 262,356" fill="#00ffff" filter="url(#glow-btn)" opacity="0.45"/>
+  <!-- Body -->
+  <polygon points="262,316 534,316 538,320 538,360 266,360 262,356" fill="#00ffff"/>
+  <!-- Highlight top strip -->
+  <polygon points="262,316 534,316 538,320 538,330 262,330" fill="rgba(255,255,255,0.16)"/>
+  <!-- Text -->
+  <text x="400" y="343"
+        font-family="'Courier New', Courier, monospace"
+        font-weight="700" font-size="16" letter-spacing="4"
+        fill="#0a0a12" text-anchor="middle">JUGAR</text>
+
+  <!-- ── HINT FOOTER ── -->
+  <text x="400" y="416"
+        font-family="'Courier New', Courier, monospace"
+        font-size="9" letter-spacing="3"
+        fill="#eeeeff" text-anchor="middle" opacity="0.35">ENTER EN CUALQUIER CAMPO TAMBIÉN INICIA LA PARTIDA</text>
+
+  <!-- ── FOOTER ── -->
+  <text x="400" y="455" font-family="'Courier New', Courier, monospace" font-size="6"
+        fill="#eeeeff" text-anchor="middle" letter-spacing="2" opacity="0.28">TÉCNICAS DE PROGRAMACIÓN · DOCENTE: LEONARDO MONTES</text>
+  <text x="400" y="467" font-family="'Courier New', Courier, monospace" font-size="6"
+        fill="#eeeeff" text-anchor="middle" letter-spacing="2" opacity="0.28">JAVA 17 + SWING · UNIVERSIDAD AUTÓNOMA DE MANIZALES</text>
+</svg>
