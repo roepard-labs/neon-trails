@@ -10,6 +10,9 @@ import {
   Network,
   MonitorSmartphone,
   Trophy,
+  Code2,
+  Rocket,
+  Wrench,
   Gamepad2,
   type LucideIcon,
 } from 'lucide-vue-next'
@@ -20,7 +23,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import ThemeToggle from './ThemeToggle.vue'
 import ShortcutsButton from './ShortcutsButton.vue'
 import SidebarToggle from './SidebarToggle.vue'
 import PresenterToggle from './PresenterToggle.vue'
@@ -44,6 +46,9 @@ const iconMap: Record<string, LucideIcon> = {
   Network,
   MonitorSmartphone,
   Trophy,
+  Code2,
+  Rocket,
+  Wrench,
 }
 
 const route = useRoute()
@@ -216,16 +221,14 @@ const activeName = computed(() => route.name)
       <template v-if="props.collapsed">
         <PresenterToggle />
         <ShortcutsButton />
-        <ThemeToggle />
       </template>
 
       <template v-else>
         <div class="flex items-center justify-between">
-          <span class="text-xs text-muted-foreground">Expositor · Atajos · Tema</span>
+          <span class="text-xs text-muted-foreground">Expositor · Atajos</span>
           <div class="flex items-center gap-1.5">
             <PresenterToggle />
             <ShortcutsButton />
-            <ThemeToggle />
           </div>
         </div>
         <p class="text-xs leading-relaxed text-muted-foreground">

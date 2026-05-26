@@ -5,6 +5,7 @@ import { MapPin, ArrowRight, Play, Trophy } from 'lucide-vue-next'
 import { projectInfo } from '@/data/project'
 import { buttonVariants } from '@/components/ui/button'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import NeonSprite from '@/components/content/NeonSprite.vue'
 import logoJemg from '@/assets/logo-jemg.png'
 import logoJaco from '@/assets/logo-jaco.svg'
 
@@ -140,17 +141,33 @@ const tituloWords = projectInfo.titulo.split(' ')
         </span>
       </div>
 
-      <!-- Título -->
-      <h1
-        ref="title"
-        class="mt-8 text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-      >
-        <span
-          v-for="(word, i) in tituloWords"
-          :key="i"
-          class="split-word mr-3 inline-block"
-        >{{ word }}</span>
-      </h1>
+      <!-- Título con los sprites de los dos jugadores (cian P1 · magenta P2) -->
+      <div class="mt-8 flex items-center justify-center gap-3 sm:gap-6">
+        <NeonSprite
+          v-motion-pop-visible-once
+          player="p1"
+          state="idle"
+          :size="88"
+          class="hidden shrink-0 md:block"
+        />
+        <h1
+          ref="title"
+          class="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-glow-cyan sm:text-5xl md:text-6xl lg:text-7xl"
+        >
+          <span
+            v-for="(word, i) in tituloWords"
+            :key="i"
+            class="split-word mr-3 inline-block"
+          >{{ word }}</span>
+        </h1>
+        <NeonSprite
+          v-motion-pop-visible-once
+          player="p2"
+          state="idle"
+          :size="88"
+          class="hidden shrink-0 md:block"
+        />
+      </div>
 
       <!-- Subtitle -->
       <p
@@ -228,7 +245,7 @@ const tituloWords = projectInfo.titulo.split(' ')
           Comenzar la exposición
           <ArrowRight data-cta-arrow class="size-5" />
         </RouterLink>
-        <span class="text-sm text-muted-foreground">— 8 secciones</span>
+        <span class="text-sm text-muted-foreground">— 11 secciones</span>
       </div>
 
       <!-- Acciones rápidas: jugar y ranking -->

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Neon Trails - P2 (magenta) - MODO MOTO - vista aerea
+     Cuerpo 18x13, aura rotatoria, boost trail, destellos, +30% brillo. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="22" height="22">
+  <defs>
+    <filter id="glow-magenta-strong" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="0.9" result="b1"/>
+      <feGaussianBlur stdDeviation="0.35" in="SourceGraphic" result="b2"/>
+      <feMerge>
+        <feMergeNode in="b1"/>
+        <feMergeNode in="b2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="pulse-magenta-m" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="40%"  stop-color="#ff99cc" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ff3399" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g id="bike-aura" opacity="0.9">
+    <circle cx="11" cy="11" r="10.2"
+            fill="none" stroke="#ff3399" stroke-width="0.35"
+            opacity="0.25"/>
+    <g>
+      <circle cx="11" cy="11" r="10"
+              fill="none" stroke="#ff3399" stroke-width="0.6"
+              stroke-dasharray="3 2 1.5 2 4 2.5"
+              filter="url(#glow-magenta-strong)"/>
+      <animateTransform attributeName="transform"
+                        type="rotate"
+                        from="0 11 11" to="360 11 11"
+                        dur="0.5s" repeatCount="indefinite"/>
+    </g>
+    <g opacity="0.45">
+      <circle cx="11" cy="11" r="8.4"
+              fill="none" stroke="#ff99cc" stroke-width="0.3"
+              stroke-dasharray="0.8 4"/>
+      <animateTransform attributeName="transform"
+                        type="rotate"
+                        from="360 11 11" to="0 11 11"
+                        dur="0.8s" repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <g id="boost-trail" fill="#ff3399" stroke="none">
+    <polygon points="9.5,19 8,22 11,21" opacity="0.7">
+      <animate attributeName="opacity" values="0;0.85;0" dur="0.28s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="12.5,19 14,22 11,21" opacity="0.7">
+      <animate attributeName="opacity" values="0;0.85;0" dur="0.28s" begin="0.09s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="11,19.5 10,22 12,22" fill="#ff99cc" opacity="0.9">
+      <animate attributeName="opacity" values="0;1;0" dur="0.22s" begin="0.05s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+
+  <g id="player-body-moto" filter="url(#glow-magenta-strong)">
+    <rect class="main-body"
+          x="2" y="4.5" width="18" height="13" rx="1.8" ry="1.8"
+          fill="#0a0a12" stroke="#ff3399" stroke-width="0.75"/>
+    <polygon class="direction-arrow"
+             points="11,0.5 3.5,4.5 18.5,4.5"
+             fill="#0a0a12" stroke="#ff3399" stroke-width="0.75"
+             stroke-linejoin="miter"/>
+    <rect x="3.6" y="6" width="14.8" height="10" rx="1.2" ry="1.2"
+          fill="none" stroke="#ff99cc" stroke-width="0.25" opacity="0.7"/>
+    <line x1="11" y1="5.5" x2="11" y2="17" stroke="#ff3399" stroke-width="0.4"/>
+    <circle class="core-glow" cx="11" cy="11" r="2.3" fill="url(#pulse-magenta-m)">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="11" cy="11" r="0.7" fill="#ffffff">
+      <animate attributeName="r" values="0.5;0.9;0.5" dur="0.3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <g id="sparkles" fill="#ffffff">
+    <circle cx="2.5" cy="6" r="0.35">
+      <animate attributeName="opacity" values="0;1;0;0" keyTimes="0;0.1;0.2;1" dur="1.1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="19.5" cy="6" r="0.35">
+      <animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.35;0.45;0.7" dur="1.1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="3" cy="16" r="0.35">
+      <animate attributeName="opacity" values="0;1;0;0;0" keyTimes="0;0.6;0.7;0.8;1" dur="1.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="19" cy="16" r="0.35">
+      <animate attributeName="opacity" values="0;0;0;1;0" keyTimes="0;0.2;0.85;0.9;1" dur="1.3s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="11" cy="1.5" r="0.4">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="0.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

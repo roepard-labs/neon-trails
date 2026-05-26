@@ -8,8 +8,11 @@ import {
   NotebookText,
   Network,
   MonitorSmartphone,
+  Trophy,
+  Code2,
+  Rocket,
+  Wrench,
   Hash,
-  Sun,
   Presentation,
   type LucideIcon,
 } from 'lucide-vue-next'
@@ -26,15 +29,9 @@ import { sectionRoutes } from '@/router'
 import { useCases } from '@/data/useCases'
 import { isCommandOpen } from '@/composables/useAppShortcuts'
 import { usePresenterMode } from '@/composables/usePresenterMode'
-import { useColorMode } from '@vueuse/core'
 
 const router = useRouter()
 const { toggle: togglePresenter } = usePresenterMode()
-const mode = useColorMode({
-  attribute: 'class',
-  selector: 'html',
-  modes: { dark: 'dark', light: '' },
-})
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpenText,
@@ -44,6 +41,10 @@ const iconMap: Record<string, LucideIcon> = {
   NotebookText,
   Network,
   MonitorSmartphone,
+  Trophy,
+  Code2,
+  Rocket,
+  Wrench,
 }
 
 const sections = sectionRoutes
@@ -69,11 +70,6 @@ function goSection(path: string) {
 function goUseCase(codigo: string) {
   isCommandOpen.value = false
   router.push(`/descripciones#${codigo}`)
-}
-
-function toggleTheme() {
-  mode.value = mode.value === 'dark' ? 'light' : 'dark'
-  isCommandOpen.value = false
 }
 
 function togglePresenterAction() {
@@ -123,9 +119,9 @@ function togglePresenterAction() {
           <Presentation class="mr-2 size-4 text-brand" />
           Activar/desactivar modo expositor
         </CommandItem>
-        <CommandItem value="tema oscuro claro dark light" @select="toggleTheme">
-          <Sun class="mr-2 size-4 text-brand" />
-          Alternar tema claro / oscuro
+        <CommandItem value="jugar juego game novnc" @select="go('/leaderboard')">
+          <Trophy class="mr-2 size-4 text-brand" />
+          Ir al leaderboard y jugar
         </CommandItem>
       </CommandGroup>
     </CommandList>

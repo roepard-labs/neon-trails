@@ -5,8 +5,8 @@ import { Menu } from 'lucide-vue-next'
 import SidebarNav from './SidebarNav.vue'
 import MobileNavSheet from './MobileNavSheet.vue'
 import ShortcutsDialog from './ShortcutsDialog.vue'
-import ThemeToggle from './ThemeToggle.vue'
 import CommandPalette from './CommandPalette.vue'
+import { Toaster } from '@/components/ui/sonner'
 import { sectionRoutes } from '@/router'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useSidebar } from '@/composables/useSidebar'
@@ -14,10 +14,12 @@ import { useAppShortcuts } from '@/composables/useAppShortcuts'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { usePageTitle } from '@/composables/usePageTitle'
 import { usePresenterMode } from '@/composables/usePresenterMode'
+import { usePresentationStore } from '@/stores/presentation'
 
 const route = useRoute()
 const { isCollapsed, toggleMobile } = useSidebar()
 const prefersReducedMotion = usePrefersReducedMotion()
+const presentation = usePresentationStore()
 
 useAppShortcuts()
 usePageTitle()
@@ -56,14 +58,15 @@ const totalSections = sectionRoutes.length
           >
             <Menu class="size-5" />
           </button>
-          <span class="font-heading text-base font-bold">Neon Trails — Exposición</span>
-          <ThemeToggle />
+          <span class="font-heading text-base font-bold text-glow-cyan-soft">Neon Trails</span>
+          <!-- Spacer para mantener el título centrado (tema fijo: sin toggle) -->
+          <span class="w-11" aria-hidden="true" />
         </div>
 
-        <!-- Breadcrumb -->
+        <!-- Breadcrumb + barra de progreso (alimentada por el store Pinia) -->
         <div
           v-if="currentSection"
-          class="sticky top-0 z-10 hidden border-b border-border bg-background/80 px-8 py-3 backdrop-blur md:flex md:items-center md:justify-between"
+          class="sticky top-0 z-10 hidden border-b border-border bg-background/80 px-8 py-3 backdrop-blur md:flex md:items-center md:justify-between relative"
         >
           <div class="flex items-center gap-3 text-sm text-muted-foreground">
             <span class="font-mono">
@@ -71,6 +74,15 @@ const totalSections = sectionRoutes.length
             </span>
             <span class="text-muted-foreground/50">·</span>
             <span class="font-medium text-foreground">{{ currentSection.titulo }}</span>
+          </div>
+          <span class="font-mono text-xs text-brand">{{ presentation.progress }}%</span>
+
+          <!-- Hilo de neón inferior: avance de la presentación -->
+          <div class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-border/40">
+            <div
+              class="h-full bg-brand shadow-glow-cyan transition-[width] duration-500 ease-out"
+              :style="{ width: presentation.progress + '%' }"
+            />
           </div>
         </div>
 
@@ -109,6 +121,9 @@ const totalSections = sectionRoutes.length
 
       <!-- Command palette (Ctrl/⌘+K) -->
       <CommandPalette />
+
+      <!-- Notificaciones (vue-sonner): usadas por el botón "copiar" de los CodeBlock -->
+      <Toaster position="bottom-right" :duration="2200" />
     </div>
   </TooltipProvider>
 </template>

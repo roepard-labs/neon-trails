@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useColorMode } from '@vueuse/core'
 import { useShortcuts } from 'vue-shortcut-manager'
 import { sectionRoutes } from '@/router'
 import { useSidebar } from './useSidebar'
@@ -11,11 +10,6 @@ export const isCommandOpen = ref(false)
 
 export function useAppShortcuts() {
   const router = useRouter()
-  const mode = useColorMode({
-    attribute: 'class',
-    selector: 'html',
-    modes: { dark: 'dark', light: '' },
-  })
   const { toggle: toggleSidebar, toggleMobile } = useSidebar()
   const { isMobile } = useBreakpoint()
 
@@ -41,30 +35,33 @@ export function useAppShortcuts() {
     if (i > 0) goSection(i - 1)
   }
 
+  // Abre el juego (servido por el monolito en /game/ vía noVNC) en otra pestaña,
+  // sin perder la presentación. En dev local la ruta no existe y dará 404.
+  const openGame = () => window.open('/game/', '_blank', 'noopener')
+
+  // Saltos 1..9 generados desde las rutas: las etiquetas y el número siempre
+  // coinciden con sectionRoutes y escalan al añadir secciones (las 10/11 quedan
+  // accesibles por flechas, sidebar y command palette).
+  const jumpShortcuts = sectionRoutes.slice(0, 9).map((route, i) => ({
+    key: String(i + 1),
+    handler: () => goSection(i),
+    description: `Sección ${i + 1} · ${route.meta?.seccion?.titulo ?? String(route.name ?? '')}`,
+    scope: 'Saltos rápidos',
+  }))
+
   useShortcuts([
-    // Navegación
+    // Navegación (J/K = alias estilo Vim de ←/→)
     { key: 'arrowright', handler: nextSection, description: 'Siguiente sección', scope: 'Navegación' },
     { key: 'arrowleft', handler: prevSection, description: 'Sección anterior', scope: 'Navegación' },
+    { key: 'k', handler: nextSection, description: 'Siguiente sección', scope: 'Navegación' },
+    { key: 'j', handler: prevSection, description: 'Sección anterior', scope: 'Navegación' },
     { key: 'h', handler: () => goSection(0), description: 'Ir a la portada', scope: 'Navegación' },
+    { key: 'g', handler: openGame, description: 'Abrir el juego (/game/)', scope: 'Navegación' },
 
-    // Saltos rápidos a sección
-    { key: '1', handler: () => goSection(0), description: 'Sección 1 · Portada', scope: 'Saltos rápidos' },
-    { key: '2', handler: () => goSection(1), description: 'Sección 2 · Problema', scope: 'Saltos rápidos' },
-    { key: '3', handler: () => goSection(2), description: 'Sección 3 · Requerimientos', scope: 'Saltos rápidos' },
-    { key: '4', handler: () => goSection(3), description: 'Sección 4 · Casos de uso', scope: 'Saltos rápidos' },
-    { key: '5', handler: () => goSection(4), description: 'Sección 5 · Descripciones', scope: 'Saltos rápidos' },
-    { key: '6', handler: () => goSection(5), description: 'Sección 6 · Actividad', scope: 'Saltos rápidos' },
-    { key: '7', handler: () => goSection(6), description: 'Sección 7 · Mockups', scope: 'Saltos rápidos' },
+    // Saltos rápidos a sección (1..9)
+    ...jumpShortcuts,
 
     // Interfaz
-    {
-      key: 't',
-      handler: () => {
-        mode.value = mode.value === 'dark' ? 'light' : 'dark'
-      },
-      description: 'Alternar tema claro / oscuro',
-      scope: 'Interfaz',
-    },
     {
       key: 'b',
       handler: toggleSidebarOrMobile,

@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -7,10 +7,27 @@
 @custom-variant dark (&:is(.dark *));
 @custom-variant presenter (&:is(.presenter *));
 
+/* ==========================================================================
+   Rajdhani — fuente display/heading sci-fi (squared, condensed). Proviene del
+   bundle de diseño de Claude (colors_and_type.css) y es la misma familia que
+   usa el juego Java. Solo se suministró el peso 300, así que se re-declara en
+   cada peso que el sistema usa (400..700): sin esto, el navegador rechaza el
+   rango de peso sobre un TTF no-variable y los títulos (700) caen a la fuente
+   del sistema. Cambiar por los TTF reales 500/600/700 cuando existan.
+   ========================================================================== */
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-latin-300-normal.ttf') format("truetype"); font-weight: 300; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-latin-300-normal.ttf') format("truetype"); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-latin-300-normal.ttf') format("truetype"); font-weight: 500; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-latin-300-normal.ttf') format("truetype"); font-weight: 600; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-latin-300-normal.ttf') format("truetype"); font-weight: 700; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-devanagari-300-normal.ttf') format("truetype"); font-weight: 300; font-style: normal; font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB; }
+@font-face { font-family: "Rajdhani"; src: url('./assets/fonts/rajdhani-devanagari-400-normal.ttf') format("truetype"); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB; }
+
 @theme inline {
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Tipografía base bumpeada para legibilidad en video-beamer
      (el modo expositor sube además el font-size del <html>) */
@@ -55,93 +72,85 @@
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
+  /* Player 2 — magenta. Permite text-p2 / bg-p2 / border-p2 en las plantillas. */
+  --color-p2: var(--p2);
+  --color-p2-foreground: var(--p2-foreground);
+  --color-p2-muted: var(--p2-muted);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ==========================================================================
+   Tema neón Tron — PERMANENTE (sin modo claro). La paleta refleja los Color()
+   del juego Java (logic/GameState.java, view/GamePanel.java): cyan #00ffff P1,
+   magenta #ff3399 P2 sobre negro profundo #0a0a12. Los tokens semánticos de
+   shadcn se mapean a estos valores, así que toda la presentación se re-colorea
+   automáticamente. El <html> lleva class="dark" fija para activar los refina-
+   mientos dark: de los componentes shadcn.
+   ========================================================================== */
 :root {
-  color-scheme: light;
-  accent-color: oklch(0.488 0.217 264);
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.45 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.488 0.217 264);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.96 0.02 264);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
-
-  /* Brand — azul logístico */
-  --brand: oklch(0.488 0.217 264);
-  --brand-foreground: oklch(0.985 0 0);
-  --brand-muted: oklch(0.95 0.03 264);
-}
-
-.dark {
   color-scheme: dark;
-  accent-color: oklch(0.7 0.18 264);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.78 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.7 0.18 264);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.04 264);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  accent-color: #00ffff;
+  --radius: 0.625rem;
 
-  /* Brand — azul logístico (variante oscura) */
-  --brand: oklch(0.7 0.18 264);
-  --brand-foreground: oklch(0.141 0.005 285.823);
-  --brand-muted: oklch(0.3 0.06 264);
+  /* Superficies / chrome */
+  --background: #0a0a12;          /* mundo (Java: 0x0a,0x0a,0x12) */
+  --foreground: #eeeeff;          /* tinta primaria */
+  --card: #12121c;                /* panel / tarjeta */
+  --card-foreground: #eeeeff;
+  --popover: #101019;
+  --popover-foreground: #eeeeff;
+  --secondary: #16161f;
+  --secondary-foreground: #eeeeff;
+  --muted: #14141c;
+  --muted-foreground: rgba(238, 238, 255, 0.62);
+  --accent: #1b1b29;              /* superficie hover */
+  --accent-foreground: #ffffff;
+
+  /* Acentos de marca = colores de los jugadores */
+  --primary: #00ffff;             /* cyan P1 */
+  --primary-foreground: #06080f;
+  --ring: #00ffff;
+  --brand: #00ffff;
+  --brand-foreground: #06080f;
+  --brand-muted: rgba(0, 255, 255, 0.12);
+  --p2: #ff3399;                  /* magenta P2 */
+  --p2-foreground: #0a0211;
+  --p2-muted: rgba(255, 51, 153, 0.14);
+
+  --destructive: #ff3b6b;
+
+  /* Bordes / inputs — hairlines cyan tenues (arena edge) */
+  --border: rgba(51, 255, 255, 0.18);
+  --input: rgba(51, 255, 255, 0.22);
+
+  /* Datos / charts */
+  --chart-1: #00ffff;
+  --chart-2: #ff3399;
+  --chart-3: #aaffff;
+  --chart-4: #ff66b3;
+  --chart-5: #8b9bff;
+
+  /* Sidebar */
+  --sidebar: #0b0b15;
+  --sidebar-foreground: #eeeeff;
+  --sidebar-primary: #00ffff;
+  --sidebar-primary-foreground: #06080f;
+  --sidebar-accent: rgba(0, 255, 255, 0.10);
+  --sidebar-accent-foreground: #eeeeff;
+  --sidebar-border: rgba(51, 255, 255, 0.16);
+  --sidebar-ring: #00ffff;
+
+  /* Sistemas de glow / sombra (mirror de colors_and_type.css del bundle) */
+  --nt-glow-cyan: 0 0 12px rgba(0, 255, 255, 0.55), 0 0 28px rgba(0, 255, 255, 0.25);
+  --nt-glow-cyan-soft: 0 0 6px rgba(0, 255, 255, 0.35);
+  --nt-glow-pink: 0 0 12px rgba(255, 51, 153, 0.55), 0 0 28px rgba(255, 51, 153, 0.20);
+  --nt-glow-pink-soft: 0 0 6px rgba(255, 51, 153, 0.35);
+  --nt-glow-white: 0 0 8px rgba(255, 255, 255, 0.45);
+  --nt-shadow-card: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --nt-arena-border: rgba(51, 255, 255, 0.31);
 }
 
 @layer base {
@@ -155,24 +164,84 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Velo de arena: dos halos radiales muy sutiles (cyan arriba-izq, magenta abajo-der) */
+    background-image:
+      radial-gradient(60rem 60rem at 12% -10%, rgba(0, 255, 255, 0.05), transparent 60%),
+      radial-gradient(50rem 50rem at 100% 110%, rgba(255, 51, 153, 0.05), transparent 60%);
+    background-attachment: fixed;
   }
+  /* Rajdhani da el look sci-fi; mantenemos sentence-case para legibilidad en
+     español (el uppercase es opt-in vía .nt-display / utilidades). */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.005em;
   }
   code, pre, kbd, samp {
     font-family: var(--font-mono);
   }
 }
 
-/* Custom utility: grid background (los text-brand / bg-brand / border-brand
-   se generan automáticamente desde --color-brand definido en @theme inline) */
+/* ==========================================================================
+   Utilidades neón (sintaxis @utility de Tailwind v4)
+   ========================================================================== */
+
+/* Glows de texto y caja para P1 (cyan) y P2 (magenta) */
+@utility text-glow-cyan { text-shadow: var(--nt-glow-cyan); }
+@utility text-glow-cyan-soft { text-shadow: var(--nt-glow-cyan-soft); }
+@utility text-glow-pink { text-shadow: var(--nt-glow-pink); }
+@utility text-glow-pink-soft { text-shadow: var(--nt-glow-pink-soft); }
+@utility text-glow-white { text-shadow: var(--nt-glow-white); }
+@utility shadow-glow-cyan { box-shadow: var(--nt-glow-cyan); }
+@utility shadow-glow-pink { box-shadow: var(--nt-glow-pink); }
+
+/* Rejilla de arena (los sprites/portada la usan como fondo) */
+@utility bg-arena-grid {
+  background-color: var(--background);
+  background-image:
+    linear-gradient(rgba(51, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(51, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Grid genérico (reemplaza al azul anterior por cyan tenue) */
 @utility bg-grid {
   background-image:
-    linear-gradient(to right, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, rgba(51, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(51, 255, 255, 0.07) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* Scanlines CRT sutiles (overlay opcional para marcos de pantalla) */
+@utility nt-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Keycap estilo HUD (el juego es solo-teclado) — portado del bundle */
+.nt-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7em;
+  padding: 2px 6px;
+  background: #14141c;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--foreground);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.nt-kbd--p1 { color: #00ffff; border-color: rgba(0, 255, 255, 0.45); }
+.nt-kbd--p2 { color: #ff3399; border-color: rgba(255, 51, 153, 0.45); }
 
 /* Mermaid diagram container theming hooks */
 .mermaid-host svg {
@@ -192,6 +261,11 @@
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+/* Pulso de glow neón (para títulos hero / bordes vivos) */
+@keyframes nt-pulse-cyan {
+  0%, 100% { text-shadow: var(--nt-glow-cyan-soft); }
+  50%      { text-shadow: var(--nt-glow-cyan); }
+}
 
 @utility animate-grid-drift {
   animation: grid-drift 60s ease-in-out infinite;
@@ -204,11 +278,14 @@
   background-image: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in oklch, var(--brand) 35%, transparent) 50%,
+    rgba(0, 255, 255, 0.35) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
   animation: shimmer-brand 8s linear infinite;
+}
+@utility animate-pulse-cyan {
+  animation: nt-pulse-cyan 3.2s var(--ease-glow, ease-in-out) infinite;
 }
 
 /* Print: expandir accordions y tabs ocultos */

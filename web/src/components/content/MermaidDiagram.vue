@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { useColorMode } from '@vueuse/core'
 import mermaid from 'mermaid'
 import { useDiagramDraw } from '@/composables/useDiagramDraw'
 
@@ -15,18 +14,52 @@ const props = withDefaults(defineProps<Props>(), { animate: true })
 
 const host = ref<HTMLElement | null>(null)
 const rendered = ref<string>('')
-const mode = useColorMode()
 
 const diagramId = computed(() => `mmd-${props.id ?? Math.random().toString(36).slice(2, 9)}`)
 
 const draw = useDiagramDraw(host)
 
+// Tema neón fijo (la presentación es dark permanente): cyan en líneas/bordes,
+// fondos oscuros de tarjeta y texto claro, para que los diagramas combinen con
+// la arena Tron en lugar de verse como un bloque blanco.
+const NEON_THEME_VARS = {
+  darkMode: true,
+  fontFamily: 'Inter, system-ui, sans-serif',
+  background: '#0a0a12',
+  mainBkg: '#12121c',
+  primaryColor: '#12121c',
+  primaryTextColor: '#eeeeff',
+  primaryBorderColor: '#00ffff',
+  secondaryColor: '#1b1b29',
+  tertiaryColor: '#101019',
+  lineColor: '#33ffff',
+  textColor: '#eeeeff',
+  nodeBorder: '#00ffff',
+  nodeTextColor: '#eeeeff',
+  clusterBkg: '#101019',
+  clusterBorder: 'rgba(51,255,255,0.30)',
+  titleColor: '#00ffff',
+  edgeLabelBackground: '#0a0a12',
+  // Diagramas de secuencia
+  actorBkg: '#12121c',
+  actorBorder: '#00ffff',
+  actorTextColor: '#eeeeff',
+  signalColor: '#eeeeff',
+  signalTextColor: '#eeeeff',
+  labelBoxBkgColor: '#12121c',
+  labelBoxBorderColor: '#00ffff',
+  labelTextColor: '#eeeeff',
+  noteBkgColor: '#1b1b29',
+  noteTextColor: '#eeeeff',
+  noteBorderColor: 'rgba(255,51,153,0.55)',
+}
+
 async function render() {
   if (!host.value) return
-  const theme = mode.value === 'dark' ? 'dark' : 'default'
   mermaid.initialize({
     startOnLoad: false,
-    theme,
+    theme: 'dark',
+    themeVariables: NEON_THEME_VARS,
     securityLevel: 'loose',
     fontFamily: 'Inter, system-ui, sans-serif',
     flowchart: {
@@ -46,7 +79,7 @@ async function render() {
 }
 
 onMounted(render)
-watch(() => [props.source, mode.value], render)
+watch(() => props.source, render)
 </script>
 
 <template>

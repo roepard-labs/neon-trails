@@ -14,7 +14,7 @@ const secundarios = computed(() => useCases.filter((uc) => uc.tipo === 'secundar
 </script>
 
 <template>
-  <section>
+  <section class="snap-slide">
     <PageHeader
       :numero="6"
       titulo="Descripciones de casos de uso"

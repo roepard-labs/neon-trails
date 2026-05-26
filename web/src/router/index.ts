@@ -118,6 +118,45 @@ export const sectionRoutes: RouteRecordRaw[] = [
       },
     },
   },
+  {
+    path: '/stack',
+    name: 'stack',
+    component: () => import('@/views/StackView.vue'),
+    meta: {
+      seccion: {
+        numero: 9,
+        titulo: 'Stack & Código',
+        subtitulo: 'Las 4 capas con código real (Java, PHP, Vue/TS, SQL)',
+        icon: 'Code2',
+      },
+    },
+  },
+  {
+    path: '/despliegue',
+    name: 'despliegue',
+    component: () => import('@/views/DespliegueView.vue'),
+    meta: {
+      seccion: {
+        numero: 10,
+        titulo: 'Despliegue',
+        subtitulo: 'Imagen Docker monolítica, noVNC y Dokploy',
+        icon: 'Rocket',
+      },
+    },
+  },
+  {
+    path: '/herramientas',
+    name: 'herramientas',
+    component: () => import('@/views/HerramientasView.vue'),
+    meta: {
+      seccion: {
+        numero: 11,
+        titulo: 'Herramientas',
+        subtitulo: 'mise, make y la integración continua (CI)',
+        icon: 'Wrench',
+      },
+    },
+  },
 ]
 
 const router = createRouter({

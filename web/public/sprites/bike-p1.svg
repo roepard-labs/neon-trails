@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Neon Trails · MOTO P1 · top-down 28x28 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28">
+  <defs>
+    <filter id="glow-p1" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="0.7" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="bike-p1-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#AAFFFF" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#00FFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- AURA giratoria (boost halo) -->
+  <g opacity="0.55">
+    <circle cx="14" cy="14" r="13" fill="none" stroke="#00FFFF" stroke-width="0.4"
+            stroke-dasharray="3 2 1 2 4 2"
+            filter="url(#glow-p1)">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="0 14 14" to="360 14 14"
+                        dur="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="14" cy="14" r="11" fill="none" stroke="#AAFFFF" stroke-width="0.25"
+            stroke-dasharray="1 5" opacity="0.65">
+      <animateTransform attributeName="transform" type="rotate"
+                        from="360 14 14" to="0 14 14"
+                        dur="0.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <g id="bike-p1" filter="url(#glow-p1)">
+    <!-- RUEDAS (rectángulos largos a los lados, característica TRON) -->
+    <rect x="4" y="6" width="2.4" height="16" rx="0.6" fill="#0a0a12" stroke="#00FFFF" stroke-width="0.6"/>
+    <rect x="21.6" y="6" width="2.4" height="16" rx="0.6" fill="#0a0a12" stroke="#00FFFF" stroke-width="0.6"/>
+    <!-- Neón en ruedas -->
+    <line x1="5.2" y1="7" x2="5.2" y2="21" stroke="#AAFFFF" stroke-width="0.4" opacity="0.85"/>
+    <line x1="22.8" y1="7" x2="22.8" y2="21" stroke="#AAFFFF" stroke-width="0.4" opacity="0.85"/>
+
+    <!-- CHASIS principal -->
+    <rect x="8" y="3" width="12" height="22" rx="2.5" ry="2.5"
+          fill="#0a0a12" stroke="#00FFFF" stroke-width="0.85"/>
+    <!-- Línea central -->
+    <line x1="14" y1="3" x2="14" y2="25" stroke="#00FFFF" stroke-width="0.45" opacity="0.85"/>
+
+    <!-- COCKPIT (parabrisas anterior) -->
+    <path d="M 9.5 6 Q 14 2 18.5 6 L 17 9 L 11 9 Z"
+          fill="#0a0a12" stroke="#00FFFF" stroke-width="0.7"/>
+    <!-- Reflejo del parabrisas -->
+    <line x1="11" y1="6.5" x2="17" y2="6.5" stroke="#AAFFFF" stroke-width="0.3" opacity="0.6"/>
+
+    <!-- Paneles laterales del chasis -->
+    <line x1="9" y1="12" x2="13" y2="12" stroke="#00FFFF" stroke-width="0.35" opacity="0.7"/>
+    <line x1="15" y1="12" x2="19" y2="12" stroke="#00FFFF" stroke-width="0.35" opacity="0.7"/>
+    <line x1="9" y1="17" x2="13" y2="17" stroke="#00FFFF" stroke-width="0.35" opacity="0.7"/>
+    <line x1="15" y1="17" x2="19" y2="17" stroke="#00FFFF" stroke-width="0.35" opacity="0.7"/>
+
+    <!-- TURBINAS traseras -->
+    <rect x="9" y="21" width="2.5" height="3.5" rx="0.5" fill="#0a0a12" stroke="#00FFFF" stroke-width="0.5"/>
+    <rect x="16.5" y="21" width="2.5" height="3.5" rx="0.5" fill="#0a0a12" stroke="#00FFFF" stroke-width="0.5"/>
+    <!-- Núcleos de turbina · pulsando -->
+    <circle cx="10.25" cy="22.5" r="0.7" fill="url(#bike-p1-core)">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="0.25s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="17.75" cy="22.5" r="0.7" fill="url(#bike-p1-core)">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="0.25s" begin="0.08s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- ESTELA de velocidad por detrás (fuera del chasis) -->
+  <g id="bike-trail-p1" fill="#00FFFF" stroke="none">
+    <polygon points="12.5,25 11,28 14,27" opacity="0.7">
+      <animate attributeName="opacity" values="0;0.85;0" dur="0.22s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="15.5,25 17,28 14,27" opacity="0.7">
+      <animate attributeName="opacity" values="0;0.85;0" dur="0.22s" begin="0.07s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="14,26 13,28 15,28" fill="#AAFFFF" opacity="0.9">
+      <animate attributeName="opacity" values="0;1;0" dur="0.18s" begin="0.04s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+</svg>

@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { useSectionAnimation } from '@/composables/useSectionAnimation'
 
+import NeonSprite from '@/components/content/NeonSprite.vue'
 import WelcomeMock from '@/components/mockups/neontrails/WelcomeMock.vue'
 import ArenaMock from '@/components/mockups/neontrails/ArenaMock.vue'
 import GameOverMock from '@/components/mockups/neontrails/GameOverMock.vue'
@@ -124,12 +125,33 @@ const grupos: Grupo[] = [
 </script>
 
 <template>
-  <section>
+  <section class="snap-slide">
     <PageHeader
       :numero="7"
       titulo="Mockups"
       subtitulo="Cada mockup enlaza un caso de uso con una pantalla concreta: las del juego Swing (bienvenida, partida, game over) y la sección Leaderboard de la SPA Vue."
     />
+
+    <!-- Hero: los sprites reales del juego sobre la rejilla de arena -->
+    <div
+      data-anim
+      class="relative mb-8 overflow-hidden rounded-xl border border-border bg-arena-grid"
+    >
+      <span aria-hidden="true" class="nt-scanlines pointer-events-none absolute inset-0 opacity-20" />
+      <div class="relative flex items-center justify-center gap-6 px-6 py-10 sm:gap-14">
+        <NeonSprite player="p1" state="walk" :size="118" alt="Jugador 1 (cian) caminando" />
+        <NeonSprite
+          src="/sprites/disc-p1-active.svg"
+          player="p1"
+          :size="40"
+          alt="Disco en juego"
+        />
+        <NeonSprite player="p2" state="walk" :size="118" alt="Jugador 2 (magenta) caminando" />
+      </div>
+      <p class="relative pb-4 text-center font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        Sprites reales del juego · P1 cian vs P2 magenta
+      </p>
+    </div>
 
     <Tabs default-value="cu-01" data-anim class="w-full">
       <TabsList

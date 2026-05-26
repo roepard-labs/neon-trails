@@ -20,7 +20,7 @@ defineProps<Props>()
       </span>
     </div>
     <h1
-      class="mt-3 text-balance font-bold tracking-tight text-foreground text-[clamp(2rem,2.5vw+1.25rem,3.5rem)] presenter:text-[clamp(2.5rem,3.5vw+1.25rem,4.5rem)]"
+      class="mt-3 text-balance font-bold tracking-tight text-foreground text-glow-cyan-soft text-[clamp(2rem,2.5vw+1.25rem,3.5rem)] presenter:text-[clamp(2.5rem,3.5vw+1.25rem,4.5rem)]"
     >
       {{ titulo }}
     </h1>
