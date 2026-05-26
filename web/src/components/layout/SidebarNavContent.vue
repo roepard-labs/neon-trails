@@ -4,9 +4,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import {
   BookOpenText,
   FileQuestion,
-  ListChecks,
   Workflow,
-  NotebookText,
   Network,
   MonitorSmartphone,
   Trophy,
@@ -44,9 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
 const iconMap: Record<string, LucideIcon> = {
   BookOpenText,
   FileQuestion,
-  ListChecks,
   Workflow,
-  NotebookText,
   Network,
   MonitorSmartphone,
   Trophy,

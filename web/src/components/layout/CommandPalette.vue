@@ -3,9 +3,7 @@ import { useRouter } from 'vue-router'
 import {
   BookOpenText,
   FileQuestion,
-  ListChecks,
   Workflow,
-  NotebookText,
   Network,
   MonitorSmartphone,
   Trophy,
@@ -40,9 +38,7 @@ const { toggle: togglePresenter } = usePresenterMode()
 const iconMap: Record<string, LucideIcon> = {
   BookOpenText,
   FileQuestion,
-  ListChecks,
   Workflow,
-  NotebookText,
   Network,
   MonitorSmartphone,
   Trophy,

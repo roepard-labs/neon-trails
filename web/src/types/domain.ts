@@ -8,26 +8,6 @@ export interface Actor {
   icon: string
 }
 
-export type RequirementCategory =
-  | 'negocio'
-  | 'usuario'
-  | 'sistema'
-  | 'funcional'
-  | 'no-funcional'
-
-export interface Requirement {
-  codigo: string
-  nombre: string
-  descripcion: string
-}
-
-export interface RequirementGroup {
-  categoria: RequirementCategory
-  titulo: string
-  subtitulo: string
-  items: Requirement[]
-}
-
 export type UseCaseType = 'principal' | 'secundario'
 
 export interface UseCase {

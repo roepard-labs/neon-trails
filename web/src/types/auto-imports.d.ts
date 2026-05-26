@@ -76,6 +76,7 @@ declare global {
   const useRouter: typeof import('vue-router').useRouter
   const useScrollReveal: typeof import('../composables/useScrollReveal').useScrollReveal
   const useSectionAnimation: typeof import('../composables/useSectionAnimation').useSectionAnimation
+  const useSectionNav: typeof import('../composables/useSectionNav').useSectionNav
   const useSidebar: typeof import('../composables/useSidebar').useSidebar
   const useSlots: typeof import('vue').useSlots
   const useTemplateRef: typeof import('vue').useTemplateRef
@@ -169,6 +170,7 @@ declare module 'vue' {
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
     readonly useScrollReveal: UnwrapRef<typeof import('../composables/useScrollReveal')['useScrollReveal']>
     readonly useSectionAnimation: UnwrapRef<typeof import('../composables/useSectionAnimation')['useSectionAnimation']>
+    readonly useSectionNav: UnwrapRef<typeof import('../composables/useSectionNav')['useSectionNav']>
     readonly useSidebar: UnwrapRef<typeof import('../composables/useSidebar')['useSidebar']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>

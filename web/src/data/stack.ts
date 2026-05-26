@@ -291,7 +291,7 @@ Route::post('scores', [ScoreController::class, 'store'])
         code: `const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    ...sectionRoutes,                       // las 11 secciones de la presentación
+    ...sectionRoutes,                       // las 13 secciones de la presentación
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior(to) {
