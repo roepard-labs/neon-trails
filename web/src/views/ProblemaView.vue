@@ -63,7 +63,7 @@ const toneClass = (tone: 'muted' | 'destructive' | 'brand') => {
 <template>
   <section class="snap-slide">
     <PageHeader
-      :numero="2"
+      :numero="3"
       titulo="Planteamiento del problema"
       subtitulo="Un juego de arena en tiempo real tiende a acoplar simulación, render y entrada. Neon Trails separa logic / view / events y persiste el ranking en un backend web."
     />

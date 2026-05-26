@@ -245,7 +245,7 @@ const tituloWords = projectInfo.titulo.split(' ')
           Comenzar la exposición
           <ArrowRight data-cta-arrow class="size-5" />
         </RouterLink>
-        <span class="text-sm text-muted-foreground">— 11 secciones</span>
+        <span class="text-sm text-muted-foreground">— 13 secciones</span>
       </div>
 
       <!-- Acciones rápidas: jugar y ranking -->

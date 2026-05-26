@@ -127,7 +127,7 @@ const grupos: Grupo[] = [
 <template>
   <section class="snap-slide">
     <PageHeader
-      :numero="7"
+      :numero="6"
       titulo="Mockups"
       subtitulo="Cada mockup enlaza un caso de uso con una pantalla concreta: las del juego Swing (bienvenida, partida, game over) y la sección Leaderboard de la SPA Vue."
     />

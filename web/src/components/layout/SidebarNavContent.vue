@@ -13,6 +13,10 @@ import {
   Code2,
   Rocket,
   Wrench,
+  Dna,
+  Library,
+  FlaskConical,
+  Github,
   Gamepad2,
   type LucideIcon,
 } from 'lucide-vue-next'
@@ -49,6 +53,10 @@ const iconMap: Record<string, LucideIcon> = {
   Code2,
   Rocket,
   Wrench,
+  Dna,
+  Library,
+  FlaskConical,
+  Github,
 }
 
 const route = useRoute()

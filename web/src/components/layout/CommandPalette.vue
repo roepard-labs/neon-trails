@@ -12,6 +12,10 @@ import {
   Code2,
   Rocket,
   Wrench,
+  Dna,
+  Library,
+  FlaskConical,
+  Github,
   Hash,
   Presentation,
   type LucideIcon,
@@ -45,6 +49,10 @@ const iconMap: Record<string, LucideIcon> = {
   Code2,
   Rocket,
   Wrench,
+  Dna,
+  Library,
+  FlaskConical,
+  Github,
 }
 
 const sections = sectionRoutes
@@ -65,11 +73,6 @@ function go(path: string) {
 
 function goSection(path: string) {
   go(path)
-}
-
-function goUseCase(codigo: string) {
-  isCommandOpen.value = false
-  router.push(`/descripciones#${codigo}`)
 }
 
 function togglePresenterAction() {
@@ -104,7 +107,7 @@ function togglePresenterAction() {
           v-for="uc in useCases"
           :key="uc.codigo"
           :value="`${uc.codigo} ${uc.nombre} ${uc.descripcion}`"
-          @select="goUseCase(uc.codigo)"
+          @select="go('/casos-de-uso')"
         >
           <Hash class="mr-2 size-4 text-brand" />
           <span class="font-mono text-sm font-semibold">{{ uc.codigo }}</span>

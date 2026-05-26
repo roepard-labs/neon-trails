@@ -20,7 +20,7 @@ const firstLayerId = stackLayers[0]?.id ?? 'juego'
 <template>
   <section class="snap-slide">
     <PageHeader
-      :numero="9"
+      :numero="7"
       titulo="Stack & Código en vivo"
       subtitulo="Las cuatro capas del monolito, explicadas dos veces: una analogía sencilla y el código real que la hace funcionar."
     />

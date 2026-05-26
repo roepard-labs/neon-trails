@@ -21,6 +21,7 @@ export const SHIKI_LANGS = [
   'json',
   'toml',
   'make',
+  'xml',
 ] as const
 
 export type ShikiLang = (typeof SHIKI_LANGS)[number]
@@ -77,6 +78,7 @@ export function getHighlighter(): Promise<HighlighterCore> {
         import('shiki/langs/json.mjs'),
         import('shiki/langs/toml.mjs'),
         import('shiki/langs/make.mjs'),
+        import('shiki/langs/xml.mjs'),
       ],
       engine: createOnigurumaEngine(import('shiki/wasm')),
     })

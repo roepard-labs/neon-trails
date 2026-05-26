@@ -6,6 +6,7 @@ import SidebarNav from './SidebarNav.vue'
 import MobileNavSheet from './MobileNavSheet.vue'
 import ShortcutsDialog from './ShortcutsDialog.vue'
 import CommandPalette from './CommandPalette.vue'
+import SlideNavButtons from './SlideNavButtons.vue'
 import { Toaster } from '@/components/ui/sonner'
 import { sectionRoutes } from '@/router'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -122,8 +123,12 @@ const totalSections = sectionRoutes.length
       <!-- Command palette (Ctrl/⌘+K) -->
       <CommandPalette />
 
-      <!-- Notificaciones (vue-sonner): usadas por el botón "copiar" de los CodeBlock -->
-      <Toaster position="bottom-right" :duration="2200" />
+      <!-- Navegación de slides: botones flotantes atrás / adelante (abajo-derecha) -->
+      <SlideNavButtons />
+
+      <!-- Notificaciones (vue-sonner): usadas por el botón "copiar" de los CodeBlock.
+           Va arriba a la derecha para no chocar con los botones de navegación. -->
+      <Toaster position="top-right" :duration="2200" />
     </div>
   </TooltipProvider>
 </template>

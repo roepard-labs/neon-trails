@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useShortcuts } from 'vue-shortcut-manager'
 import { sectionRoutes } from '@/router'
+import { useSectionNav } from './useSectionNav'
 import { useSidebar } from './useSidebar'
 import { useBreakpoint } from './useBreakpoint'
 
@@ -9,30 +9,13 @@ export const isShortcutsOpen = ref(false)
 export const isCommandOpen = ref(false)
 
 export function useAppShortcuts() {
-  const router = useRouter()
+  const { next: nextSection, prev: prevSection, go: goSection } = useSectionNav()
   const { toggle: toggleSidebar, toggleMobile } = useSidebar()
   const { isMobile } = useBreakpoint()
 
   const toggleSidebarOrMobile = () => {
     if (isMobile.value) toggleMobile()
     else toggleSidebar()
-  }
-
-  const goSection = (idx: number) => {
-    const route = sectionRoutes[idx]
-    if (route?.path) router.push(route.path)
-  }
-
-  const currentIndex = () =>
-    sectionRoutes.findIndex((r) => r.name === router.currentRoute.value.name)
-
-  const nextSection = () => {
-    const i = currentIndex()
-    if (i >= 0 && i < sectionRoutes.length - 1) goSection(i + 1)
-  }
-  const prevSection = () => {
-    const i = currentIndex()
-    if (i > 0) goSection(i - 1)
   }
 
   // Abre el juego (servido por el monolito en /game/ vía noVNC) en otra pestaña,

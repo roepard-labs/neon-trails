@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Server, Monitor, ArrowRightLeft, FileJson, Route as RouteIcon, Plug, Workflow } from 'lucide-vue-next'
+import { Server, Monitor, ArrowRightLeft, FileJson, Route as RouteIcon, Plug, Workflow, FolderTree } from 'lucide-vue-next'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import MermaidDiagram from '@/components/content/MermaidDiagram.vue'
+import CodeBlock from '@/components/content/CodeBlock.vue'
+import ExplainCard from '@/components/content/ExplainCard.vue'
 import {
   Card,
   CardContent,
@@ -31,6 +33,20 @@ import {
 } from '@/data/architecture'
 
 useSectionAnimation()
+
+// Cabecera real de logic/GameState.java: demuestra `package` + `import` (lo
+// visto en clase). Anotada para primer semestre.
+const packageSnippet = `package logic;                 // este archivo vive en la carpeta logic/
+
+import events.InputController; // traemos una clase de NUESTRA carpeta events/
+
+import java.awt.Color;         // y estas vienen de la caja de Java (estándar)
+import java.util.ArrayList;
+import java.util.List;
+
+public class GameState {
+    // …usa InputController, Color y List para simular la partida…
+}`
 </script>
 
 <template>
@@ -40,6 +56,43 @@ useSectionAnimation()
       titulo="Arquitectura del sistema"
       subtitulo="Monolito Docker: el juego Java envía puntajes a la API Laravel sobre MariaDB; Vue y Filament leen el ranking, y el juego se sirve en el navegador vía noVNC."
     />
+
+    <!-- Carpetas, paquetes e imports (lo visto en clase) -->
+    <div data-anim class="mb-4 flex items-center gap-3">
+      <span class="flex size-11 items-center justify-center rounded-xl bg-brand/15 text-brand">
+        <FolderTree class="size-6" />
+      </span>
+      <h2 class="font-heading text-2xl font-bold text-foreground">Carpetas, paquetes e imports</h2>
+    </div>
+
+    <div data-anim class="mb-6">
+      <ExplainCard
+        simple="Cada carpeta del código es un «paquete» (package). Para que una clase use a otra que vive en otra carpeta, primero la «importa» (import), como pedir prestado un lápiz del estuche de al lado. Java además trae su propia caja de herramientas (java.*) lista para importar."
+      >
+        <template #detalle>
+          <p>
+            La primera línea de cada archivo declara su paquete
+            (<code class="font-mono text-brand">package logic;</code>). Los
+            <code class="font-mono text-brand">import</code> de arriba traen clases de otros paquetes:
+            <code class="font-mono text-brand">events.InputController</code> es nuestro (de la carpeta
+            <code class="font-mono text-brand">events/</code>), mientras
+            <code class="font-mono text-brand">java.awt.Color</code> y
+            <code class="font-mono text-brand">java.util.List</code> vienen de la librería estándar de
+            Java. Así <code class="font-mono text-brand">logic/</code> usa la entrada sin depender de Swing.
+          </p>
+        </template>
+      </ExplainCard>
+    </div>
+
+    <div data-anim class="mb-10">
+      <CodeBlock
+        :code="packageSnippet"
+        lang="java"
+        filename="logic/GameState.java (cabecera)"
+        player="p1"
+        :show-line-numbers="false"
+      />
+    </div>
 
     <!-- Pilares Backend / Frontend -->
     <div data-anim class="mb-10 grid gap-5 md:grid-cols-2">

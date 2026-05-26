@@ -94,7 +94,7 @@ onMounted(() => load(20))
 <template>
   <section class="snap-slide">
     <PageHeader
-      :numero="8"
+      :numero="13"
       titulo="Leaderboard"
       subtitulo="Ranking en vivo del juego y acceso directo a todas las superficies del despliegue (juego, panel admin y API), servidas en el mismo dominio."
     />

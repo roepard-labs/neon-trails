@@ -28,28 +28,28 @@ export const sectionRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/historia',
+    name: 'historia',
+    component: () => import('@/views/HistoriaView.vue'),
+    meta: {
+      seccion: {
+        numero: 2,
+        titulo: 'Historia & ADN',
+        subtitulo: 'Por qué Tron, el reto de POO y cómo creció el proyecto',
+        icon: 'Dna',
+      },
+    },
+  },
+  {
     path: '/problema',
     name: 'problema',
     component: () => import('@/views/ProblemaView.vue'),
     meta: {
       seccion: {
-        numero: 2,
+        numero: 3,
         titulo: 'Planteamiento del problema',
         subtitulo: 'Contexto, actores y necesidades',
         icon: 'FileQuestion',
-      },
-    },
-  },
-  {
-    path: '/requerimientos',
-    name: 'requerimientos',
-    component: () => import('@/views/RequerimientosView.vue'),
-    meta: {
-      seccion: {
-        numero: 3,
-        titulo: 'Requerimientos',
-        subtitulo: 'Negocio, usuario, sistema y F/NF',
-        icon: 'ListChecks',
       },
     },
   },
@@ -61,7 +61,7 @@ export const sectionRoutes: RouteRecordRaw[] = [
       seccion: {
         numero: 4,
         titulo: 'Arquitectura del sistema',
-        subtitulo: 'Juego Java, API Laravel, MariaDB, Filament y noVNC',
+        subtitulo: 'Carpetas, paquetes/imports y el monolito (Java, Laravel, Vue, noVNC)',
         icon: 'Network',
       },
     },
@@ -80,41 +80,15 @@ export const sectionRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/descripciones',
-    name: 'descripciones',
-    component: () => import('@/views/DescripcionesView.vue'),
-    meta: {
-      seccion: {
-        numero: 6,
-        titulo: 'Descripciones de casos de uso',
-        subtitulo: '8 fichas formales (4 principales + 4 secundarios)',
-        icon: 'NotebookText',
-      },
-    },
-  },
-  {
     path: '/mockups',
     name: 'mockups',
     component: () => import('@/views/MockupsView.vue'),
     meta: {
       seccion: {
-        numero: 7,
+        numero: 6,
         titulo: 'Mockups',
         subtitulo: 'Pantallas del juego y superficies web',
         icon: 'MonitorSmartphone',
-      },
-    },
-  },
-  {
-    path: '/leaderboard',
-    name: 'leaderboard',
-    component: () => import('@/views/LeaderboardView.vue'),
-    meta: {
-      seccion: {
-        numero: 8,
-        titulo: 'Leaderboard',
-        subtitulo: 'Ranking en vivo (GET /api/scores) y jugar',
-        icon: 'Trophy',
       },
     },
   },
@@ -124,10 +98,36 @@ export const sectionRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/StackView.vue'),
     meta: {
       seccion: {
-        numero: 9,
+        numero: 7,
         titulo: 'Stack & Código',
         subtitulo: 'Las 4 capas con código real (Java, PHP, Vue/TS, SQL)',
         icon: 'Code2',
+      },
+    },
+  },
+  {
+    path: '/librerias',
+    name: 'librerias',
+    component: () => import('@/views/LibreriasView.vue'),
+    meta: {
+      seccion: {
+        numero: 8,
+        titulo: 'Librerías',
+        subtitulo: 'Qué son las dependencias (Maven) y para qué sirven',
+        icon: 'Library',
+      },
+    },
+  },
+  {
+    path: '/pruebas',
+    name: 'pruebas',
+    component: () => import('@/views/PruebasView.vue'),
+    meta: {
+      seccion: {
+        numero: 9,
+        titulo: 'Pruebas unitarias',
+        subtitulo: 'Qué son los tests (JUnit) y para qué sirven',
+        icon: 'FlaskConical',
       },
     },
   },
@@ -154,6 +154,32 @@ export const sectionRoutes: RouteRecordRaw[] = [
         titulo: 'Herramientas',
         subtitulo: 'mise, make y la integración continua (CI)',
         icon: 'Wrench',
+      },
+    },
+  },
+  {
+    path: '/documentacion',
+    name: 'documentacion',
+    component: () => import('@/views/DocumentacionView.vue'),
+    meta: {
+      seccion: {
+        numero: 12,
+        titulo: 'Documentación & GitHub',
+        subtitulo: 'Dónde vive el código y cómo se documenta',
+        icon: 'Github',
+      },
+    },
+  },
+  {
+    path: '/leaderboard',
+    name: 'leaderboard',
+    component: () => import('@/views/LeaderboardView.vue'),
+    meta: {
+      seccion: {
+        numero: 13,
+        titulo: 'Leaderboard',
+        subtitulo: 'Ranking en vivo (GET /api/scores) y jugar',
+        icon: 'Trophy',
       },
     },
   },
