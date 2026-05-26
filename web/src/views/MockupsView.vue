@@ -139,14 +139,26 @@ const grupos: Grupo[] = [
     >
       <span aria-hidden="true" class="nt-scanlines pointer-events-none absolute inset-0 opacity-20" />
       <div class="relative flex items-center justify-center gap-6 px-6 py-10 sm:gap-14">
-        <NeonSprite player="p1" state="walk" :size="118" alt="Jugador 1 (cian) caminando" />
+        <NeonSprite
+          v-motion-pop-visible-once
+          player="p1"
+          state="walk"
+          :size="118"
+          alt="Jugador 1 (cian) caminando"
+        />
         <NeonSprite
           src="/sprites/disc-p1-active.svg"
           player="p1"
           :size="40"
           alt="Disco en juego"
         />
-        <NeonSprite player="p2" state="walk" :size="118" alt="Jugador 2 (magenta) caminando" />
+        <NeonSprite
+          v-motion-pop-visible-once
+          player="p2"
+          state="walk"
+          :size="118"
+          alt="Jugador 2 (magenta) caminando"
+        />
       </div>
       <p class="relative pb-4 text-center font-mono text-xs uppercase tracking-wider text-muted-foreground">
         Sprites reales del juego · P1 cian vs P2 magenta

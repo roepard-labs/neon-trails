@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Neon Trails** is a two-player local arena game inspired by Tron, written in plain **Java Swing** with no external dependencies and no build tool. It is a deliverable for the *Técnicas de Programación* course; the binding spec is `docs/rules/Proyecto Técnicas de Programación.pdf`, and most structural decisions (the `logic` / `view` / `events` package split, the use of an explicit `Thread` for the game loop, key bindings instead of `KeyListener`) trace back to it. Re-read that PDF before adding screens, ranking, persistence, sounds, or new entities.
 
-The `web/` directory is a static HTML/CSS/JS leaderboard mock. It does **not** talk to the Java game and is intentionally a stub.
+The `web/` directory is a **Vue 3 + TypeScript + Vite** single-page app (Tailwind v4 + shadcn-vue/reka-ui): the project's academic presentation, with a permanent **neon-Tron dark theme** and **11 sections**. The last three — *Stack & Código*, *Despliegue*, *Herramientas* — embed real repo code (Java/PHP/Vue/SQL/Docker/nginx/Makefile) highlighted with Shiki, so when you change those source files, update the extracts in `web/src/data/{stack,deploy,tools}.ts`. The *Leaderboard* section consumes `GET /api/scores` from the Laravel backend (same origin in production; in dev the Vite proxy forwards `/api` → `:8000`). Theme tokens live in `web/src/style.css`; animated sprites in `web/public/sprites/`.
 
 ## Build and run
 
@@ -21,7 +21,7 @@ make verify    # mvn -B verify  (paridad con CI)
 make clean     # mvn clean
 ```
 
-Web stub: open `web/index.html` directly in a browser. `app.js` falls back to embedded mock data if `fetch` is blocked under `file://`.
+Web app (presentación): `cd web && pnpm install`, then `make web-dev` (Vite dev server; proxies `/api` → `:8000`) or `make web-build` / `make web-lint` / `make web-type-check`. CI runs in `.github/workflows/vue.yml` (Node 24.16.0, `pnpm lint` + `pnpm build`).
 
 ## Tests
 
