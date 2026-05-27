@@ -11,12 +11,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ScoreFactory extends Factory
 {
-
-    public function run(): void
-    {
-        // Esto inicializa correctamente Faker internamente
-        Score::factory()->count(10)->create();
-    }
     /**
      * Define the model's default state.
      *
