@@ -239,7 +239,7 @@ const tituloWords = projectInfo.titulo.split(' ')
 
       <div ref="cta" class="mt-12 flex items-center justify-center gap-2">
         <RouterLink
-          to="/problema"
+          to="/historia"
           class="group inline-flex min-h-12 items-center gap-3 rounded-lg bg-brand px-6 py-3.5 text-base font-medium text-brand-foreground shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Comenzar la exposición
