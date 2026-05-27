@@ -19,10 +19,10 @@ class ScoreFactory extends Factory
     public function definition(): array
     {
         return [
-            'player_name' => fake()->userName(),
-            'score' => fake()->numberBetween(0, 50),
-            'result' => fake()->randomElement(MatchResult::cases()),
-            'match_played_at' => fake()->dateTimeBetween('-1 month'),
+            'player_name' => $this->faker->userName(),
+            'score' => $this->faker->numberBetween(0, 50),
+            'result' => $this->faker->randomElement(MatchResult::cases()),
+            'match_played_at' => $this->faker->dateTimeBetween('-1 month'),
         ];
     }
 }
