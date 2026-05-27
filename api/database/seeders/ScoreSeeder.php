@@ -4,11 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Score;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ScoreSeeder extends Seeder
 {
-    use HasFactory;
     /**
      * Run the database seeds.
      */
