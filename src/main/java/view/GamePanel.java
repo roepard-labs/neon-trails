@@ -36,6 +36,10 @@ import java.util.function.IntConsumer;
  */
 public class GamePanel extends JPanel {
 
+    // NOTE: [sustentación] Lock único compartido entre el EDT (paintComponent) y el hilo de
+    // juego (stepSimulation). Tomar SIEMPRE este lock al leer o escribir gameState evita
+    // race conditions: el dibujo podría ver un disco a medio mover o un score a medio
+    // actualizar y el resultado visual sería inconsistente.
     private final Object stateLock = new Object();
     private final InputController input = new InputController();
     private final GameEventListener gameEventListener = new AudioGameEventListener();
@@ -61,8 +65,8 @@ public class GamePanel extends JPanel {
 
     /** Lista de sprites usados por paintComponent, con sus tamaños exactos de render. */
     private static List<SpriteLoader.SpriteSpec> criticalSprites() {
-        int playerSize = GameConstants.PLAYER_SIZE * 2;
-        int discSize = GameConstants.DISC_RADIUS * 4;
+        int playerSize = GameConstants.PLAYER_SIZE * GameConstants.PLAYER_RENDER_SCALE;
+        int discSize = GameConstants.DISC_RADIUS * GameConstants.DISC_RENDER_SCALE;
         return List.of(
                 new SpriteLoader.SpriteSpec("arena-floor-vaporwave.svg",
                         GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT),
@@ -156,7 +160,12 @@ public class GamePanel extends JPanel {
     }
 
     /**
-     * Un tick de simulación; invocado desde el hilo de juego.
+     * Un tick de simulación; invocado desde el hilo de juego ({@link GameLoop}).
+     * <p>
+     * NOTE: [sustentación] El bloque {@code synchronized} es deliberadamente <b>corto</b>:
+     * contiene sólo {@code gameState.tick(...)} y una copia local de {@code winnerId}. Mantener
+     * el lock el menor tiempo posible es lo que hace que el repaint en el EDT no se quede
+     * esperando — el rendimiento del juego depende de esta disciplina.
      */
     public void stepSimulation() {
         int w = Math.max(getWidth(), GameConstants.DEFAULT_WIDTH / 4);
@@ -328,9 +337,47 @@ public class GamePanel extends JPanel {
         Player p2 = gameState.getPlayerTwo();
         drawHudVidas(g2, 12, 22, labelFor(1), hearts(p1.getLives()), p1.isOnBike(), texto, corazonesFont);
         drawHudVidas(g2, 12, 40, labelFor(2), hearts(p2.getLives()), p2.isOnBike(), texto, corazonesFont);
+        drawHudScoreTime(g2, w, p1, p2);
         g2.setFont(FontLoader.regular(11f));
         String help = "P1: WASD | disco: E | moto 5s: Q   —   P2: flechas | disco: Enter | moto 5s: U";
         g2.drawString(help, 12, h - 12);
+    }
+
+    /**
+     * Dibuja la columna derecha del HUD: cronómetro y puntajes numéricos de ambos jugadores.
+     * <p>
+     * NOTE: [sustentación] El cronómetro se refresca por dos vías independientes — el
+     * {@link view.GameLoop} repinta cada 16 ms y el {@code javax.swing.Timer} de
+     * {@code GameScreen} repinta cada 1000 ms. Ambos ven la misma {@link logic.GameSession}.
+     */
+    private void drawHudScoreTime(Graphics2D g2, int w, Player p1, Player p2) {
+        Color CYAN = new Color(0x00, 0xff, 0xff);
+        Color PINK = new Color(0xff, 0x33, 0x99);
+        Color TEXT = new Color(0xee, 0xee, 0xff);
+
+        long ms = (session != null) ? session.getElapsedMillisLive() : 0L;
+        long totalSec = ms / 1000L;
+        String tiempo = String.format("Tiempo  %02d:%02d", totalSec / 60L, totalSec % 60L);
+
+        Font bold = FontLoader.bold(14f);
+        Font reg = FontLoader.regular(13f);
+        int xRight = w - 12;
+
+        g2.setFont(bold);
+        g2.setColor(TEXT);
+        int tWidth = g2.getFontMetrics(bold).stringWidth(tiempo);
+        g2.drawString(tiempo, xRight - tWidth, 22);
+
+        g2.setFont(reg);
+        g2.setColor(CYAN);
+        String s1 = labelFor(1) + ": " + p1.getScore();
+        int s1Width = g2.getFontMetrics(reg).stringWidth(s1);
+        g2.drawString(s1, xRight - s1Width, 40);
+
+        g2.setColor(PINK);
+        String s2 = labelFor(2) + ": " + p2.getScore();
+        int s2Width = g2.getFontMetrics(reg).stringWidth(s2);
+        g2.drawString(s2, xRight - s2Width, 58);
     }
 
     /**

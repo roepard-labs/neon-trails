@@ -11,8 +11,18 @@ import java.util.List;
 /**
  * Estado mutable del juego: jugadores, discos y reglas de colisión por tick.
  * <p>
- * NOTE: Los métodos {@link #tick(events.InputController, int, int)} están pensados para llamarse
- * desde un único hilo (el del {@link view.GameLoop}).
+ * Es el núcleo de la simulación. Vive en el paquete {@code logic/} y por convención del proyecto
+ * <b>no importa Swing/AWT</b> (el único uso de {@link Color} es para identificar visualmente al
+ * jugador, no para dibujar). Esto facilita testearlo con JUnit 5 sin necesidad de un display.
+ * <p>
+ * NOTE: [sustentación] {@link #tick(InputController, int, int)} está pensado para llamarse desde
+ * un único hilo (el del {@link view.GameLoop}). La sincronización con el EDT la hace
+ * {@code GamePanel.stepSimulation} mediante un único {@code synchronized} sobre su
+ * {@code stateLock}; aquí no hay {@code synchronized} interno para no introducir un segundo lock.
+ *
+ * @see GameEventListener
+ * @see Player
+ * @see DiscProjectile
  */
 public class GameState {
 
@@ -56,22 +66,27 @@ public class GameState {
         this.listener = listener != null ? listener : NOOP_LISTENER;
     }
 
+    /** @return jugador 1 (cian, esquina superior izquierda). */
     public Player getPlayerOne() {
         return playerOne;
     }
 
+    /** @return jugador 2 (rosa, esquina inferior derecha). */
     public Player getPlayerTwo() {
         return playerTwo;
     }
 
+    /** @return lista mutable de discos en juego; se modifica desde {@link #tick}. */
     public List<DiscProjectile> getDiscs() {
         return discs;
     }
 
+    /** @return true si algún jugador agotó sus vidas (la partida terminó). */
     public boolean isFinished() {
         return finished;
     }
 
+    /** @return id del ganador (1 = cian, 2 = rosa, 0 = partida en curso). */
     public int getWinnerId() {
         return winnerId;
     }
@@ -90,37 +105,89 @@ public class GameState {
 
     /**
      * Avanza un tick de simulación.
+     * <p>
+     * El cuerpo está dividido en sub-métodos nombrados con el orden de fases exacto del juego.
+     * Esta granularidad es deliberadamente <b>didáctica</b>: permite al sustentante mostrar el
+     * ciclo de un tick paso a paso señalando con el cursor cada llamada.
+     * <p>
+     * Fases en orden:
+     * <ol>
+     *   <li>Aplicar input de movimiento (con reglas de moto).</li>
+     *   <li>Mover y registrar rastro si está en moto.</li>
+     *   <li>Decrementar enfriamientos.</li>
+     *   <li>Procesar disparos.</li>
+     *   <li>Procesar solicitudes de moto (edge-trigger).</li>
+     *   <li>Avanzar discos (movimiento + rebotes).</li>
+     *   <li>Resolver hits de disco contra jugadores.</li>
+     *   <li>Resolver hits de rastro contra jugadores.</li>
+     *   <li>Detectar expiración de moto.</li>
+     *   <li>Erosionar rastros expirados.</li>
+     * </ol>
      *
-     * @param input  snapshot de teclas
-     * @param width  ancho del mundo
-     * @param height alto del mundo
+     * @param input  snapshot de teclas del tick (lectura/consume)
+     * @param width  ancho del mundo en píxeles
+     * @param height alto del mundo en píxeles
      */
     public void tick(InputController input, int width, int height) {
-        this.lastWorldWidth = width;
-        this.lastWorldHeight = height;
+        rememberWorldSize(width, height);
         if (finished) {
             // NOTE: La pantalla decide cuándo limpiar; aquí solo no avanzamos más simulación.
             return;
         }
         applyMovementInput(input);
+        moveAndRecordTrails(width, height);
+        tickCooldowns();
+        procesarDisparos(input, width, height);
+        procesarSolicitudesDeMoto(input);
+        avanzarDiscos(width, height);
+        resolveDiscHits();
+        resolveTrailHits();
+        actualizarEstadoMoto();
+        erosionarTrails();
+    }
+
+    /** Memoriza el tamaño del mundo para usarlo al respawn tras un golpe. */
+    private void rememberWorldSize(int width, int height) {
+        this.lastWorldWidth = width;
+        this.lastWorldHeight = height;
+    }
+
+    /**
+     * Mueve a ambos jugadores respetando los bordes del mundo y, si están en moto, graba un
+     * punto del rastro tras el movimiento.
+     * <p>
+     * NOTE: [sustentación] Grabamos el rastro <b>después</b> del movimiento del tick para que
+     * cada punto refleje la posición ya validada contra los bordes (clamp). Si lo grabáramos
+     * antes, el rastro podría incluir posiciones fuera del área de juego.
+     */
+    private void moveAndRecordTrails(int width, int height) {
         playerOne.moveWithinBounds(width, height);
         playerTwo.moveWithinBounds(width, height);
-
-        // NOTE: Graba rastro tras el movimiento del tick para que cada punto refleje la posición
-        // ya validada contra los bordes. addTrailPoint salta duplicados (jugador quieto).
         if (playerOne.isOnBike()) {
             playerOne.addTrailPoint(playerOne.getX(), playerOne.getY());
         }
         if (playerTwo.isOnBike()) {
             playerTwo.addTrailPoint(playerTwo.getX(), playerTwo.getY());
         }
+    }
 
+    /** Decrementa los enfriamientos de disparo de ambos jugadores. */
+    private void tickCooldowns() {
         playerOne.tickCooldown();
         playerTwo.tickCooldown();
+    }
 
+    /** Procesa los disparos de ambos jugadores en este tick. */
+    private void procesarDisparos(InputController input, int width, int height) {
         tryShoot(playerOne, input.isP1Shoot(), width, height);
         tryShoot(playerTwo, input.isP2Shoot(), width, height);
+    }
 
+    /**
+     * Consume las solicitudes de moto (edge-trigger) y activa el modo en cada jugador que
+     * la haya pedido.
+     */
+    private void procesarSolicitudesDeMoto(InputController input) {
         if (input.consumeP1BikeRequest()) {
             playerOne.activateBike();
             listener.onBikeActivated(1);
@@ -129,11 +196,57 @@ public class GameState {
             playerTwo.activateBike();
             listener.onBikeActivated(2);
         }
+    }
 
-        updateDiscs(width, height);
-        resolveDiscHits();
-        resolveTrailHits();
+    /** Avanza un tick a todos los discos vivos y resuelve rebotes contra los bordes. */
+    private void avanzarDiscos(int width, int height) {
+        for (DiscProjectile d : discs) {
+            d.tick();
+            if (d.isStuck()) {
+                continue;
+            }
+            // NOTE: Rebote eje a eje con clamp al borde para no incrustar el disco en la pared
+            // cuando se queda quieto tras el último rebote.
+            double minX = GameConstants.DISC_RADIUS;
+            double maxX = width - GameConstants.DISC_RADIUS;
+            double minY = GameConstants.DISC_RADIUS;
+            double maxY = height - GameConstants.DISC_RADIUS;
+            boolean bouncedAny = false;
+            if (d.getX() <= minX) {
+                d.setPosition(minX, d.getY());
+                d.bounceX();
+                bouncedAny = true;
+            } else if (d.getX() >= maxX) {
+                d.setPosition(maxX, d.getY());
+                d.bounceX();
+                bouncedAny = true;
+            }
+            if (d.getY() <= minY) {
+                d.setPosition(d.getX(), minY);
+                d.bounceY();
+                bouncedAny = true;
+            } else if (d.getY() >= maxY) {
+                d.setPosition(d.getX(), maxY);
+                d.bounceY();
+                bouncedAny = true;
+            }
+            if (bouncedAny) {
+                // NOTE: si el rebote consumió el último, emitimos sólo onDiscStopped; evita
+                // bounce + stop sonando juntos en la misma transición.
+                if (d.isStuck()) {
+                    listener.onDiscStopped();
+                } else {
+                    listener.onBounce();
+                }
+            }
+        }
+    }
 
+    /**
+     * Detecta la transición true→false del estado de moto de cada jugador y emite el evento
+     * {@code onBikeEnded} (con inicio de erosión del rastro) si el modo expiró en este tick.
+     */
+    private void actualizarEstadoMoto() {
         // NOTE: Compara el estado de moto cacheado del tick anterior con el actual al cierre del
         // tick. Detecta la expiración del temporizador (true→false) aunque ocurra entre ticks.
         boolean nowOnBikeP1 = playerOne.isOnBike();
@@ -148,7 +261,10 @@ public class GameState {
         }
         prevOnBikeP1 = nowOnBikeP1;
         prevOnBikeP2 = nowOnBikeP2;
+    }
 
+    /** Eroda los rastros de los jugadores cuya moto haya expirado en este o en ticks previos. */
+    private void erosionarTrails() {
         if (playerOne.isTrailEroding()) {
             playerOne.erodeTrail();
         }
@@ -157,38 +273,45 @@ public class GameState {
         }
     }
 
-    private void applyMovementInput(events.InputController input) {
-        int mx1 = 0;
-        int my1 = 0;
+    /**
+     * Lee las teclas de movimiento de ambos jugadores y aplica
+     * {@link #normalizeMovement(int, int, Player)} a cada uno.
+     * <p>
+     * NOTE: Las variables están explícitamente nombradas {@code mxP1/myP1/mxP2/myP2} para que en
+     * la sustentación quede claro que son los componentes de movimiento (x,y) de cada jugador.
+     */
+    private void applyMovementInput(InputController input) {
+        int mxP1 = 0;
+        int myP1 = 0;
         if (input.isP1Left()) {
-            mx1--;
+            mxP1--;
         }
         if (input.isP1Right()) {
-            mx1++;
+            mxP1++;
         }
         if (input.isP1Up()) {
-            my1--;
+            myP1--;
         }
         if (input.isP1Down()) {
-            my1++;
+            myP1++;
         }
-        normalizeMovement(mx1, my1, playerOne);
+        normalizeMovement(mxP1, myP1, playerOne);
 
-        int mx2 = 0;
-        int my2 = 0;
+        int mxP2 = 0;
+        int myP2 = 0;
         if (input.isP2Left()) {
-            mx2--;
+            mxP2--;
         }
         if (input.isP2Right()) {
-            mx2++;
+            mxP2++;
         }
         if (input.isP2Up()) {
-            my2--;
+            myP2--;
         }
         if (input.isP2Down()) {
-            my2++;
+            myP2++;
         }
-        normalizeMovement(mx2, my2, playerTwo);
+        normalizeMovement(mxP2, myP2, playerTwo);
     }
 
     /**
@@ -197,19 +320,23 @@ public class GameState {
      * el opuesto exacto del rumbo actual se ignora para que el jugador no se invierta sobre su propia
      * estela; para volver hay que girar primero (perpendicular o diagonal). Fuera de moto: movimiento
      * libre, incluida la inversión instantánea.
+     * <p>
+     * NOTE: [sustentación] Guard clause + early return: la reversa directa en moto se ignora
+     * <em>antes</em> de llamar a {@code p.setMove}. Es un buen ejemplo del principio de
+     * responsabilidad única — este método no conoce de teclas, sólo de física de moto.
      */
     private static void normalizeMovement(int mx, int my, Player p) {
-        int dx = (mx != 0 && my != 0) ? Integer.signum(mx) : mx;
-        int dy = (mx != 0 && my != 0) ? Integer.signum(my) : my;
+        int dirX = (mx != 0 && my != 0) ? Integer.signum(mx) : mx;
+        int dirY = (mx != 0 && my != 0) ? Integer.signum(my) : my;
 
         if (p.isOnBike()
                 && (p.getMoveX() != 0 || p.getMoveY() != 0)
-                && dx == -p.getMoveX() && dy == -p.getMoveY()) {
+                && dirX == -p.getMoveX() && dirY == -p.getMoveY()) {
             // NOTE: Reversa directa en moto → se ignora; conserva el rumbo (hay que girar para volver).
             // Detenerse (0,0) nunca es el opuesto de un rumbo no nulo, así que soltar teclas sí frena.
             return;
         }
-        p.setMove(dx, dy);
+        p.setMove(dirX, dirY);
     }
 
     private void tryShoot(Player p, boolean wantsShoot, int width, int height) {
@@ -251,49 +378,6 @@ public class GameState {
             }
         }
         return false;
-    }
-
-    private void updateDiscs(int width, int height) {
-        for (DiscProjectile d : discs) {
-            d.tick();
-            if (d.isStuck()) {
-                continue;
-            }
-            // NOTE: Rebote eje a eje con clamp al borde para no incrustar el disco en la pared
-            // cuando se queda quieto tras el último rebote.
-            double minX = GameConstants.DISC_RADIUS;
-            double maxX = width - GameConstants.DISC_RADIUS;
-            double minY = GameConstants.DISC_RADIUS;
-            double maxY = height - GameConstants.DISC_RADIUS;
-            boolean bouncedAny = false;
-            if (d.getX() <= minX) {
-                d.setPosition(minX, d.getY());
-                d.bounceX();
-                bouncedAny = true;
-            } else if (d.getX() >= maxX) {
-                d.setPosition(maxX, d.getY());
-                d.bounceX();
-                bouncedAny = true;
-            }
-            if (d.getY() <= minY) {
-                d.setPosition(d.getX(), minY);
-                d.bounceY();
-                bouncedAny = true;
-            } else if (d.getY() >= maxY) {
-                d.setPosition(d.getX(), maxY);
-                d.bounceY();
-                bouncedAny = true;
-            }
-            if (bouncedAny) {
-                // NOTE: si el rebote consumió el último, emitimos sólo onDiscStopped; evita
-                // bounce + stop sonando juntos en la misma transición.
-                if (d.isStuck()) {
-                    listener.onDiscStopped();
-                } else {
-                    listener.onBounce();
-                }
-            }
-        }
     }
 
     private void resolveDiscHits() {

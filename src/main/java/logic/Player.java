@@ -49,35 +49,50 @@ public class Player {
         this.y = spawnY;
     }
 
+    /** @return identificador del jugador (1 = cian, 2 = rosa). */
     public int getId() {
         return id;
     }
 
+    /** @return color base del jugador (cian para P1, rosa para P2). */
     public Color getColor() {
         return color;
     }
 
+    /** @return coordenada X del centro del jugador en píxeles. */
     public double getX() {
         return x;
     }
 
+    /** @return coordenada Y del centro del jugador en píxeles. */
     public double getY() {
         return y;
     }
 
+    /** Reposiciona el jugador (usado en respawn tras recibir daño). */
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    /** @return componente horizontal de la dirección de movimiento (-1, 0 o 1). */
     public int getMoveX() {
         return moveX;
     }
 
+    /** @return componente vertical de la dirección de movimiento (-1, 0 o 1). */
     public int getMoveY() {
         return moveY;
     }
 
+    /**
+     * Fija la dirección de movimiento del próximo tick y actualiza la orientación
+     * ({@code facing}) si la nueva dirección no es nula. La orientación se usa para
+     * decidir hacia dónde sale disparado el disco.
+     *
+     * @param mx -1 (izq), 0 (sin movimiento horizontal) o 1 (der)
+     * @param my -1 (arriba), 0 (sin movimiento vertical) o 1 (abajo)
+     */
     public void setMove(int mx, int my) {
         this.moveX = mx;
         this.moveY = my;
@@ -87,22 +102,27 @@ public class Player {
         }
     }
 
+    /** @return componente X de la última dirección de avance no nula (orientación del disparo). */
     public int getFacingX() {
         return facingX;
     }
 
+    /** @return componente Y de la última dirección de avance no nula (orientación del disparo). */
     public int getFacingY() {
         return facingY;
     }
 
+    /** @return ticks restantes de enfriamiento de disparo (≥0); 0 significa "puede disparar ya". */
     public int getFireCooldownTicks() {
         return fireCooldownTicks;
     }
 
+    /** Fija el enfriamiento de disparo (en ticks). Llamado por {@link GameState} al disparar. */
     public void setFireCooldownTicks(int fireCooldownTicks) {
         this.fireCooldownTicks = fireCooldownTicks;
     }
 
+    /** Decrementa el enfriamiento de disparo en un tick (nunca por debajo de 0). */
     public void tickCooldown() {
         if (fireCooldownTicks > 0) {
             fireCooldownTicks--;
@@ -114,7 +134,7 @@ public class Player {
      */
     public void activateBike() {
         long now = System.nanoTime();
-        bikeUntilNanos = now + (long) (GameConstants.BIKE_DURATION_SEC * 1_000_000_000L);
+        bikeUntilNanos = now + (long) (GameConstants.BIKE_DURATION_SEC * GameConstants.NANOS_PER_SECOND);
     }
 
     /**
@@ -137,14 +157,17 @@ public class Player {
         return System.nanoTime() < bikeUntilNanos;
     }
 
+    /** @return puntaje acumulado del jugador en la partida actual. */
     public int getScore() {
         return score;
     }
 
+    /** Suma puntos al marcador. Usado por {@link GameState} al golpear al rival. */
     public void addScore(int delta) {
         this.score += delta;
     }
 
+    /** @return vidas restantes del jugador (0..{@link #INITIAL_LIVES}). */
     public int getLives() {
         return lives;
     }
@@ -156,6 +179,7 @@ public class Player {
         }
     }
 
+    /** @return true si el jugador agotó todas sus vidas (la partida debe terminar). */
     public boolean isDead() {
         return lives <= 0;
     }
@@ -219,7 +243,8 @@ public class Player {
      * {@link GameConstants#TRAIL_INVULN_SEC} segundos a partir de ahora.
      */
     public void setTrailInvuln() {
-        trailInvulnUntilNanos = System.nanoTime() + (long) (GameConstants.TRAIL_INVULN_SEC * 1_000_000_000L);
+        trailInvulnUntilNanos = System.nanoTime()
+                + (long) (GameConstants.TRAIL_INVULN_SEC * GameConstants.NANOS_PER_SECOND);
     }
 
     /**

@@ -45,11 +45,22 @@
             <version>2.12.2</version>
         </dependency>
 
-        <!-- HTML parser -->
+        <!--
+            Gson 2.11.0: serialización/deserialización JSON para el leaderboard.
+            Justificación (AGENTS.md §Política de Dependencias):
+            (1) Java SE no incluye parser JSON.
+            (2) Reemplaza el escapado manual en net/LeaderboardClient.toJson, frágil
+                ante Unicode, comillas y saltos de línea anidados.
+            (3) Permite parsear GET /api/scores para mostrar Top-N en el juego.
+            (4) Es base de logic/RankingManager para leer/escribir el ranking persistente
+                en ~/.neon-trails/ranking.json.
+            ~300 KB, sin dependencias transitivas, mantenida por Google.
+            Documentar en el PDF entregable, sección "Librerías utilizadas y justificación".
+        -->
         <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.19.1</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
         </dependency>
 
         <dependency>

@@ -2,6 +2,7 @@ package view;
 
 import view.screens.GameOverScreen;
 import view.screens.GameScreen;
+import view.screens.InstructionsScreen;
 import view.screens.NameInputScreen;
 import view.screens.WelcomeScreen;
 
@@ -10,8 +11,15 @@ import javax.swing.WindowConstants;
 import java.awt.Dimension;
 
 /**
- * Ventana principal del juego (capa vista). Aloja el {@link ScreenManager}
- * y registra las pantallas del flujo: bienvenida → captura de nombres → partida → game over.
+ * Ventana principal del juego (capa vista). Aloja el {@link ScreenManager} y registra las
+ * pantallas del flujo:
+ * <pre>
+ *   welcome → instructions ↘
+ *      ↓        ↑              welcome
+ *   nameinput → game → gameover
+ *                        ↓
+ *                  welcome / game
+ * </pre>
  */
 public class GameWindow {
 
@@ -24,6 +32,7 @@ public class GameWindow {
 
         ScreenManager screens = new ScreenManager();
         screens.register("welcome", new WelcomeScreen());
+        screens.register("instructions", new InstructionsScreen());
         screens.register("nameinput", new NameInputScreen());
         screens.register("game", new GameScreen());
         screens.register("gameover", new GameOverScreen());

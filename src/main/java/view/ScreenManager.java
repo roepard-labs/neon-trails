@@ -1,6 +1,7 @@
 package view;
 
 import logic.GameSession;
+import logic.RankingManager;
 
 import javax.swing.JPanel;
 import java.awt.CardLayout;
@@ -19,6 +20,8 @@ public class ScreenManager {
     private final CardLayout cards = new CardLayout();
     private final Map<String, BaseScreen> screens = new HashMap<>();
     private final GameSession session = new GameSession();
+    /** Ranking persistente compartido entre pantallas (lectura desde GameOver, escritura en partidas). */
+    private final RankingManager ranking = new RankingManager();
     private BaseScreen current;
 
     public ScreenManager() {
@@ -66,5 +69,13 @@ public class ScreenManager {
      */
     public GameSession getSession() {
         return session;
+    }
+
+    /**
+     * Ranking persistente compartido entre pantallas: lo escribe {@code GameOverScreen} al
+     * terminar la partida y lo lee la misma pantalla para mostrar el Top-3.
+     */
+    public RankingManager getRanking() {
+        return ranking;
     }
 }

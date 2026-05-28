@@ -71,6 +71,39 @@ Todos los archivos viven en `src/main/resources/audio/sfx/` y se cargan en arran
 - [ ] Volver al menú detiene el jingle de inmediato (no continúa de fondo en WelcomeScreen).
 - [ ] Jugar varias partidas seguidas no produce latencia creciente ni clip cortado: el preload evita jitter en el primer disparo de cada partida.
 
+## Pantalla de Instrucciones
+
+- [ ] WelcomeScreen muestra el botón "Instrucciones" debajo del botón "Iniciar Juego".
+- [ ] Click en "Instrucciones" abre `InstructionsScreen` con título "¿CÓMO JUGAR?".
+- [ ] La pantalla muestra los controles de P1 (cian) y P2 (rosa) en dos filas separadas.
+- [ ] El bloque de reglas lista los 5 bullets (rebotes, 1 disco/jugador, gracia, moto 5s, condición de victoria).
+- [ ] Botón "Volver" regresa a Welcome con SFX `ui_click.wav`.
+- [ ] Activar la pantalla varias veces no acumula listeners ni causa fugas visuales.
+
+## Cronómetro y HUD ampliado
+
+- [ ] Durante la partida, esquina superior derecha muestra "Tiempo MM:SS" e incrementa cada segundo.
+- [ ] Mismo lugar muestra los puntajes numéricos `P1: N` (cian) y `P2: N` (rosa) y se actualizan al golpear.
+- [ ] Volver al menú durante una partida detiene el cronómetro (no sigue contando en background).
+- [ ] Al iniciar una nueva partida el cronómetro vuelve a 00:00.
+- [ ] En GameOver, el detalle muestra "Tiempo total: MM:SS" con la duración real de la partida.
+
+## Ranking persistente + Top-3 en Game Over
+
+- [ ] Primera partida del juego: GameOver muestra "RANKING TOP 3" con sólo los dos jugadores actuales (o tres si quedan dos partidas en el archivo).
+- [ ] El número 1 del Top-3 aparece resaltado en cian.
+- [ ] Cerrar y reabrir el juego: GameOver de la siguiente partida sigue mostrando entradas previas ordenadas por puntaje descendente.
+- [ ] El archivo `~/.neon-trails/ranking.json` existe y es JSON válido tras una partida.
+- [ ] Borrar el archivo manualmente y volver a jugar: la próxima partida arranca el ranking limpio sin error.
+- [ ] Si el backend Laravel está caído, el ranking local sigue funcionando (los POST async son tolerantes a fallos).
+
+## Branding UAM en Welcome
+
+- [ ] Pie de Welcome muestra "Universidad Autónoma de Manizales" en cian neón.
+- [ ] Debajo aparecen "Técnicas de Programación · Fundamentos de POO", "Docente: Leonardo Montes" y la línea de integrantes "Juan Esteban Manrique Giraldo · Jacobo Lopez Patiño".
+- [ ] Si `assets/branding/logo-uam.png` está presente, aparece centrado arriba del texto de la universidad.
+- [ ] Si el PNG falta o está corrupto, la pantalla sigue funcional (degradación elegante vía `ImageIO`).
+
 ## Web stub
 
 - [ ] Abrir `web/index.html` en el navegador muestra el Top 3 del JSON mock.
@@ -79,4 +112,4 @@ Todos los archivos viven en `src/main/resources/audio/sfx/` y se cargan en arran
 ## Regresiones conocidas / TODO
 
 - [ ] Si el foco no está en la ventana, las teclas pueden no registrarse — hacer clic en el panel.
-- [ ] FIXME futuro: pantallas del PDF (ranking persistente, música de fondo del menú).
+- [ ] FIXME futuro: música de fondo del menú.

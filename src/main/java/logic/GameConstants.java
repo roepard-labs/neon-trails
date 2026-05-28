@@ -52,4 +52,33 @@ public final class GameConstants {
     public static final int TRAIL_GRACE_POINTS = 4;
     /** Grosor de la polilínea del rastro de moto (px). */
     public static final float TRAIL_LINE_WIDTH = 3.0f;
+
+    /**
+     * Ticks de gracia tras disparar durante los cuales el propio disco no puede golpear a su dueño.
+     * <p>
+     * NOTE: [sustentación] Evita el "autogol instantáneo" cuando el disco aún solapa con el hitbox
+     * del jugador en los primeros frames después de salir disparado. A {@link #GAME_TICK_MS} = 16 ms,
+     * son ~128 ms de inmunidad inicial — suficiente para que el disco abandone el hitbox.
+     */
+    public static final int DISC_FRIENDLY_TICKS = 8;
+
+    /**
+     * Factor de conversión segundos → nanosegundos usado con {@link System#nanoTime()}.
+     * <p>
+     * NOTE: [sustentación] Centralizar este "número mágico" como constante con nombre semántico
+     * deja el código defensible en sustentación (principio DRY, legibilidad sobre eficiencia).
+     */
+    public static final long NANOS_PER_SECOND = 1_000_000_000L;
+
+    /**
+     * Escala visual del sprite del jugador respecto a {@link #PLAYER_SIZE}: se renderiza al doble
+     * para incluir el halo de glow sin que el hitbox lógico cambie.
+     */
+    public static final int PLAYER_RENDER_SCALE = 2;
+
+    /**
+     * Escala visual del sprite del disco respecto a {@link #DISC_RADIUS}: se renderiza a 4×
+     * para incluir el halo y la ranura central del disco neón.
+     */
+    public static final int DISC_RENDER_SCALE = 4;
 }

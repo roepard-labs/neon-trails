@@ -22,9 +22,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 
 /**
- * Captura nombres de P1 y P2 antes de la partida.
+ * Captura los nombres de los dos jugadores antes de empezar la partida.
  * <p>
- * NOTE: Validación mínima — recorta espacios y limita a 15 chars; si queda vacío usa "P1"/"P2".
+ * Tiene dos campos de texto (P1 cian, P2 rosa) y un botón "Jugar" que valida los nombres,
+ * los guarda en la {@link GameSession} compartida y navega a la pantalla del juego. Como
+ * atajo, presionar Enter en cualquiera de los campos también empieza la partida.
+ * <p>
+ * NOTE: [sustentación] La validación es mínima ({@link #sanitize(String, String)}): recorta
+ * espacios, limita a 15 chars y si queda vacío usa los valores por defecto "P1"/"P2". Es
+ * deliberadamente simple — el énfasis del proyecto está en POO y threading, no en formularios.
  */
 public class NameInputScreen extends BaseScreen {
 
@@ -45,6 +51,7 @@ public class NameInputScreen extends BaseScreen {
         add(buildFooter(), BorderLayout.SOUTH);
     }
 
+    /** Construye el encabezado "¿Quiénes juegan?" en cian neón. */
     private JLabel buildHeader() {
         JLabel l = new JLabel("¿Quiénes juegan?", SwingConstants.CENTER);
         l.setFont(FontLoader.bold(36f));
@@ -53,6 +60,10 @@ public class NameInputScreen extends BaseScreen {
         return l;
     }
 
+    /**
+     * Construye el formulario central con dos filas (P1 + P2) y el botón "JUGAR" que dispara
+     * {@link #empezar()}.
+     */
     private JPanel buildForm() {
         JPanel form = new JPanel();
         form.setOpaque(false);
@@ -74,6 +85,10 @@ public class NameInputScreen extends BaseScreen {
         return form;
     }
 
+    /**
+     * Construye una fila del formulario: etiqueta + {@link JTextField} con el color de acento del
+     * jugador. Engancha también el atajo Enter para empezar la partida.
+     */
     private JPanel buildRow(String label, JTextField field, Color accent) {
         JPanel row = new JPanel();
         row.setOpaque(false);
@@ -105,6 +120,7 @@ public class NameInputScreen extends BaseScreen {
         return row;
     }
 
+    /** Construye el pie de la pantalla con la ayuda "Enter inicia la partida". */
     private JLabel buildFooter() {
         JLabel l = new JLabel("Enter en cualquier campo también inicia la partida", SwingConstants.CENTER);
         l.setFont(FontLoader.regular(11f));
@@ -113,6 +129,10 @@ public class NameInputScreen extends BaseScreen {
         return l;
     }
 
+    /**
+     * Al mostrar la pantalla: refresca los campos con los nombres guardados en la sesión (útil
+     * al volver desde GameOver para reusar los mismos nombres) y pide el foco al campo de P1.
+     */
     @Override
     public void onShow() {
         // NOTE: Reset visual al volver desde GameOver.
@@ -122,6 +142,10 @@ public class NameInputScreen extends BaseScreen {
         p1Field.requestFocusInWindow();
     }
 
+    /**
+     * Sanea los nombres ingresados, los guarda en la {@link GameSession}, marca la partida como
+     * en curso (winnerId = 0) y navega a la pantalla del juego.
+     */
     private void empezar() {
         GameSession s = screens().getSession();
         s.setPlayerOneName(sanitize(p1Field.getText(), "P1"));
@@ -130,6 +154,14 @@ public class NameInputScreen extends BaseScreen {
         screens().mostrar("game");
     }
 
+    /**
+     * Sanea un nombre: recorta espacios y limita la longitud a {@link #MAX_NAME}. Si tras el
+     * trim queda vacío, devuelve el valor por defecto.
+     *
+     * @param raw      texto bruto del campo
+     * @param fallback valor a usar si el input es nulo o vacío
+     * @return nombre listo para mostrar y persistir
+     */
     private static String sanitize(String raw, String fallback) {
         if (raw == null) {
             return fallback;

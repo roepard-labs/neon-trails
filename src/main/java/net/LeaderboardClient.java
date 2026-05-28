@@ -1,23 +1,40 @@
 package net;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Cliente HTTP mínimo que publica puntajes en la API del leaderboard (backend Laravel).
+ * Cliente HTTP del leaderboard: envía puntajes y consulta el Top-N desde el backend Laravel.
  * <p>
- * NOTE: Usa {@link java.net.http.HttpClient} nativo (Java 11+) para no añadir dependencias al POM.
- * Es <b>tolerante a fallos</b>: si la API no responde o falla, se registra y se descarta — nunca
- * interrumpe ni bloquea el juego. El envío es asíncrono ({@code sendAsync}) para no congelar la EDT
- * ni el hilo de simulación.
+ * NOTE: [sustentación] Usa {@link java.net.http.HttpClient} (Java 11+) para la red — sin
+ * dependencias adicionales — y {@code Gson} sólo para serializar/parsear JSON. Gson reemplazó
+ * al escapado manual previo porque éste era frágil con caracteres Unicode, comillas dobles y
+ * saltos de línea en nombres de jugador.
  * <p>
- * La URL base se toma de la variable de entorno {@code LEADERBOARD_API_URL}; si no está definida,
- * usa {@code http://127.0.0.1/api} (el gateway nginx dentro del contenedor monolítico).
+ * Es <b>tolerante a fallos</b>: cualquier fallo se registra y se descarta; el juego nunca se
+ * interrumpe ni se bloquea. Tanto {@link #submitAsync(String, int, String)} como
+ * {@link #fetchTopAsync(int)} ejecutan en hilos de {@link HttpClient}, fuera de la EDT y del
+ * hilo de simulación.
+ * <p>
+ * La URL base se toma de la variable de entorno {@code LEADERBOARD_API_URL}; si no está
+ * definida, usa {@code http://127.0.0.1/api} (el gateway nginx del contenedor monolítico).
  */
 public final class LeaderboardClient {
 
@@ -29,6 +46,9 @@ public final class LeaderboardClient {
     private static final HttpClient HTTP = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
             .build();
+
+    /** Instancia única de Gson reutilizada (thread-safe). */
+    private static final Gson GSON = new Gson();
 
     private LeaderboardClient() {
     }
@@ -70,6 +90,37 @@ public final class LeaderboardClient {
         }
     }
 
+    /**
+     * Consulta los Top-N puntajes del backend (asíncrono). Tolerante a fallos: si la API no
+     * responde, completa con lista vacía y registra en nivel FINE.
+     * <p>
+     * Útil para mostrar un ranking remoto en la pantalla de fin de partida cuando el juego
+     * tiene acceso al backend; complementa al {@link logic.RankingManager} local.
+     *
+     * @param limit cantidad pedida (el backend clampa internamente entre 1 y 100)
+     * @return future con la lista de puntajes ordenados descendente por score; nunca lanza
+     */
+    public static CompletableFuture<List<ScoreEntry>> fetchTopAsync(int limit) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_BASE + "/scores?limit=" + limit))
+                    .timeout(Duration.ofSeconds(3))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+
+            return HTTP.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(LeaderboardClient::parseScores)
+                    .exceptionally(ex -> {
+                        LOG.log(Level.FINE, "GET /scores falló; usando ranking local", ex);
+                        return List.of();
+                    });
+        } catch (RuntimeException ex) {
+            LOG.log(Level.FINE, "Construcción de GET /scores descartada", ex);
+            return CompletableFuture.completedFuture(List.of());
+        }
+    }
+
     private static void logIfRejected(HttpResponse<String> response) {
         if (response.statusCode() >= 300) {
             LOG.log(Level.WARNING, "El leaderboard rechazó el puntaje (HTTP {0})",
@@ -77,38 +128,69 @@ public final class LeaderboardClient {
         }
     }
 
-    /** Serializa el puntaje a JSON a mano (payload mínimo; evita depender de una librería JSON). */
-    private static String toJson(String playerName, int score, String result) {
-        StringBuilder sb = new StringBuilder(64);
-        sb.append('{')
-                .append("\"player_name\":\"").append(escape(playerName)).append("\",")
-                .append("\"score\":").append(score);
+    /**
+     * Construye el cuerpo JSON del POST {@code /api/scores} usando Gson.
+     * <p>
+     * NOTE: [sustentación] {@link LinkedHashMap} preserva el orden de inserción de las claves
+     * para que el JSON resultante sea idéntico al de la implementación previa (manual). El
+     * backend Laravel ignora el orden, pero esto facilita inspeccionar diferencias en logs.
+     */
+    static String toJson(String playerName, int score, String result) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("player_name", playerName);
+        payload.put("score", score);
         if (result != null && !result.isBlank()) {
-            sb.append(",\"result\":\"").append(escape(result)).append('"');
+            payload.put("result", result);
         }
-        return sb.append('}').toString();
+        return GSON.toJson(payload);
     }
 
-    /** Escapa los caracteres especiales de JSON en una cadena. */
-    private static String escape(String s) {
-        StringBuilder sb = new StringBuilder(s.length() + 8);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                default -> {
-                    if (c < 0x20) {
-                        sb.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-                }
-            }
+    /**
+     * Parsea la respuesta de {@code GET /api/scores}. El backend Laravel envuelve los datos en
+     * {@code {"data": [...]}} (recurso de colección), pero se tolera también un array plano.
+     */
+    private static List<ScoreEntry> parseScores(HttpResponse<String> resp) {
+        if (resp.statusCode() >= 300) {
+            return List.of();
         }
-        return sb.toString();
+        try {
+            JsonElement root = JsonParser.parseString(resp.body());
+            JsonArray arr;
+            if (root.isJsonObject() && root.getAsJsonObject().has("data")) {
+                arr = root.getAsJsonObject().getAsJsonArray("data");
+            } else if (root.isJsonArray()) {
+                arr = root.getAsJsonArray();
+            } else {
+                return List.of();
+            }
+            Type listType = new TypeToken<List<ScoreEntry>>() { }.getType();
+            List<ScoreEntry> parsed = GSON.fromJson(arr, listType);
+            return parsed != null ? parsed : List.of();
+        } catch (RuntimeException ex) {
+            LOG.log(Level.FINE, "Respuesta del leaderboard ilegible", ex);
+            return List.of();
+        }
+    }
+
+    /**
+     * DTO inmutable de una entrada del ranking devuelta por el backend.
+     * <p>
+     * Los nombres de campo en JSON usan {@code snake_case}; las anotaciones {@link SerializedName}
+     * los mapean al estilo Java {@code camelCase}.
+     */
+    public static final class ScoreEntry {
+
+        @SerializedName("player_name")
+        public final String playerName;
+
+        public final int score;
+
+        public final String result;
+
+        public ScoreEntry(String playerName, int score, String result) {
+            this.playerName = playerName;
+            this.score = score;
+            this.result = result;
+        }
     }
 }
