@@ -62,3 +62,7 @@ web/*.timestamp-*-*.mjs
 # jemg
 web/.env
 .sessions.yml
+
+# ia
+.swarm/
+node_modules/
