@@ -8,6 +8,11 @@ import java.util.List;
 
 /**
  * Jugador controlable: posición, dirección de movimiento, disparo y modo moto temporal.
+ * <p>
+ * NOTE: [sustentación POO: Encapsulamiento] Todos los campos son {@code private}; las invariantes
+ * del modelo (vidas en {@code [0..INITIAL_LIVES]}, {@code fireCooldownTicks >= 0}, último punto del
+ * trail no duplicado, posición clamped al rectángulo del mundo) se garantizan únicamente a través
+ * de los mutadores de esta clase. Ninguna capa externa puede escribir un campo directamente.
  */
 public class Player {
 
@@ -122,7 +127,12 @@ public class Player {
         this.fireCooldownTicks = fireCooldownTicks;
     }
 
-    /** Decrementa el enfriamiento de disparo en un tick (nunca por debajo de 0). */
+    /**
+     * Decrementa el enfriamiento de disparo en un tick (nunca por debajo de 0).
+     * <p>
+     * NOTE: [sustentación POO: Encapsulamiento] Invariante {@code fireCooldownTicks >= 0} aplicada
+     * dentro del mutador; {@link GameState} sólo puede pedir el decremento, no escribir el campo.
+     */
     public void tickCooldown() {
         if (fireCooldownTicks > 0) {
             fireCooldownTicks--;
@@ -140,9 +150,9 @@ public class Player {
     /**
      * Ajusta directamente el instante en que termina el modo moto.
      * <p>
-     * NOTE: Visibilidad de paquete a propósito: sólo para pruebas dentro de {@code logic/}
-     * (forzar expiración inmediata sin esperar 5 s reales). No usar desde {@code view/}, {@code audio/}
-     * ni {@code events/}.
+     * NOTE: [sustentación POO: Encapsulamiento] Visibilidad de paquete a propósito: sólo las
+     * pruebas dentro de {@code logic/} pueden forzar expiración inmediata sin esperar 5 s reales;
+     * las capas {@code view/}, {@code audio/} y {@code events/} ni siquiera ven este mutador.
      *
      * @param nanos valor absoluto en escala de {@link System#nanoTime()}
      */
@@ -172,7 +182,12 @@ public class Player {
         return lives;
     }
 
-    /** Resta una vida; nunca baja de cero. */
+    /**
+     * Resta una vida; nunca baja de cero.
+     * <p>
+     * NOTE: [sustentación POO: Encapsulamiento] Invariante {@code lives >= 0} garantizada en este
+     * único mutador; ninguna ruta externa puede dejar al jugador con vidas negativas.
+     */
     public void loseLife() {
         if (lives > 0) {
             lives--;
@@ -201,6 +216,9 @@ public class Player {
     /**
      * Añade un punto al rastro del modo moto. Salta si la posición coincide con la del último
      * punto (evita inflar la lista cuando el jugador se queda quieto sobre el mismo pixel).
+     * <p>
+     * NOTE: [sustentación POO: Encapsulamiento] Invariante "no duplicar el último punto"
+     * centralizada aquí; ninguna otra ruta accede directamente a la lista {@code motoTrail}.
      *
      * @param x coordenada absoluta en píxeles
      * @param y coordenada absoluta en píxeles
@@ -217,6 +235,10 @@ public class Player {
 
     /**
      * @return vista inmutable de los puntos del rastro, en orden de grabación (cola = más viejo).
+     *
+     * <p>NOTE: [sustentación POO: Encapsulamiento] Se devuelve una vista
+     * {@link Collections#unmodifiableList(List) unmodifiableList}: la capa de render puede leer
+     * pero no puede mutar la lista interna de puntos.
      */
     public List<Point2D.Double> getMotoTrail() {
         return Collections.unmodifiableList(motoTrail);
@@ -291,8 +313,8 @@ public class Player {
     /**
      * Fija directamente el instante en que termina la invulnerabilidad al trail.
      * <p>
-     * NOTE: Visibilidad de paquete a propósito: sólo para pruebas dentro de {@code logic/}
-     * (forzar expiración inmediata sin esperar 0.5 s reales).
+     * NOTE: [sustentación POO: Encapsulamiento] Visibilidad de paquete a propósito: sólo las
+     * pruebas dentro de {@code logic/} pueden forzar expiración inmediata sin esperar 0.5 s reales.
      */
     void setTrailInvulnUntilNanos(long nanos) {
         this.trailInvulnUntilNanos = nanos;
@@ -300,6 +322,10 @@ public class Player {
 
     /**
      * Avanza la posición respetando límites del rectángulo de juego.
+     * <p>
+     * NOTE: [sustentación POO: Encapsulamiento] El {@link #clamp(double, double, double)} privado
+     * mantiene la invariante "la posición nunca sale del rectángulo válido"; el exterior no puede
+     * escribir {@code x}/{@code y} fuera de los bordes ni evadir el chequeo.
      *
      * @param width  ancho del mundo
      * @param height alto del mundo

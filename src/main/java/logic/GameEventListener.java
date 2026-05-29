@@ -8,6 +8,10 @@ package logic;
  * deje de ser independiente de Swing / AudioSystem. Todos los métodos tienen implementación
  * {@code default} vacía para que las pruebas headless puedan usar un listener mínimo o
  * {@code new GameEventListener(){}} como no-op.
+ * <p>
+ * NOTE: [sustentación POO: Abstracción] Contrato puro sin estado ni dependencias de
+ * Swing/AudioSystem; los métodos {@code default} vacíos permiten composición y no-op en pruebas
+ * headless. Quien lo implementa decide qué eventos atender sin ver detalles de la simulación.
  */
 public interface GameEventListener {
 
