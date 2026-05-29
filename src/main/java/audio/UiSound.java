@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
  */
 public final class UiSound {
 
+    /** Clase de utilidades estáticas; no se instancia. */
     private UiSound() {
     }
 
@@ -31,6 +32,7 @@ public final class UiSound {
      */
     public static void attachHover(AbstractButton button) {
         button.addMouseListener(new MouseAdapter() {
+            /** Reproduce el sonido de hover cuando el cursor entra al botón. */
             @Override
             public void mouseEntered(MouseEvent e) {
                 SoundManager.play(Sfx.UI_HOVER);

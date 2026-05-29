@@ -339,6 +339,11 @@ public class GameState {
         p.setMove(dirX, dirY);
     }
 
+    /**
+     * Dispara un disco desde {@code p} en la dirección de avance si el jugador quiere disparar,
+     * tiene el cooldown a 0 y no hay otro disco suyo en juego. Aplica el cooldown y emite
+     * {@code onShoot}.
+     */
     private void tryShoot(Player p, boolean wantsShoot, int width, int height) {
         if (!wantsShoot) {
             return;
@@ -367,10 +372,12 @@ public class GameState {
         listener.onShoot(p.getId());
     }
 
+    /** Devuelve {@code v} recortado al intervalo {@code [min, max]}; usado por el tick para mantener entidades dentro del mundo. */
     private static double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
     }
 
+    /** @return true si {@code playerId} ya tiene un disco vivo en {@link #discs} (impide disparar otro). */
     private boolean hasActiveDisc(int playerId) {
         for (DiscProjectile d : discs) {
             if (d.getOwnerId() == playerId) {
@@ -380,6 +387,10 @@ public class GameState {
         return false;
     }
 
+    /**
+     * Resuelve colisiones de discos contra jugadores: gestiona recoger discos quietos del propio
+     * dueño y los impactos enemigos (daño, score, respawn o game over).
+     */
     private void resolveDiscHits() {
         Iterator<DiscProjectile> it = discs.iterator();
         while (it.hasNext()) {
@@ -431,6 +442,7 @@ public class GameState {
         }
     }
 
+    /** @return true si {@code d} (disco) entra en contacto con el AABB del jugador {@code p}. */
     private static boolean hitsPlayer(DiscProjectile d, Player p) {
         double px = p.getX();
         double py = p.getY();
@@ -442,6 +454,7 @@ public class GameState {
         return (dx * dx + dy * dy) <= (double) GameConstants.DISC_RADIUS * GameConstants.DISC_RADIUS;
     }
 
+    /** Limpia discos, restablece posiciones en esquinas opuestas y vacía los rastros tras un golpe. */
     private void respawnPlayersAfterHit() {
         discs.clear();
         int w = lastWorldWidth;
@@ -482,6 +495,12 @@ public class GameState {
         checkTrailHit(playerTwo, playerOne, 2);
     }
 
+    /**
+     * Comprueba si {@code victim} toca algún punto del rastro de {@code trailOwner} fuera de su
+     * ventana de invulnerabilidad; si toca, aplica daño vía {@link #applyTrailHit(Player, int)}.
+     * Si la víctima es el propio dueño, los últimos {@link GameConstants#TRAIL_GRACE_POINTS} puntos
+     * se ignoran (gracia para no autodañarse al activar la moto).
+     */
     private void checkTrailHit(Player victim, Player trailOwner, int victimId) {
         if (victim.isTrailInvuln()) {
             return;
@@ -504,6 +523,7 @@ public class GameState {
         }
     }
 
+    /** Aplica el daño por rastro: pierde una vida, activa invulnerabilidad, respawn o game over. */
     private void applyTrailHit(Player victim, int victimId) {
         victim.loseLife();
         victim.setTrailInvuln();
@@ -518,6 +538,7 @@ public class GameState {
         }
     }
 
+    /** @return true si el punto {@code (px, py)} cae dentro del AABB del jugador {@code p}. */
     private static boolean pointHitsPlayer(double px, double py, Player p) {
         double cx = p.getX();
         double cy = p.getY();

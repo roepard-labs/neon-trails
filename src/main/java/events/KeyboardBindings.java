@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
  */
 public final class KeyboardBindings {
 
+    /** Clase de utilidades estáticas; no se instancia. */
     private KeyboardBindings() {
     }
 
@@ -59,17 +60,23 @@ public final class KeyboardBindings {
         bindEdge(im, am, "P2_BIKE", KeyStroke.getKeyStroke("pressed U"), input::requestP2Bike);
     }
 
+    /**
+     * Asocia un par {@code pressStroke}/{@code releaseStroke} con dos {@link Runnable} que
+     * cambian un flag de "tecla mantenida" (movimiento, disparo continuo).
+     */
     private static void bindHold(InputMap im, ActionMap am, String pressKey, String releaseKey,
             KeyStroke pressStroke, KeyStroke releaseStroke, Runnable onPress, Runnable onRelease) {
         im.put(pressStroke, pressKey);
         im.put(releaseStroke, releaseKey);
         am.put(pressKey, new AbstractAction() {
+            /** Marca la tecla como presionada en el {@link InputController}. */
             @Override
             public void actionPerformed(ActionEvent e) {
                 onPress.run();
             }
         });
         am.put(releaseKey, new AbstractAction() {
+            /** Marca la tecla como soltada en el {@link InputController}. */
             @Override
             public void actionPerformed(ActionEvent e) {
                 onRelease.run();
@@ -77,9 +84,14 @@ public final class KeyboardBindings {
         });
     }
 
+    /**
+     * Asocia una sola tecla con un {@link Runnable} que dispara un evento de borde (edge-trigger:
+     * un único pulso por presión, sin importar cuánto se mantenga). Usado para activar la moto.
+     */
     private static void bindEdge(InputMap im, ActionMap am, String key, KeyStroke stroke, Runnable onFire) {
         im.put(stroke, key);
         am.put(key, new AbstractAction() {
+            /** Emite el pulso edge-trigger al {@link InputController}. */
             @Override
             public void actionPerformed(ActionEvent e) {
                 onFire.run();

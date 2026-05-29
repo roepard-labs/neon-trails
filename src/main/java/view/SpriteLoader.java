@@ -124,6 +124,7 @@ public final class SpriteLoader {
         CACHE.clear();
     }
 
+    /** Compone la clave de caché del sprite con formato {@code nombre@WxH}. */
     private static String key(String spriteName, int width, int height) {
         return spriteName + "@" + width + "x" + height;
     }
@@ -136,10 +137,12 @@ public final class SpriteLoader {
         final int width;
         final int height;
 
+        /** Sprite cuadrado del lado indicado. */
         public SpriteSpec(String name, int size) {
             this(name, size, size);
         }
 
+        /** Sprite rectangular con dimensiones independientes (útil para el arena floor). */
         public SpriteSpec(String name, int width, int height) {
             this.name = name;
             this.width = width;
@@ -154,16 +157,19 @@ public final class SpriteLoader {
     private static final class CapturingTranscoder extends ImageTranscoder {
         private BufferedImage image;
 
+        /** Crea el buffer ARGB destino donde Batik dibuja el SVG transcodificado. */
         @Override
         public BufferedImage createImage(int w, int h) {
             return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         }
 
+        /** Captura el {@link BufferedImage} resultante en lugar de escribirlo a un {@code OutputStream}. */
         @Override
         public void writeImage(BufferedImage img, TranscoderOutput output) {
             this.image = img;
         }
 
+        /** @return imagen rasterizada capturada por {@link #writeImage(BufferedImage, TranscoderOutput)}, o {@code null} si aún no se invocó. */
         BufferedImage getImage() {
             return image;
         }

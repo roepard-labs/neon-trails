@@ -201,6 +201,7 @@ public class GameOverScreen extends BaseScreen {
         return String.format("Tiempo total: %02d:%02d", sec / 60L, sec % 60L);
     }
 
+    /** Devuelve {@code s} o un guión largo cuando la cadena es {@code null} o solo espacios. */
     private static String nullToDash(String s) {
         return (s == null || s.isBlank()) ? "—" : s;
     }

@@ -123,6 +123,7 @@ public class DiscProjectile {
         consumeBounce();
     }
 
+    /** Decrementa los rebotes restantes y, si se agotan, detiene el disco. */
     private void consumeBounce() {
         bouncesRemaining--;
         if (bouncesRemaining <= 0) {
@@ -130,6 +131,7 @@ public class DiscProjectile {
         }
     }
 
+    /** Anula la velocidad y marca el disco como {@code stuck}; lo invoca {@link #consumeBounce()} al agotarse los rebotes. */
     private void stop() {
         vx = 0;
         vy = 0;

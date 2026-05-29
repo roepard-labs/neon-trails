@@ -190,6 +190,10 @@ public final class RankingManager {
     // Persistencia con Gson
     // ------------------------------------------------------------------------------------------
 
+    /**
+     * Lee {@code ranking.json} del HOME del usuario; si no existe o el JSON es corrupto, devuelve
+     * una lista vacía y registra un warning. Nunca lanza — el juego siempre puede arrancar.
+     */
     private List<RankingEntry> load() {
         if (!Files.exists(rankingFile)) {
             return new ArrayList<>();
@@ -205,6 +209,7 @@ public final class RankingManager {
         }
     }
 
+    /** Serializa la lista actual a {@code ranking.json}; los errores se registran como warning. */
     private void persist() {
         try {
             Files.createDirectories(rankingDir);

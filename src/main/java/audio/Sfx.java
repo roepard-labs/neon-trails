@@ -31,15 +31,21 @@ public enum Sfx {
     private final String filename;
     private final float gainDb;
 
+    /**
+     * @param filename nombre del WAV dentro de {@code src/main/resources/audio/sfx/}
+     * @param gainDb   ganancia de mezcla en decibelios (0 dB = amplitud nativa)
+     */
     Sfx(String filename, float gainDb) {
         this.filename = filename;
         this.gainDb = gainDb;
     }
 
+    /** @return nombre del archivo WAV asociado (sin ruta). */
     public String filename() {
         return filename;
     }
 
+    /** @return ganancia de mezcla en decibelios aplicada por {@code SoundManager}. */
     public float gainDb() {
         return gainDb;
     }

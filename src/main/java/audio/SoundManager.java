@@ -43,6 +43,7 @@ public final class SoundManager {
     /** Cuántos jugadores están actualmente en moto; el loop BIKE arranca/para según pase 0↔1. */
     private static int bikeLoopRefCount;
 
+    /** Clase de utilidades estáticas; no se instancia. */
     private SoundManager() {
     }
 
@@ -79,6 +80,10 @@ public final class SoundManager {
         }
     }
 
+    /**
+     * Abre un {@link Clip} con el WAV de {@code s} desde el classpath y le aplica la ganancia
+     * declarada en el enum. Lanza si el recurso no existe o el mixer no concede una línea.
+     */
     private static Clip loadClip(Sfx s)
             throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         String path = "/audio/sfx/" + s.filename();
@@ -94,6 +99,7 @@ public final class SoundManager {
         }
     }
 
+    /** Aplica {@code dB} al {@code MASTER_GAIN} del clip si el mixer lo soporta; clampa al rango válido. */
     private static void applyGain(Clip clip, float dB) {
         if (!clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
             return;
@@ -205,6 +211,7 @@ public final class SoundManager {
         }
     }
 
+    /** @return true si {@link #preloadAll()} consiguió abrir los clips y el audio está operativo. */
     public static boolean isAvailable() {
         return available;
     }
@@ -219,6 +226,7 @@ public final class SoundManager {
         initialized = false;
     }
 
+    /** Devuelve el primer (o único) clip asociado a {@code s}, o {@code null} si no se precargó. */
     private static Clip singleClip(Sfx s) {
         Clip[] pool = CLIPS.get(s);
         if (pool == null || pool.length == 0) {
@@ -227,6 +235,7 @@ public final class SoundManager {
         return pool[0];
     }
 
+    /** Cierra todos los clips abiertos y limpia caches; best-effort, no propaga excepciones. */
     private static void shutdownInternal() {
         for (Clip[] pool : CLIPS.values()) {
             for (Clip c : pool) {

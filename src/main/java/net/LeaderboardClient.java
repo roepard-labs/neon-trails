@@ -50,9 +50,14 @@ public final class LeaderboardClient {
     /** Instancia única de Gson reutilizada (thread-safe). */
     private static final Gson GSON = new Gson();
 
+    /** Clase de utilidades estáticas; no se instancia. */
     private LeaderboardClient() {
     }
 
+    /**
+     * Resuelve la URL base del backend leyendo {@code LEADERBOARD_API_URL}; si no está definida,
+     * usa {@code http://127.0.0.1/api}. Quita la barra final para normalizar concatenaciones.
+     */
     private static String resolveApiBase() {
         String env = System.getenv("LEADERBOARD_API_URL");
         if (env == null || env.isBlank()) {
@@ -121,6 +126,7 @@ public final class LeaderboardClient {
         }
     }
 
+    /** Registra un warning si la respuesta HTTP indica error (códigos ≥ 300). */
     private static void logIfRejected(HttpResponse<String> response) {
         if (response.statusCode() >= 300) {
             LOG.log(Level.WARNING, "El leaderboard rechazó el puntaje (HTTP {0})",

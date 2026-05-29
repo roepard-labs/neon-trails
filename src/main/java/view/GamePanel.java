@@ -50,6 +50,7 @@ public class GamePanel extends JPanel {
     private IntConsumer onGameOver;
     private boolean gameOverFired;
 
+    /** Construye el panel, instala los key bindings de ambos jugadores y arranca el preload de sprites. No inicia el bucle (lo hace {@link #startLoop()} desde {@code GameScreen}). */
     public GamePanel() {
         setBackground(new Color(0x0a, 0x0a, 0x12));
         setPreferredSize(new Dimension(GameConstants.DEFAULT_WIDTH, GameConstants.DEFAULT_HEIGHT));
@@ -147,12 +148,14 @@ public class GamePanel extends JPanel {
         }
     }
 
+    /** Al adjuntarse a un contenedor, solicita el foco para que las key bindings reciban eventos. */
     @Override
     public void addNotify() {
         super.addNotify();
         requestFocusInWindow();
     }
 
+    /** Al desadjuntarse, detiene el bucle de juego para liberar el hilo. */
     @Override
     public void removeNotify() {
         stopLoop();
@@ -188,6 +191,10 @@ public class GamePanel extends JPanel {
         }
     }
 
+    /**
+     * Renderiza el frame actual desde la EDT: arena, bordes, rastros, discos, jugadores y HUD.
+     * Sincroniza sobre {@code stateLock} para leer una snapshot consistente del {@link GameState}.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -209,6 +216,7 @@ public class GamePanel extends JPanel {
         g2.dispose();
     }
 
+    /** Dibuja el suelo de la arena reusando el SVG cacheado a tamaño nominal; reescala si el panel cambió de tamaño. */
     private static void drawArenaFloor(Graphics2D g2, int w, int h) {
         if (w <= 0 || h <= 0) {
             return;
@@ -224,11 +232,13 @@ public class GamePanel extends JPanel {
         // Si el preload aún no terminó: el background oscuro del JPanel ya cubre el área.
     }
 
+    /** Dibuja los rastros de moto de ambos jugadores, en orden P1 → P2. */
     private static void drawTrails(Graphics2D g2, Player p1, Player p2) {
         drawPlayerTrail(g2, p1);
         drawPlayerTrail(g2, p2);
     }
 
+    /** Dibuja el rastro de un jugador como un {@link Path2D} continuo del color del jugador. No hace nada si hay menos de 2 puntos. */
     private static void drawPlayerTrail(Graphics2D g2, Player p) {
         List<Point2D.Double> trail = p.getMotoTrail();
         if (trail.size() < 2) {
@@ -247,6 +257,7 @@ public class GamePanel extends JPanel {
         g2.draw(path);
     }
 
+    /** @return nombre del jugador {@code id} desde la sesión, o {@code "P1"}/{@code "P2"} si aún no hay sesión. */
     private String labelFor(int id) {
         if (session == null) {
             return id == 1 ? "P1" : "P2";
@@ -254,12 +265,17 @@ public class GamePanel extends JPanel {
         return id == 1 ? session.getPlayerOneName() : session.getPlayerTwoName();
     }
 
+    /** Dibuja el marco cian translúcido alrededor del área de juego. */
     private static void drawBorder(Graphics2D g2, int w, int h) {
         g2.setColor(new Color(0x33, 0xff, 0xff, 80));
         g2.setStroke(new BasicStroke(3f));
         g2.drawRect(2, 2, w - 4, h - 4);
     }
 
+    /**
+     * Dibuja un jugador: aura de moto, sprite rotado según la orientación de avance y, encima, su
+     * etiqueta. Cae a un cuadrado coloreado si el sprite aún no terminó de precargarse.
+     */
     private void drawPlayer(Graphics2D g2, Player p, String label) {
         // NOTE: Sprite del handoff a 2x el lado lógico (PLAYER_SIZE=22 → 44 px) para que el glow
         // SMIL no quede recortado. El hitbox lógico sigue siendo 22, solo el render se infla.
@@ -296,6 +312,10 @@ public class GamePanel extends JPanel {
         g2.drawString(label, cx - half + 3, cy - half - 4);
     }
 
+    /**
+     * Dibuja todos los discos en juego usando el sprite {@code disc-pN-active/stuck.svg}; cae a un
+     * óvalo coloreado si el sprite aún no está cacheado.
+     */
     private void drawDiscs(Graphics2D g2, List<DiscProjectile> discs) {
         // Tamaño visible del disco: 4x el radio lógico para que el glow del sprite no se recorte.
         int spriteSize = GameConstants.DISC_RADIUS * 4;
@@ -326,6 +346,7 @@ public class GamePanel extends JPanel {
         }
     }
 
+    /** Dibuja el HUD: vidas de cada jugador, cronómetro/puntajes en la columna derecha y línea de ayuda con los controles. */
     private void drawHud(Graphics2D g2, int w, int h) {
         g2.setColor(new Color(0xee, 0xee, 0xff));
         Font texto = FontLoader.regular(13f);

@@ -341,6 +341,7 @@ public class Player {
         y = ny;
     }
 
+    /** Recorta {@code v} al intervalo {@code [min, max]}; lo usa {@link #moveWithinBounds(int, int)} para que la posición nunca salga del rectángulo del mundo. */
     private static double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
     }
