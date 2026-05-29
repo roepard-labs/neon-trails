@@ -8,6 +8,7 @@ import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import NeonSprite from '@/components/content/NeonSprite.vue'
 import logoJemg from '@/assets/logo-jemg.png'
 import logoJaco from '@/assets/logo-jaco.svg'
+import qrCode from '@/assets/qr-code.png'
 
 const logos = ref<HTMLElement | null>(null)
 const eyebrow = ref<HTMLElement | null>(null)
@@ -16,6 +17,7 @@ const subtitle = ref<HTMLElement | null>(null)
 const card = ref<HTMLElement | null>(null)
 const accentLine = ref<HTMLElement | null>(null)
 const cta = ref<HTMLElement | null>(null)
+const qr = ref<HTMLElement | null>(null)
 
 const prefersReducedMotion = usePrefersReducedMotion()
 
@@ -29,6 +31,7 @@ onMounted(() => {
       subtitle.value,
       ...(card.value?.querySelectorAll('[data-info]') ?? []),
       cta.value,
+      qr.value,
     ].filter(Boolean) as Element[]
     gsap.set(targets, { opacity: 1, y: 0, scale: 1, clearProps: 'all' })
     return
@@ -61,6 +64,7 @@ onMounted(() => {
       '-=0.2',
     )
     .from(cta.value, { opacity: 0, y: 10, duration: 0.4 }, '-=0.2')
+    .from(qr.value, { opacity: 0, scale: 0.85, duration: 0.55 }, '-=0.1')
 
   // Pulse en la flecha del CTA
   gsap.to('[data-cta-arrow]', {
@@ -263,6 +267,24 @@ const tituloWords = projectInfo.titulo.split(' ')
           <Trophy class="size-4" />
           Ver leaderboard
         </RouterLink>
+      </div>
+
+      <!-- QR para abrir la presentación en el móvil -->
+      <div ref="qr" class="mt-10 flex flex-col items-center gap-3">
+        <div
+          class="rounded-xl border border-fuchsia-500/30 bg-white p-2.5 shadow-[0_0_38px_-10px_rgba(217,70,239,0.55)]"
+        >
+          <img
+            :src="qrCode"
+            alt="Código QR para abrir esta presentación en otro dispositivo"
+            loading="lazy"
+            decoding="async"
+            class="size-32 object-contain sm:size-36"
+          />
+        </div>
+        <p class="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
+          Escanea para abrir en tu móvil
+        </p>
       </div>
     </div>
   </section>
